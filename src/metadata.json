@@ -1,0 +1,9 @@
+{
+    "shell-version": ["3.6", "3.8"],
+    "uuid": "bitcoin-markets@ottoallmendinger.github.com",
+    "name": "bitcoin-markets",
+    "url": "https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/",
+    "description": "Display info on various Bitcon markets",
+    "settings-schema":  "org.gnome.shell.extensions.bitcoin-markets",
+    "gettext-domain": "bitcoin-markets"
+}
