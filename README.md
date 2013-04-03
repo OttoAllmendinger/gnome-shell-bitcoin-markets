@@ -1,4 +1,4 @@
-![Screenshot](https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/raw/master/data/screenshot.jpg)
+![Screenshot](https://raw.github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/master/data/screenshot.png)
 
 Displays bitcoin market information in the gnome shell. Currently only shows
 last MtGox trade in dollars.
