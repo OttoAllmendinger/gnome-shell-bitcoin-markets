@@ -21,20 +21,22 @@ Soup.Session.prototype.add_feature.call(
 
 
 let getJSON = function (url, callback) {
-    // log('getJSON ' + url);
+    log('getJSON ' + url);
     _httpSession.queue_message(
         Soup.Message.new("GET", url),
         function (session, message) {
             if (message.status_code == 200) {
                 callback(null, JSON.parse(message.response_body.data));
             } else {
+                log('getJSON error status code', message.status_code);
+                log('getJSON error response', message.response_body.data);
                 callback(message.status_code, null);
             }
         }
     );
 };
 
-let MtGoxMarket = function () {
+let MtGoxApi = function () {
     var tickerBase = "http://data.mtgox.com/api/2/";
 
     var getTickerUrl = function (options) {
@@ -42,28 +44,61 @@ let MtGoxMarket = function () {
             "/money/ticker?nonce=" + (+new Date());
     }
 
-    var marketInfo = function (obj) {
-        return obj.data;
-    };
-
     this.poll = function (options, callback) {
         getJSON(getTickerUrl(options), function (error, obj) {
             if (error) {
                 callback(error, null);
             } else {
-                callback(null, marketInfo(obj));
+                callback(null, obj);
             }
         });
     };
 };
 
 
-var MarketProvider = function () {
-    let markets = {
-        mtgox: new MtGoxMarket()
+let BitcoinChartsApi = function () {
+    var url = "http://bitcoincharts.com/t/markets.json";
+    var data;
+    var minInterval = 15 * 60 * 1000;
+    var lastTime = 0;
+    var lastError;
+    var lastData;
+
+    var rateLimitedGetJSON = function (options, callback) {
+        if ((+new Date() - lastTime) > minInterval) {
+            getJSON(url, function (err, data) {
+                lastTime = +new Date();
+                lastError = err;
+                lastData = data;
+                callback(err, data);
+            });
+        } else {
+            callback(lastError, lastData);
+        }
     }
 
     this.poll = function (options, callback) {
+        rateLimitedGetJSON(options, function (err, data) {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, data);
+            }
+        });
+    }
+}
+
+
+var MarketProvider = function () {
+    let btcharts = new BitcoinChartsApi();
+
+    let markets = {
+        mtgox: new MtGoxApi(),
+        bitcoin24: btcharts
+    };
+
+    this.poll = function (options, callback) {
+        log('polling with ' + JSON.stringify(options));
         let source = markets[options.market];
 
         if (!source) {
@@ -81,12 +116,12 @@ if (this['ARGV']) {
 
     let o = {
         currency: "USD",
-        market: "mtgox"
+        market: "bitcoin24"
     }
 
     p.poll(o, function (error, result) {
         log(error);
-        log(result.value);
+        log(JSON.stringify(result.value));
 
         imports.mainloop.quit("main");
     });

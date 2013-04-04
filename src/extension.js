@@ -34,15 +34,28 @@ const MarketProvider = extension.imports.MarketProvider;
  */
 
 
+let _marketProvider = new MarketProvider.MarketProvider();
 
-const BitcoinMarkets = new Lang.Class({
-    Name: 'BitcoinMarkets',
+let _selectAttribute = function (obj, path) {
+    return path.split('.').reduce(function (obj, key) {
+        if (obj[key]) {
+            return obj[key];
+        } else {
+            throw new Error('invalid path: ' + path);
+        }
+    }, obj);
+};
+
+const MarketIndicator = new Lang.Class({
+    Name: 'MarketIndicator',
     Extends: PanelMenu.Button,
 
-    _init: function () {
+    _init: function (options) {
         this.parent();
 
-        this._pollInterval = 5;
+        this._options = options;
+
+        this._pollInterval = 30;
         this._pollLoopContinue = true;
 
         this._initLayout();
@@ -57,23 +70,12 @@ const BitcoinMarkets = new Lang.Class({
     },
 
     _initBehavior: function () {
-        let ext = this;
-
-        this._marketProvider = new MarketProvider.MarketProvider();
-
         this._pollLoop();
     },
 
-    _getPollOptions: function () {
-        return {
-            market: "mtgox",
-            currency: "USD"
-        }
-    },
-
     _pollLoop: function () {
-        this._marketProvider.poll(
-            this._getPollOptions(),
+        _marketProvider.poll(
+            this._options,
             Lang.bind(this, function (err, res) {
                 if (err) {
                     this._displayError(err);
@@ -97,7 +99,7 @@ const BitcoinMarkets = new Lang.Class({
     },
 
     _displayUpdate: function (data) {
-        this._priceView.text = data.last_all.display;
+        this._priceView.text = _selectAttribute(data, this._options.attribute);
     },
 
     destroy: function () {
@@ -107,19 +109,45 @@ const BitcoinMarkets = new Lang.Class({
     }
 });
 
+let IndicatorCollection = function () {
+    var indicators = [];
+
+    this.add = function (indicator) {
+        indicators.push(indicator);
+        Main.panel.addToStatusArea('indicator-' + indicators.length, indicator);
+    };
+
+    this.destroy = function () {
+        for (i in indicators) {
+            i.destroy();
+        }
+    };
+}
+
+let _indicatorCollection = new IndicatorCollection();
+
 function init(metadata) {
     Convenience.initTranslations();
 }
 
-let _bitcoinMarkets;
-
 function enable() {
-    _bitcoinMarkets = new BitcoinMarkets();
-    Main.panel.addToStatusArea('display', _bitcoinMarkets);
+    _indicatorCollection.add(
+            new MarketIndicator({
+                market: 'mtgox',
+                currency: 'USD',
+                attribute: 'data.last_local.display'
+            })
+    );
+
+    _indicatorCollection.add(
+            new MarketIndicator({
+                market: 'mtgox',
+                currency: 'EUR',
+                attribute: 'data.last_local.display'
+            })
+    );
 }
 
 function disable() {
-    if (_bitcoinMarkets) {
-        _bitcoinMarkets.destroy();
-    }
+    _indicatorCollection.destroy();
 }

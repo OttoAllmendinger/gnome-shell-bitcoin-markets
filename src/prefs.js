@@ -13,8 +13,13 @@ const SETTINGS_FIRST_TIME = 'first-time';
 const SETTINGS_MARKET = 'market';
 const SETTINGS_CURRENCY = 'currency';
 
+
+let settings;
+
 function init() {
-    settings = convenience.getSettings(extension, 'bitcoin-markets');
+    log(extension);
+    // convenience.initTranslations(extension);
+    settings = convenience.getSettings(SETTINGS_SCHEMA);
 }
 
 function buildPrefsWidget() {
