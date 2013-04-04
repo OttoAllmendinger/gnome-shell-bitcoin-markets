@@ -22,7 +22,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const extension = ExtensionUtils.getCurrentExtension();
 
 const Convenience = extension.imports.convenience;
-const MarketProvider = extension.imports.MarketProvider;
+const ApiProvider = extension.imports.ApiProvider;
 
 
 /**
@@ -34,7 +34,7 @@ const MarketProvider = extension.imports.MarketProvider;
  */
 
 
-let _marketProvider = new MarketProvider.MarketProvider();
+let _apiProvider = new ApiProvider.ApiProvider();
 
 let _selector = function (path) {
     return function (obj) {
@@ -54,14 +54,19 @@ const MarketIndicator = new Lang.Class({
 
     _init: function (options) {
         this.parent();
-
+        this._dataSource = _apiProvider.get(options.api, options);
         this._options = options;
-
-        this._pollInterval = 30;
-        this._pollLoopContinue = true;
-
         this._initLayout();
-        this._initBehavior();
+
+        let indicator = this;
+
+        this._dataSource.onupdate(function (err, data) {
+            if (err) {
+                indicator._displayError(err);
+            } else {
+                indicator._displayUpdate(data);
+            }
+        });
     },
 
     _initLayout: function () {
@@ -71,31 +76,6 @@ const MarketIndicator = new Lang.Class({
         this.actor.add_actor(layout);
     },
 
-    _initBehavior: function () {
-        this._pollLoop();
-    },
-
-    _pollLoop: function () {
-        _marketProvider.poll(
-            this._options,
-            Lang.bind(this, function (err, res) {
-                if (err) {
-                    this._displayError(err);
-                } else {
-                    this._displayUpdate(res);
-                }
-
-                if (this._pollLoopContinue) {
-                    this._timeoutUpdateDisplay = Mainloop.timeout_add_seconds(
-                            this._pollInterval,
-                            Lang.bind(this, this._pollLoop)
-                    );
-                }
-            }
-            )
-        );
-    },
-
     _displayError: function (error) {
         this._priceView.text = 'error';
     },
@@ -103,12 +83,6 @@ const MarketIndicator = new Lang.Class({
     _displayUpdate: function (data) {
         this._priceView.text = this._options.render(data);
     },
-
-    destroy: function () {
-        Mainloop.source_remove(this._timeoutUpdateDisplay);
-
-        PanelMenu.Button.prototype.destroy.apply(this);
-    }
 });
 
 let IndicatorCollection = function () {
@@ -133,10 +107,9 @@ function init(metadata) {
 }
 
 function enable() {
-    /*
     _indicatorCollection.add(
             new MarketIndicator({
-                market: 'mtgox',
+                api: 'mtgox',
                 currency: 'USD',
                 render: _selector('data.last_local.display')
             })
@@ -144,22 +117,11 @@ function enable() {
 
     _indicatorCollection.add(
             new MarketIndicator({
-                market: 'mtgox',
+                api: 'mtgox',
                 currency: 'EUR',
                 render: _selector('data.last_local.display')
             })
     );
-    */
-
-    /*
-    _indicatorCollection.add(
-            new MarketIndicator({
-                market: 'bitcoin24',
-                currency: 'EUR',
-                render: _selector('data.last_local.display')
-            })
-    );
-    */
 }
 
 function disable() {
