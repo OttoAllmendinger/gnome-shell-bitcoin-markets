@@ -36,15 +36,17 @@ const MarketProvider = extension.imports.MarketProvider;
 
 let _marketProvider = new MarketProvider.MarketProvider();
 
-let _selectAttribute = function (obj, path) {
-    return path.split('.').reduce(function (obj, key) {
-        if (obj[key]) {
-            return obj[key];
-        } else {
-            throw new Error('invalid path: ' + path);
-        }
-    }, obj);
-};
+let _selector = function (path) {
+    return function (obj) {
+        return path.split('.').reduce(function (obj, key) {
+            if (obj[key]) {
+                return obj[key];
+            } else {
+                throw new Error('invalid path: ' + path);
+            }
+        }, obj);
+    };
+}
 
 const MarketIndicator = new Lang.Class({
     Name: 'MarketIndicator',
@@ -99,13 +101,13 @@ const MarketIndicator = new Lang.Class({
     },
 
     _displayUpdate: function (data) {
-        this._priceView.text = _selectAttribute(data, this._options.attribute);
+        this._priceView.text = this._options.render(data);
     },
 
     destroy: function () {
         Mainloop.source_remove(this._timeoutUpdateDisplay);
 
-        PanelMenu.Button.prototype.destroy.apply(this)
+        PanelMenu.Button.prototype.destroy.apply(this);
     }
 });
 
@@ -131,11 +133,12 @@ function init(metadata) {
 }
 
 function enable() {
+    /*
     _indicatorCollection.add(
             new MarketIndicator({
                 market: 'mtgox',
                 currency: 'USD',
-                attribute: 'data.last_local.display'
+                render: _selector('data.last_local.display')
             })
     );
 
@@ -143,9 +146,20 @@ function enable() {
             new MarketIndicator({
                 market: 'mtgox',
                 currency: 'EUR',
-                attribute: 'data.last_local.display'
+                render: _selector('data.last_local.display')
             })
     );
+    */
+
+    /*
+    _indicatorCollection.add(
+            new MarketIndicator({
+                market: 'bitcoin24',
+                currency: 'EUR',
+                render: _selector('data.last_local.display')
+            })
+    );
+    */
 }
 
 function disable() {
