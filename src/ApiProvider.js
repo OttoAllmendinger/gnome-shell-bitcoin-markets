@@ -24,7 +24,7 @@ let debug = function (message) {
     log(message);
 };
 
-// debug = function () {}
+debug = function () {}
 
 let getJSON = function (url, callback) {
     debug('getJSON ' + url);
@@ -127,8 +127,7 @@ let MtGoxApi = function () {
         return api.getUrl(options) + "?nonce=" + (+new Date());
     };
 
-    // this.interval = 30;
-    this.interval = 2;
+    this.interval = 30;
 };
 
 MtGoxApi.prototype = BaseApi.prototype;
