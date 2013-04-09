@@ -70,14 +70,14 @@ let _ChangeRenderer = function (getValue)  {
     var lastValue;
 
     return function (data) {
-        var ret = "=";
+        var ret = " ";
         var newValue = getValue(data);
 
         if (lastValue !== undefined) {
             if (lastValue > newValue) {
                 ret = _Symbols.down;
             } else if (lastValue < newValue) {
-                ret = _Symbols.down;
+                ret = _Symbols.up;
             }
         }
 
