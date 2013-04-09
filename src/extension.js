@@ -47,6 +47,10 @@ let _Colors = {
 };
 
 let _Selector = function (path) {
+    /**
+     * returns a function that returns a nested attribute
+     * path format: a.b.c.d
+     */
     return function (obj) {
         return path.split('.').reduce(function (obj, key) {
             if (obj[key]) {
@@ -59,6 +63,10 @@ let _Selector = function (path) {
 }
 
 let _ChangeRenderer = function (getValue)  {
+    /**
+     * Returns a function that returns a unicode symbol representing the change
+     * in value between consecutive calls.
+     */
     var lastValue;
 
     return function (data) {
@@ -175,16 +183,14 @@ function enable() {
     _apiProvider = new ApiProvider.ApiProvider();
 
     let render = new _Selector('data.last_local.display');
-    let renderChange = new _ChangeRenderer(
-        new _Selector('data.last_local.value_int')
-    );
+    let selectValueInt = new _Selector('data.last_local.value_int');
 
     _indicatorCollection.add(
             new MarketIndicator({
                 api: 'mtgox',
                 currency: 'USD',
                 render: render,
-                renderChange: renderChange
+                renderChange: new _ChangeRenderer(selectValueInt)
             })
     );
 
@@ -193,7 +199,7 @@ function enable() {
                 api: 'mtgox',
                 currency: 'EUR',
                 render: render,
-                renderChange: renderChange
+                renderChange: new _ChangeRenderer(selectValueInt)
             })
     );
 }

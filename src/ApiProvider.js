@@ -70,10 +70,24 @@ BaseApi.prototype = {
     },
 
     _getHandlerId: function (options) {
+        /**
+         * default case: each poll URL gets a separate handler. This doesn't
+         * work so well if the url needs to be dynamic (MtGox nonce)
+         */
         return this.getUrl(options);
     },
 
     getHandler: function (options) {
+        /**
+         * We want to return a handler for each data source. The handler
+         * polls the API in periodic intervals and calls onUpdate and
+         * onUpdateStart methods.
+         *
+         * Some URLs respond with data for many different indicators, others
+         * have different URLs for each poll request. Thus we request a handler
+         * id for each set of query options
+         */
+
         var self = this;
         var interval = this.interval;
         var id = this._getHandlerId(options);
