@@ -7,6 +7,7 @@ const GnomeDesktop = imports.gi.GnomeDesktop;
 const Lang = imports.lang;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
+const Clutter = imports.gi.Clutter;
 
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
@@ -33,20 +34,19 @@ const ApiProvider = extension.imports.ApiProvider;
  * or pure JS impl
  */
 
-
-
 let _Symbols = {
-    error: '⚠',
-    refresh: '⟲',
-    up: '▲',
-    down: '▼'
+    error: "\u26A0",
+    refresh: "\u27f2",
+    up: "\u25b2",
+    down: "\u25bc",
+    equal: "="
 };
 
 let _Colors = {
     error: '#ff0000',
 };
 
-let _selector = function (path) {
+let _Selector = function (path) {
     return function (obj) {
         return path.split('.').reduce(function (obj, key) {
             if (obj[key]) {
@@ -58,40 +58,93 @@ let _selector = function (path) {
     };
 }
 
+let _ChangeRenderer = function (getValue)  {
+    var lastValue;
+
+    return function (data) {
+        var ret = "=";
+        var newValue = getValue(data);
+
+        if (lastValue !== undefined) {
+            if (lastValue > newValue) {
+                ret = _Symbols.down;
+            } else if (lastValue < newValue) {
+                ret = _Symbols.down;
+            }
+        }
+
+        lastValue = newValue;
+
+        return ret;
+    }
+}
+
 const MarketIndicator = new Lang.Class({
     Name: 'MarketIndicator',
     Extends: PanelMenu.Button,
 
     _init: function (options) {
         this.parent();
-        this._dataSource = _apiProvider.get(options.api, options);
         this._options = options;
         this._initLayout();
-
-        let indicator = this;
-
-        this._dataSource.onupdate(function (err, data) {
-            if (err) {
-                indicator._displayError(err);
-            } else {
-                indicator._displayUpdate(data);
-            }
-        });
+        this._initBehavior();
     },
 
     _initLayout: function () {
         let layout = new St.BoxLayout();
-        this._priceView = new St.Label({text: "..."});
+        this._priceView = new St.Label();
+        this._statusView = new St.Label({
+            width: 24
+            // , x_fill: true
+            // , x_align: Clutter.ActorAlign.CENTER
+        });
+        layout.add_actor(this._statusView);
         layout.add_actor(this._priceView);
         this.actor.add_actor(layout);
     },
 
+    _initBehavior: function () {
+        let indicator = this;
+
+        this._dataSource = _apiProvider.get(this._options.api, this._options);
+
+        this._dataSource.onUpdateStart(function () {
+            indicator._displayStatus(_Symbols.refresh);
+        });
+
+        this._dataSource.onUpdate(function (err, data) {
+            if (err) {
+                indicator._displayError(err);
+                indicator._displayStatus(_Symbols.error);
+            } else {
+                indicator._renderData(data);
+                indicator._renderStatus(data);
+            }
+        });
+
+        this._dataSource.start();
+    },
+
     _displayError: function (error) {
+        log("err " + JSON.stringify(error));
         this._priceView.text = 'error';
     },
 
-    _displayUpdate: function (data) {
+    _displayStatus: function (text) {
+        this._statusView.text = " " + text + " ";
+    },
+
+    _renderData: function (data) {
         this._priceView.text = this._options.render(data);
+    },
+
+
+    _renderStatus: function (data) {
+        var render = this._options.renderChange;
+
+        if (render) {
+            this._displayStatus(render(data));
+        }
     }
 });
 
@@ -121,11 +174,17 @@ function enable() {
     _indicatorCollection = new IndicatorCollection();
     _apiProvider = new ApiProvider.ApiProvider();
 
+    let render = new _Selector('data.last_local.display');
+    let renderChange = new _ChangeRenderer(
+        new _Selector('data.last_local.value_int')
+    );
+
     _indicatorCollection.add(
             new MarketIndicator({
                 api: 'mtgox',
                 currency: 'USD',
-                render: _selector('data.last_local.display')
+                render: render,
+                renderChange: renderChange
             })
     );
 
@@ -133,7 +192,8 @@ function enable() {
             new MarketIndicator({
                 api: 'mtgox',
                 currency: 'EUR',
-                render: _selector('data.last_local.display')
+                render: render,
+                renderChange: renderChange
             })
     );
 }

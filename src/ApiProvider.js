@@ -20,22 +20,16 @@ Soup.Session.prototype.add_feature.call(
     new Soup.ProxyResolverDefault()
 );
 
-let debug = function (message) {
-    log(message);
-};
-
-debug = function () {}
-
 let getJSON = function (url, callback) {
-    debug('getJSON ' + url);
+    log('getJSON ' + url);
     _httpSession.queue_message(
         Soup.Message.new("GET", url),
         function (session, message) {
             if (message.status_code == 200) {
                 callback(null, JSON.parse(message.response_body.data));
             } else {
-                debug('getJSON error status code: ' + message.status_code);
-                debug('getJSON error response: ' + message.response_body.data);
+                log('getJSON error status code: ' + message.status_code);
+                log('getJSON error response: ' + message.response_body.data);
                 callback(message.status_code, null);
             }
         }
@@ -46,65 +40,80 @@ let getJSON = function (url, callback) {
 
 let BaseApi = function () {}
 
+let CallbackQueue = function () {
+    var callbacks = [];
+
+    return function (a) {
+        var args = arguments;
+
+        if ((typeof a) === "function") {
+            callbacks.push(a);
+        } else {
+            callbacks.forEach(function (cb) {
+                cb.apply(cb, args);
+            });
+        };
+
+        return this;
+    }
+}
+
 BaseApi.prototype = {
     _init: function () {
         this._urlHandlers = {};
+        this._update = undefined;
     },
 
     poll: function (options, callback) {
-        let url = (this.getFreshUrl || this.getUrl)(options);
+        let url = this.getUrl(options);
         getJSON(url, callback);
     },
 
-    onupdate: function (func) {
-        this._update = func;
+    _getHandlerId: function (options) {
+        return this.getUrl(options);
     },
 
-    loop: function (options) {
-        let api = this;
-        let url = this.getUrl(options);
-        let handler = this._urlHandlers[url] || (this._urlHandlers[url] = {
-            url: url,
-            callbacks: [],
-            onupdate: function (callback) {
-                this.callbacks.push(callback);
-            }
-        });
-
-        let interval = this.interval;
+    getHandler: function (options) {
+        var self = this;
+        var interval = this.interval;
+        var id = this._getHandlerId(options);
+        var handler = this._urlHandlers[id];
 
         if ((!interval) || (interval < 1)) {
             throw new Error('invalid interval ' + interval);
         };
 
-        if (handler.timeout === undefined) {
-            debug("starting loop for api " + api.name + " url: " + handler.url);
+        if (!handler) {
+            handler = this._urlHandlers[id] = {}
+            handler.id = id;
+            handler.onUpdate = new CallbackQueue(handler),
+            handler.onUpdateStart = new CallbackQueue(handler);
 
             let loop = function() {
-                api.poll(options, function (error, data) {
-                    for (i in handler.callbacks) {
-                        handler.callbacks[i](error, data);
-                    }
+                handler.onUpdateStart();
+
+                self.poll(options, function (error, data) {
+                    handler.onUpdate(error, data);
                 });
 
                 handler.timeout = Mainloop.timeout_add_seconds(interval, loop);
             };
 
-            loop();
-        } else {
-            debug("loop already started for " + this.name + " url: " + handler.url);
+            handler.start = function () { loop(); };
         }
 
         return handler;
     },
 
     destroy: function () {
-        debug("removing timeouts for api " + this.name);
+        log("removing timeouts for api " + this.name);
 
         for (let k in this._urlHandlers) {
             let h = this._urlHandlers[k];
-            debug("removing timeout for url " + h.url);
-            Mainloop.source_remove(h.timeout);
+            if (h.timeout) {
+                log("removing timeout for handler " + h.id);
+                Mainloop.source_remove(h.timeout);
+            }
         };
     }
 };
@@ -117,14 +126,14 @@ let MtGoxApi = function () {
 
     this.name = "MtGox";
 
-    this.getUrl = function (options) {
-        return "http://data.mtgox.com/" +
-                "api/2/BTC" + (options.currency) + "/money/ticker"
+    this._getHandlerId = function (options) {
+        return "mtgox://" + options.currency;
     };
 
-    this.getFreshUrl = function (options) {
-        // this function is called whenever there needs to be a cache-breaker
-        return api.getUrl(options) + "?nonce=" + (+new Date());
+    this.getUrl = function (options) {
+        return "http://data.mtgox.com/"
+            + "api/2/BTC" + (options.currency)
+            + "/money/ticker?nonce=" + (+new Date());
     };
 
     this.interval = 30;
@@ -150,36 +159,23 @@ let BitcoinChartsApi = function () {
 BitcoinChartsApi.prototype = BaseApi.prototype;
 
 
+
+
+
 var ApiProvider = function () {
     let apis = {
         mtgox: new MtGoxApi(),
         btcharts: new BitcoinChartsApi()
     };
 
-    let getApi = function (name) {
+    this.get = function (name, options) {
         let api;
 
         if ((api = apis[name]) === undefined) {
             throw new Error('unknown api ' + name);
         } else {
-            return api;
+            return api.getHandler(options);
         }
-    }
-
-    /*
-    this.poll = function (options, callback) {
-        let source = apis[options.market];
-
-        if (!source) {
-            throw new Error('no source for market ' + options.market);
-        } else {
-            source.poll(options, callback);
-        }
-    };
-    */
-
-    this.get = function (name, options) {
-        return getApi(name).loop(options);
     };
 
     this.destroy = function () {
@@ -192,16 +188,19 @@ var ApiProvider = function () {
 
 if (this['ARGV'] !== undefined) {
     // run by gjs
+    log("command line");
 
     let apiProvider = new ApiProvider();
 
     apiProvider
         .get('btcharts', {currency: "USD"})
-        .onupdate(function (error, data) {
-            debug("onupdate");
-            debug(JSON.stringify(data));
+        .onUpdateStart(function () {
+            log("onUpdateStart()");
+        }).onUpdate(function (error, data) {
+            log("onUpdate()");
+            log(JSON.stringify(data));
             apiProvider.destroy();
-        });
+        }).start();
 
     Mainloop.run("main");
 }
