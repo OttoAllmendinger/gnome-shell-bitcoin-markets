@@ -34,7 +34,17 @@ const ApiProvider = extension.imports.ApiProvider;
  */
 
 
-let _apiProvider = new ApiProvider.ApiProvider();
+
+let _Symbols = {
+    error: '⚠',
+    refresh: '⟲',
+    up: '▲',
+    down: '▼'
+};
+
+let _Colors = {
+    error: '#ff0000',
+};
 
 let _selector = function (path) {
     return function (obj) {
@@ -82,7 +92,7 @@ const MarketIndicator = new Lang.Class({
 
     _displayUpdate: function (data) {
         this._priceView.text = this._options.render(data);
-    },
+    }
 });
 
 let IndicatorCollection = function () {
@@ -94,19 +104,23 @@ let IndicatorCollection = function () {
     };
 
     this.destroy = function () {
-        for (i in indicators) {
-            i.destroy();
+        for (k in indicators) {
+            indicators[k].destroy();
         }
     };
 }
 
-let _indicatorCollection = new IndicatorCollection();
+let _indicatorCollection;
+let _apiProvider;
 
 function init(metadata) {
     Convenience.initTranslations();
 }
 
 function enable() {
+    _indicatorCollection = new IndicatorCollection();
+    _apiProvider = new ApiProvider.ApiProvider();
+
     _indicatorCollection.add(
             new MarketIndicator({
                 api: 'mtgox',
@@ -126,4 +140,5 @@ function enable() {
 
 function disable() {
     _indicatorCollection.destroy();
+    _apiProvider.destroy();
 }
