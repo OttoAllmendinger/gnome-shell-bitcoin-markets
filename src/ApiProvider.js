@@ -21,7 +21,7 @@ Soup.Session.prototype.add_feature.call(
 );
 
 let getJSON = function (url, callback) {
-    log('getJSON ' + url);
+    // log('getJSON ' + url);
     _httpSession.queue_message(
         Soup.Message.new("GET", url),
         function (session, message) {
