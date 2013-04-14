@@ -28,6 +28,7 @@ let getJSON = function (url, callback) {
             if (message.status_code == 200) {
                 callback(null, JSON.parse(message.response_body.data));
             } else {
+                log('getJSON error url: ' + url);
                 log('getJSON error status code: ' + message.status_code);
                 log('getJSON error response: ' + message.response_body.data);
                 callback(message.status_code, null);
@@ -147,7 +148,7 @@ let MtGoxApi = function () {
     this.getUrl = function (options) {
         return "http://data.mtgox.com/"
             + "api/2/BTC" + (options.currency)
-            + "/money/ticker?nonce=" + (+new Date());
+            + "/money/ticker";
     };
 
     this.interval = 30;
