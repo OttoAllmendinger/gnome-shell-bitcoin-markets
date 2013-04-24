@@ -19,7 +19,7 @@ let settings;
 function init() {
     log(extension);
     // convenience.initTranslations(extension);
-    settings = convenience.getSettings(SETTINGS_SCHEMA);
+    settings = convenience.getSettings();
 }
 
 function buildPrefsWidget() {

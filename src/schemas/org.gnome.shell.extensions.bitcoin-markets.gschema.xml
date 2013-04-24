@@ -1,0 +1,29 @@
+<?xml version="1.0"	encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions">
+	<enum id="org.gnome.shell.extensions.bitcoin-markets.market">
+		<value value="0" nick="mtgox"/>
+		<value value="1" nick="btce"/>
+		<value value="2" nick="bitstamp"/>
+		<value value="3" nick="bitcoin24"/>
+		<value value="4" nick="bitfloor"/>
+	</enum>
+	<enum id="org.gnome.shell.extensions.bitcoin-markets.currency">
+		<value value="0" nick="USD"/>
+		<value value="1" nick="EUR"/>
+		<value value="2" nick="GBP"/>
+		<value value="3" nick="PLN"/>
+		<value value="4" nick="CAD"/>
+		<value value="5" nick="JPY"/>
+	</enum>
+
+	<schema id="org.gnome.shell.extensions.bitcoin-markets" path="/org/gnome/shell/extensions/bitcoin-markets/">
+		<key name="market" enum="org.gnome.shell.extensions.bitcoin-markets.market">
+			<default>'mtgox'</default>
+			<summary>Choose the bitcoin exchange to display</summary>
+		</key>
+		<key name="currency" enum="org.gnome.shell.extensions.bitcoin-markets.currency">
+			<default>'USD'</default>
+			<summary>Choose the currency to display</summary>
+		</key>
+	</schema>
+</schemalist>
