@@ -17,7 +17,6 @@ const SETTINGS_CURRENCY = 'currency';
 let settings;
 
 function init() {
-    log(extension);
     // convenience.initTranslations(extension);
     settings = convenience.getSettings();
 }
