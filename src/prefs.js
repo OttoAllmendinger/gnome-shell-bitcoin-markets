@@ -5,8 +5,8 @@ const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
 const N_ = function(e) { return e; };
 
-let extension = imports.misc.extensionUtils.getCurrentExtension();
-let convenience = extension.imports.convenience;
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const Convenience = Extension.imports.convenience;
 
 const SETTINGS_SCHEMA = 'org.gnome.shell.extensions.bitcoin-markets';
 const SETTINGS_FIRST_TIME = 'first-time';
@@ -14,11 +14,11 @@ const SETTINGS_MARKET = 'market';
 const SETTINGS_CURRENCY = 'currency';
 
 
-let settings;
+let _settings;
 
 function init() {
-    // convenience.initTranslations(extension);
-    settings = convenience.getSettings();
+    // Convenience.initTranslations(extension);
+    _settings = Convenience.getSettings();
 }
 
 function buildPrefsWidget() {
@@ -29,7 +29,7 @@ function buildPrefsWidget() {
 
     let vbox = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
-        margin_left: 20
+        margin_left: 10
     });
 
     let label = new Gtk.Label({

@@ -39,56 +39,14 @@ let _Symbols = {
     refresh: "\u27f2",
     up: "\u25b2",
     down: "\u25bc",
-    equal: "="
 };
 
 let _Colors = {
     error: '#ff0000',
 };
 
-let _Selector = function (path) {
-    /**
-     * returns a function that returns a nested attribute
-     * path format: a.b.c.d
-     */
-    return function (obj) {
-        return path.split('.').reduce(function (obj, key) {
-            if (obj[key]) {
-                return obj[key];
-            } else {
-                throw new Error('invalid path: ' + path);
-            }
-        }, obj);
-    };
-}
-
-let _ChangeRenderer = function (getValue)  {
-    /**
-     * Returns a function that returns a unicode symbol representing the change
-     * in value between consecutive calls.
-     */
-    var lastValue;
-
-    return function (data) {
-        var ret = " ";
-        var newValue = getValue(data);
-
-        if (lastValue !== undefined) {
-            if (lastValue > newValue) {
-                ret = _Symbols.down;
-            } else if (lastValue < newValue) {
-                ret = _Symbols.up;
-            }
-        }
-
-        lastValue = newValue;
-
-        return ret;
-    }
-}
-
-const MarketIndicator = new Lang.Class({
-    Name: 'MarketIndicator',
+const MarketIndicatorView = new Lang.Class({
+    Name: 'MarketIndicatorView',
     Extends: PanelMenu.Button,
 
     _init: function (options) {
@@ -100,59 +58,60 @@ const MarketIndicator = new Lang.Class({
 
     _initLayout: function () {
         let layout = new St.BoxLayout();
-        this._priceView = new St.Label();
+        this._indicatorView = new St.Label();
         this._statusView = new St.Label({
             width: 24
             // , x_fill: true
             // , x_align: Clutter.ActorAlign.CENTER
         });
         layout.add_actor(this._statusView);
-        layout.add_actor(this._priceView);
+        layout.add_actor(this._indicatorView);
         this.actor.add_actor(layout);
     },
 
     _initBehavior: function () {
         let indicator = this;
 
-        this._dataSource = _apiProvider.get(this._options.api, this._options);
+        this._model = _apiProvider.get(this._options.api, this._options);
 
-        this._dataSource.onUpdateStart(function () {
+        this._model.onUpdateStart(function () {
             indicator._displayStatus(_Symbols.refresh);
         });
 
-        this._dataSource.onUpdate(function (err, data) {
+        this._model.onUpdate(function (err, data) {
             if (err) {
-                indicator._displayError(err);
-                indicator._displayStatus(_Symbols.error);
+                indicator._showError(err);
             } else {
-                indicator._renderData(data);
-                indicator._renderStatus(data);
+                indicator._showData(data);
             }
         });
 
-        this._dataSource.start();
+        this._model.start();
     },
 
-    _displayError: function (error) {
+    _showError: function (error) {
         log("err " + JSON.stringify(error));
-        this._priceView.text = 'error';
+        this._displayText('error');
+        this._displayStatus(_Symbols.error);
+    },
+
+    _showData: function (data) {
+        let _StatusToSymbol = {
+            up: _Symbols.up,
+            down: _Symbols.down,
+            unchanged: " "
+        };
+
+        this._displayText(data.text);
+        this._displayStatus(_StatusToSymbol[data.change]);
     },
 
     _displayStatus: function (text) {
         this._statusView.text = " " + text + " ";
     },
 
-    _renderData: function (data) {
-        this._priceView.text = this._options.render(data);
-    },
-
-
-    _renderStatus: function (data) {
-        var render = this._options.renderChange;
-
-        if (render) {
-            this._displayStatus(render(data));
-        }
+    _displayText: function (text) {
+        this._indicatorView.text = text;
     }
 });
 
@@ -165,7 +124,7 @@ let IndicatorCollection = function () {
     };
 
     this.destroy = function () {
-        for (k in indicators) {
+        for (let k in indicators) {
             indicators[k].destroy();
         }
     };
@@ -173,35 +132,35 @@ let IndicatorCollection = function () {
 
 let _indicatorCollection;
 let _apiProvider;
+let _settings;
 
 function init(metadata) {
     Convenience.initTranslations();
+    _settings = Convenience.getSettings();
 }
+
+let _defaults = [
+    {
+        api: 'mtgox',
+        currency: 'USD',
+        attribute: 'last_local'
+    } /*
+    , {
+        api: 'mtgox',
+        currency: 'EUR',
+        attribute: 'last_local'
+    } */
+];
 
 function enable() {
     _indicatorCollection = new IndicatorCollection();
     _apiProvider = new ApiProvider.ApiProvider();
 
-    let render = new _Selector('data.last_local.display');
-    let selectValueInt = new _Selector('data.last_local.value_int');
-
-    _indicatorCollection.add(
-            new MarketIndicator({
-                api: 'mtgox',
-                currency: 'USD',
-                render: render,
-                renderChange: new _ChangeRenderer(selectValueInt)
-            })
-    );
-
-    _indicatorCollection.add(
-            new MarketIndicator({
-                api: 'mtgox',
-                currency: 'EUR',
-                render: render,
-                renderChange: new _ChangeRenderer(selectValueInt)
-            })
-    );
+    for (let k in _defaults) {
+        _indicatorCollection.add(
+            new MarketIndicatorView(_defaults[k])
+        );
+    }
 }
 
 function disable() {

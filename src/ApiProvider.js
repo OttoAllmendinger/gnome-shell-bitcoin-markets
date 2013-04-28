@@ -38,6 +38,58 @@ let getJSON = function (url, callback) {
 };
 
 
+let Selector = function (path) {
+    /**
+     * returns a function that returns a nested attribute
+     * path format: a.b.c.d
+     */
+    return function (obj) {
+        return path.split('.').reduce(function (obj, key) {
+            if (obj[key]) {
+                return obj[key];
+            } else {
+                throw new Error('invalid path: ' + path);
+            }
+        }, obj);
+    };
+};
+
+var IndicatorChange = {
+    up: "up",
+    down: "down",
+    unchanged: "unchanged"
+};
+
+let ChangeRenderer = function (getValue)  {
+    /**
+     * Returns a function that returns a unicode symbol representing the change
+     * in value between consecutive calls.
+     */
+    var lastValue;
+
+    return function (data) {
+        var ret = IndicatorChange.unchanged;
+        var newValue = getValue(data);
+
+        if (lastValue !== undefined) {
+            if (lastValue > newValue) {
+                ret = IndicatorChange.down;
+            } else if (lastValue < newValue) {
+                ret = IndicatorChange.up;
+            }
+        }
+
+        lastValue = newValue;
+
+        return ret;
+    }
+}
+
+
+
+/**
+ * Api definitions
+ */
 
 let BaseApi = function () {}
 
@@ -114,10 +166,49 @@ BaseApi.prototype = {
                 handler.timeout = Mainloop.timeout_add_seconds(interval, loop);
             };
 
-            handler.start = function () { loop(); };
+            handler.start = function () {
+                if (handler.timeout === undefined) {
+                    loop();
+                }
+            };
         }
 
         return handler;
+    },
+
+    getFormatter: function (options) {
+        return this.attributes[options.attribute]();
+    },
+
+    getIndicator: function (options) {
+        let handler = this.getHandler(options);
+
+        let indicator = {};
+        indicator.onUpdateStart = new CallbackQueue(indicator);
+        indicator.onUpdate = new CallbackQueue(indicator);
+
+        indicator.start = function () {
+            handler.start();
+        };
+
+        let formatter = this.getFormatter(options);
+
+        handler.onUpdateStart(function () {
+            indicator.onUpdateStart();
+        });
+
+        handler.onUpdate(function (error, data) {
+            if (error) {
+                indicator.onUpdate(error, null);
+            } else {
+                indicator.onUpdate(null, {
+                    text: formatter.text(data, options),
+                    change: formatter.change(data, options)
+                });
+            }
+        });
+
+        return indicator;
     },
 
     destroy: function () {
@@ -140,6 +231,19 @@ let MtGoxApi = function () {
     let api = this;
 
     this.name = "MtGox";
+
+    this.currencies = ["USD", "EUR"];
+
+    this.attributes = {
+        last_local: function () {
+            return {
+                text: new Selector("data.last_local.display"),
+                change: new ChangeRenderer(
+                    new Selector('data.last_local.value_int')
+                )
+            };
+        }
+    };
 
     this._getHandlerId = function (options) {
         return "mtgox://" + options.currency;
@@ -189,12 +293,12 @@ var ApiProvider = function () {
         if ((api = apis[name]) === undefined) {
             throw new Error('unknown api ' + name);
         } else {
-            return api.getHandler(options);
+            return api.getIndicator(options);
         }
     };
 
     this.destroy = function () {
-        for (k in apis) {
+        for (let k in apis) {
             apis[k].destroy();
         }
     };
@@ -208,7 +312,7 @@ if (this['ARGV'] !== undefined) {
     let apiProvider = new ApiProvider();
 
     apiProvider
-        .get('btcharts', {currency: "USD"})
+        .get('mtgox', {currency: "USD", attribute: "last_local"})
         .onUpdateStart(function () {
             log("onUpdateStart()");
         }).onUpdate(function (error, data) {
