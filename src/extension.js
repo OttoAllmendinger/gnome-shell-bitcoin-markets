@@ -20,10 +20,11 @@ const _ = Gettext.gettext;
 const N_ = function(e) { return e };
 
 const ExtensionUtils = imports.misc.extensionUtils;
-const extension = ExtensionUtils.getCurrentExtension();
+const Extension = ExtensionUtils.getCurrentExtension();
 
-const Convenience = extension.imports.convenience;
-const ApiProvider = extension.imports.ApiProvider;
+const ApiProvider = Extension.imports.ApiProvider;
+
+const Convenience = Extension.imports.convenience;
 
 
 /**

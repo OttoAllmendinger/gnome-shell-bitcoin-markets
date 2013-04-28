@@ -8,6 +8,8 @@ const N_ = function(e) { return e; };
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Convenience = Extension.imports.convenience;
 
+const ApiProvider = Extension.imports.ApiProvider;
+
 const SETTINGS_SCHEMA = 'org.gnome.shell.extensions.bitcoin-markets';
 const SETTINGS_FIRST_TIME = 'first-time';
 const SETTINGS_MARKET = 'market';
