@@ -50,7 +50,7 @@ const MarketIndicatorView = new Lang.Class({
     Extends: PanelMenu.Button,
 
     _init: function (options) {
-        this.parent();
+        this.parent(0);
         this._options = options;
         this._initLayout();
         this._initBehavior();
@@ -64,9 +64,16 @@ const MarketIndicatorView = new Lang.Class({
             // , x_fill: true
             // , x_align: Clutter.ActorAlign.CENTER
         });
+
         layout.add_actor(this._statusView);
         layout.add_actor(this._indicatorView);
+
         this.actor.add_actor(layout);
+
+        /*
+        this._tooltip = new PopupMenu.PopupMenuItem("tooltip");
+        this.menu.addMenuItem(this._tooltip);
+        */
     },
 
     _initBehavior: function () {
@@ -74,19 +81,17 @@ const MarketIndicatorView = new Lang.Class({
 
         this._model = _apiProvider.get(this._options.api, this._options);
 
-        this._model.onUpdateStart(function () {
+        this._model.connect("update-start", function () {
             indicator._displayStatus(_Symbols.refresh);
         });
 
-        this._model.onUpdate(function (err, data) {
+        this._model.connect("update", function (obj, err, data) {
             if (err) {
                 indicator._showError(err);
             } else {
                 indicator._showData(data);
             }
         });
-
-        this._model.start();
     },
 
     _showError: function (error) {
@@ -120,7 +125,8 @@ let IndicatorCollection = function () {
 
     this.add = function (indicator) {
         indicators.push(indicator);
-        Main.panel.addToStatusArea('indicator-' + indicators.length, indicator);
+        let name = 'bitcoin-market-indicator-' + indicators.length;
+        Main.panel.addToStatusArea(name, indicator);
     };
 
     this.destroy = function () {

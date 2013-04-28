@@ -1,4 +1,5 @@
 const Lang = imports.lang;
+const Signals = imports.signals;
 const Soup = imports.gi.Soup;
 const Mainloop = imports.mainloop;
 
@@ -93,24 +94,6 @@ let ChangeRenderer = function (getValue)  {
 
 let BaseApi = function () {}
 
-let CallbackQueue = function () {
-    var callbacks = [];
-
-    return function (a) {
-        var args = arguments;
-
-        if ((typeof a) === "function") {
-            callbacks.push(a);
-        } else {
-            callbacks.forEach(function (cb) {
-                cb.apply(cb, args);
-            });
-        };
-
-        return this;
-    }
-}
-
 BaseApi.prototype = {
     _init: function () {
         this._urlHandlers = {};
@@ -153,24 +136,19 @@ BaseApi.prototype = {
         if (!handler) {
             handler = this._urlHandlers[id] = {}
             handler.id = id;
-            handler.onUpdate = new CallbackQueue(handler),
-            handler.onUpdateStart = new CallbackQueue(handler);
+            Signals.addSignalMethods(handler);
 
             let loop = function() {
-                handler.onUpdateStart();
+                handler.emit("update-start");
 
                 self.poll(options, function (error, data) {
-                    handler.onUpdate(error, data);
+                    handler.emit("update", error, data);
                 });
 
                 handler.timeout = Mainloop.timeout_add_seconds(interval, loop);
             };
 
-            handler.start = function () {
-                if (handler.timeout === undefined) {
-                    loop();
-                }
-            };
+            Mainloop.idle_add(function () { loop(); });
         }
 
         return handler;
@@ -184,24 +162,19 @@ BaseApi.prototype = {
         let handler = this.getHandler(options);
 
         let indicator = {};
-        indicator.onUpdateStart = new CallbackQueue(indicator);
-        indicator.onUpdate = new CallbackQueue(indicator);
-
-        indicator.start = function () {
-            handler.start();
-        };
+        Signals.addSignalMethods(indicator);
 
         let formatter = this.getFormatter(options);
 
-        handler.onUpdateStart(function () {
-            indicator.onUpdateStart();
+        handler.connect("update-start", function () {
+            indicator.emit("update-start");
         });
 
-        handler.onUpdate(function (error, data) {
+        handler.connect("update", function (obj, error, data) {
             if (error) {
-                indicator.onUpdate(error, null);
+                indicator.emit("update", error, null);
             } else {
-                indicator.onUpdate(null, {
+                indicator.emit("update", null, {
                     text: formatter.text(data, options),
                     change: formatter.change(data, options)
                 });
@@ -311,15 +284,19 @@ if (this['ARGV'] !== undefined) {
 
     let apiProvider = new ApiProvider();
 
-    apiProvider
-        .get('mtgox', {currency: "USD", attribute: "last_local"})
-        .onUpdateStart(function () {
-            log("onUpdateStart()");
-        }).onUpdate(function (error, data) {
-            log("onUpdate()");
-            log(JSON.stringify(data));
-            apiProvider.destroy();
-        }).start();
+    let options = {currency: "USD", attribute: "last_local"};
+
+    let indicator = apiProvider.get('mtgox', options);
+
+    indicator.connect("update-start", function () {
+        log("signal update-start");
+    });
+
+    indicator.connect("update", function (error, data) {
+        log("signal update");
+        log(JSON.stringify(data));
+        apiProvider.destroy();
+    });
 
     Mainloop.run("main");
 }
