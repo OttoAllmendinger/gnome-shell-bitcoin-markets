@@ -255,7 +255,7 @@ BitcoinChartsApi.prototype = BaseApi.prototype;
 
 
 var ApiProvider = function () {
-    let apis = {
+    let apis = this.apis = {
         mtgox: new MtGoxApi(),
         btcharts: new BitcoinChartsApi()
     };

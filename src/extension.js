@@ -121,53 +121,41 @@ const MarketIndicatorView = new Lang.Class({
     }
 });
 
-let IndicatorCollection = function () {
-    var indicators = [];
+let IndicatorCollection = new Lang.Class({
+    Name: "IndicatorCollection",
 
-    this.add = function (indicator) {
-        indicators.push(indicator);
-        let name = 'bitcoin-market-indicator-' + indicators.length;
+    _init: function () {
+        this._indicators = [];
+        this._settings = Convenience.getSettings();
+
+        this._settings.get_strv('indicators').forEach(function (i) {
+            this.add(new MarketIndicatorView(JSON.parse(i)));
+        }, this);
+    },
+
+    add: function (indicator) {
+        this._indicators.push(indicator);
+        let name = 'bitcoin-market-indicator-' + this._indicators.length;
         Main.panel.addToStatusArea(name, indicator);
-    };
+    },
 
-    this.destroy = function () {
-        for (let k in indicators) {
-            indicators[k].destroy();
-        }
-    };
-}
+    destroy: function () {
+        this._indicators.forEach(function (i) {
+            i.destroy();
+        });
+    }
+});
 
 let _indicatorCollection;
 let _apiProvider;
-let _settings;
 
 function init(metadata) {
     Convenience.initTranslations();
-    _settings = Convenience.getSettings();
 }
 
-let _defaults = [
-    {
-        api: 'mtgox',
-        currency: 'USD',
-        attribute: 'last_local'
-    } /*
-    , {
-        api: 'mtgox',
-        currency: 'EUR',
-        attribute: 'last_local'
-    } */
-];
-
 function enable() {
-    _indicatorCollection = new IndicatorCollection();
     _apiProvider = new ApiProvider.ApiProvider();
-
-    for (let k in _defaults) {
-        _indicatorCollection.add(
-            new MarketIndicatorView(_defaults[k])
-        );
-    }
+    _indicatorCollection = new IndicatorCollection();
 }
 
 function disable() {
