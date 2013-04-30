@@ -26,6 +26,8 @@ const ApiProvider = Extension.imports.ApiProvider;
 
 const Convenience = Extension.imports.convenience;
 
+const INDICATORS_KEY = "indicators";
+
 
 /**
  * TODO: use WebSockets for MtGox streaming api
@@ -118,6 +120,14 @@ const MarketIndicatorView = new Lang.Class({
 
     _displayText: function (text) {
         this._indicatorView.text = text;
+    },
+
+    destroy: function () {
+        this._model.disconnectAll();
+        this._indicatorView.destroy();
+        this._statusView.destroy();
+
+        this.parent();
     }
 });
 
@@ -128,9 +138,26 @@ let IndicatorCollection = new Lang.Class({
         this._indicators = [];
         this._settings = Convenience.getSettings();
 
-        this._settings.get_strv('indicators').forEach(function (i) {
+        this._settingsChangedId = this._settings.connect(
+            'changed::' + INDICATORS_KEY,
+            Lang.bind(this, this._createIndicators)
+        );
+
+        this._createIndicators();
+    },
+
+    _createIndicators: function () {
+        this._removeAll();
+
+        this._settings.get_strv(INDICATORS_KEY).forEach(function (i) {
             this.add(new MarketIndicatorView(JSON.parse(i)));
         }, this);
+    },
+
+    _removeAll: function () {
+        this._indicators.forEach(function (i) {
+            i.destroy();
+        });
     },
 
     add: function (indicator) {
@@ -140,9 +167,8 @@ let IndicatorCollection = new Lang.Class({
     },
 
     destroy: function () {
-        this._indicators.forEach(function (i) {
-            i.destroy();
-        });
+        this._removeAll();
+        this._settings.disconnect(this._settingsChangedId);
     }
 });
 
