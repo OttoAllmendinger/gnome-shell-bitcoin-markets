@@ -21,7 +21,7 @@ Soup.Session.prototype.add_feature.call(
     new Soup.ProxyResolverDefault()
 );
 
-let getJSON = function (url, callback) {
+const getJSON = function (url, callback) {
     // log('getJSON ' + url);
     _httpSession.queue_message(
         Soup.Message.new("GET", url),
@@ -39,7 +39,7 @@ let getJSON = function (url, callback) {
 };
 
 
-let Selector = function (path) {
+const Selector = function (path) {
     /**
      * returns a function that returns a nested attribute
      * path format: a.b.c.d
@@ -55,22 +55,22 @@ let Selector = function (path) {
     };
 };
 
-var IndicatorChange = {
+const IndicatorChange = {
     up: "up",
     down: "down",
     unchanged: "unchanged"
 };
 
-let ChangeRenderer = function (getValue)  {
+const ChangeRenderer = function (getValue)  {
     /**
      * Returns a function that returns the change
      * in value between consecutive calls.
      */
-    var lastValue;
+    let lastValue;
 
     return function (data) {
-        var ret = IndicatorChange.unchanged;
-        var newValue = getValue(data);
+        let ret = IndicatorChange.unchanged;
+        let newValue = getValue(data);
 
         if (lastValue !== undefined) {
             if (lastValue > newValue) {
@@ -92,7 +92,7 @@ let ChangeRenderer = function (getValue)  {
  * Api definitions
  */
 
-let BaseApi = function () {}
+const BaseApi = function () {}
 
 BaseApi.prototype = {
     _init: function () {
@@ -124,16 +124,16 @@ BaseApi.prototype = {
          * id for each set of query options
          */
 
-        var self = this;
-        var interval = this.interval;
-        var id = this._getHandlerId(options);
-        var handler = this._urlHandlers[id];
+        let self = this;
+        let interval = this.interval;
+        let id = this._getHandlerId(options);
+        let handler = this._urlHandlers[id];
 
         if ((!interval) || (interval < 1)) {
             throw new Error('invalid interval ' + interval);
         };
 
-        if (!handler) {
+        if (handler === undefined) {
             handler = this._urlHandlers[id] = {}
             handler.id = id;
             Signals.addSignalMethods(handler);
@@ -142,10 +142,14 @@ BaseApi.prototype = {
                 handler.emit("update-start");
 
                 self.poll(options, function (error, data) {
+                    handler.lastError = error;
+                    handler.lastData = data;
                     handler.emit("update", error, data);
                 });
 
-                handler.timeout = Mainloop.timeout_add_seconds(interval, loop);
+                handler.signalTimeout = Mainloop.timeout_add_seconds(
+                    interval, loop
+                );
             };
 
             Mainloop.idle_add(function () { loop(); });
@@ -166,11 +170,7 @@ BaseApi.prototype = {
 
         let formatter = this.getFormatter(options);
 
-        handler.connect("update-start", function () {
-            indicator.emit("update-start");
-        });
-
-        handler.connect("update", function (obj, error, data) {
+        let onUpdate = function (error, data) {
             if (error) {
                 indicator.emit("update", error, null);
             } else {
@@ -179,26 +179,46 @@ BaseApi.prototype = {
                     change: formatter.change(data, options)
                 });
             }
-        });
+        };
+
+        indicator._signalUpdateStart = handler.connect(
+                "update-start", function () {
+                    indicator.emit("update-start");
+                });
+
+
+        indicator._signalUpdate = handler.connect(
+                "update", function (obj, error, data) {
+                    onUpdate(error, data);
+                });
+
+        if (handler.lastError || handler.lastData) {
+            Mainloop.idle_add(function () {
+                onUpdate(handler.lastError, handler.lastData);
+            });
+        }
+
+        indicator.destroy = function () {
+            indicator.disconnectAll();
+            handler.disconnect(indicator._signalUpdateStart);
+            handler.disconnect(indicator._signalUpdate);
+        };
 
         return indicator;
     },
 
     destroy: function () {
-        log("removing timeouts for api " + this.name);
-
-        for (let k in this._urlHandlers) {
-            let h = this._urlHandlers[k];
-            if (h.timeout) {
-                log("removing timeout for handler " + h.id);
-                Mainloop.source_remove(h.timeout);
+        for (let [key, handler] in Iterator(this._urlHandlers)) {
+            if (handler.signalTimeout) {
+                Mainloop.source_remove(handler.signalTimeout);
             }
+            handler.disconnectAll()
         };
     }
 };
 
 
-let MtGoxApi = function () {
+const MtGoxApi = function () {
     BaseApi.prototype._init.apply(this);
 
     let api = this;
@@ -254,7 +274,7 @@ BitcoinChartsApi.prototype = BaseApi.prototype;
 
 
 
-var ApiProvider = function () {
+const ApiProvider = function () {
     let apis = this.apis = {
         mtgox: new MtGoxApi(),
         btcharts: new BitcoinChartsApi()
@@ -271,8 +291,8 @@ var ApiProvider = function () {
     };
 
     this.destroy = function () {
-        for (let k in apis) {
-            apis[k].destroy();
+        for (let [key, api] in Iterator(apis)) {
+            api.destroy();
         }
     };
 }

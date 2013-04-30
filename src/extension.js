@@ -95,6 +95,8 @@ const MarketIndicatorView = new Lang.Class({
                 indicator._showData(data);
             }
         });
+
+        this._displayStatus(_Symbols.refresh);
     },
 
     _showError: function (error) {
@@ -123,7 +125,7 @@ const MarketIndicatorView = new Lang.Class({
     },
 
     destroy: function () {
-        this._model.disconnectAll();
+        this._model.destroy();
         this._indicatorView.destroy();
         this._statusView.destroy();
 
@@ -158,6 +160,8 @@ let IndicatorCollection = new Lang.Class({
         this._indicators.forEach(function (i) {
             i.destroy();
         });
+
+        this._indicators = [];
     },
 
     add: function (indicator) {
