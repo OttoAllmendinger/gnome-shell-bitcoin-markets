@@ -63,7 +63,7 @@ var IndicatorChange = {
 
 let ChangeRenderer = function (getValue)  {
     /**
-     * Returns a function that returns a unicode symbol representing the change
+     * Returns a function that returns the change
      * in value between consecutive calls.
      */
     var lastValue;
