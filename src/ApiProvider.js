@@ -55,11 +55,13 @@ const Selector = function (path) {
     };
 };
 
+
 const IndicatorChange = {
     up: "up",
     down: "down",
     unchanged: "unchanged"
 };
+
 
 const ChangeRenderer = function (getValue)  {
     /**
@@ -84,7 +86,109 @@ const ChangeRenderer = function (getValue)  {
 
         return ret;
     }
-}
+};
+
+
+/**
+ * Instances of this class emit update signals periodically with formatted
+ * data from api sources
+ */
+
+const IndicatorModel = new Lang.Class({
+    Name: "IndicatorModel",
+
+    _init: function (options, handler, formatter) {
+        this._formatter = formatter;
+        this._handler = handler;
+
+        let onUpdate = Lang.bind(this, function (error, data) {
+            if (error) {
+                this.emit("update", error, null);
+            } else {
+                this.emit("update", null, {
+                    text: formatter.text(data, options),
+                    change: formatter.change(data, options)
+                });
+            }
+        });
+
+        this._signalUpdateStart = handler.connect(
+                "update-start", Lang.bind(this, function () {
+                    this.emit("update-start");
+                }));
+
+        this._signalUpdate = handler.connect(
+                "update", function (obj, error, data) {
+                    onUpdate(error, data);
+                });
+
+        if (handler._lastError || handler._lastData) {
+            Mainloop.idle_add(function () {
+                onUpdate(handler._lastError, handler._lastData);
+            });
+        }
+    },
+
+    destroy: function () {
+        this.disconnectAll();
+        this._handler.disconnect(this._signalUpdateStart);
+        this._handler.disconnect(this._signalUpdate);
+    }
+});
+
+
+Signals.addSignalMethods(IndicatorModel.prototype);
+
+
+
+
+/**
+ * We want to return a handler for each data source. The handler
+ * polls the API in periodic intervals and calls onUpdate and
+ * onUpdateStart methods.
+ *
+ * Some URLs respond with data for many different indicators, others
+ * have different URLs for each poll request. Thus we request a handler
+ * id for each set of query options
+ */
+const Handler = new Lang.Class({
+    Name: "Handler",
+
+    _init: function (id, options, poll, interval) {
+        if ((!interval) || (interval < 1)) {
+            throw new Error('invalid interval ' + interval);
+        };
+
+        this._id = id;
+
+        let loop = Lang.bind(this, function() {
+            this.emit("update-start");
+
+            poll(options, Lang.bind(this, function (error, data) {
+                this._lastError = error;
+                this._lastData = data;
+                this.emit("update", error, data);
+            }));
+
+            this._signalTimeout = Mainloop.timeout_add_seconds(
+                interval, loop
+            );
+        });
+
+        Mainloop.idle_add(loop);
+    },
+
+    destroy: function () {
+        if (this._signalTimeout) {
+            Mainloop.source_remove(this._signalTimeout);
+        }
+
+        this.disconnectAll();
+    }
+});
+
+Signals.addSignalMethods(Handler.prototype);
+
 
 
 
@@ -114,45 +218,15 @@ BaseApi.prototype = {
     },
 
     getHandler: function (options) {
-        /**
-         * We want to return a handler for each data source. The handler
-         * polls the API in periodic intervals and calls onUpdate and
-         * onUpdateStart methods.
-         *
-         * Some URLs respond with data for many different indicators, others
-         * have different URLs for each poll request. Thus we request a handler
-         * id for each set of query options
-         */
 
-        let self = this;
-        let interval = this.interval;
         let id = this._getHandlerId(options);
         let handler = this._urlHandlers[id];
 
-        if ((!interval) || (interval < 1)) {
-            throw new Error('invalid interval ' + interval);
-        };
-
         if (handler === undefined) {
-            handler = this._urlHandlers[id] = {}
-            handler.id = id;
-            Signals.addSignalMethods(handler);
-
-            let loop = function() {
-                handler.emit("update-start");
-
-                self.poll(options, function (error, data) {
-                    handler.lastError = error;
-                    handler.lastData = data;
-                    handler.emit("update", error, data);
-                });
-
-                handler.signalTimeout = Mainloop.timeout_add_seconds(
-                    interval, loop
+            handler = this._urlHandlers[id] =
+                new Handler(
+                    id, options, Lang.bind(this, this.poll), this.interval
                 );
-            };
-
-            Mainloop.idle_add(function () { loop(); });
         }
 
         return handler;
@@ -162,57 +236,17 @@ BaseApi.prototype = {
         return this.attributes[options.attribute]();
     },
 
-    getIndicator: function (options) {
-        let handler = this.getHandler(options);
-
-        let indicator = {};
-        Signals.addSignalMethods(indicator);
-
-        let formatter = this.getFormatter(options);
-
-        let onUpdate = function (error, data) {
-            if (error) {
-                indicator.emit("update", error, null);
-            } else {
-                indicator.emit("update", null, {
-                    text: formatter.text(data, options),
-                    change: formatter.change(data, options)
-                });
-            }
-        };
-
-        indicator._signalUpdateStart = handler.connect(
-                "update-start", function () {
-                    indicator.emit("update-start");
-                });
-
-
-        indicator._signalUpdate = handler.connect(
-                "update", function (obj, error, data) {
-                    onUpdate(error, data);
-                });
-
-        if (handler.lastError || handler.lastData) {
-            Mainloop.idle_add(function () {
-                onUpdate(handler.lastError, handler.lastData);
-            });
-        }
-
-        indicator.destroy = function () {
-            indicator.disconnectAll();
-            handler.disconnect(indicator._signalUpdateStart);
-            handler.disconnect(indicator._signalUpdate);
-        };
-
-        return indicator;
+    getIndicatorModel: function (options) {
+        return new IndicatorModel(
+            options,
+            this.getHandler(options),
+            this.getFormatter(options)
+        );
     },
 
     destroy: function () {
         for (let [key, handler] in Iterator(this._urlHandlers)) {
-            if (handler.signalTimeout) {
-                Mainloop.source_remove(handler.signalTimeout);
-            }
-            handler.disconnectAll()
+            handler.destroy();
         };
     }
 };
@@ -286,7 +320,7 @@ const ApiProvider = function () {
         if ((api = apis[name]) === undefined) {
             throw new Error('unknown api ' + name);
         } else {
-            return api.getIndicator(options);
+            return api.getIndicatorModel(options);
         }
     };
 
@@ -312,8 +346,9 @@ if (this['ARGV'] !== undefined) {
         log("signal update-start");
     });
 
-    indicator.connect("update", function (error, data) {
+    indicator.connect("update", function (obj, error, data) {
         log("signal update");
+        log(JSON.stringify(error));
         log(JSON.stringify(data));
         apiProvider.destroy();
     });
