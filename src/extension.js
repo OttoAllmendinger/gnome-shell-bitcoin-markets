@@ -39,7 +39,7 @@ const INDICATORS_KEY = "indicators";
 
 let _Symbols = {
     error: "\u26A0",
-    refresh: "\u27f2",
+    refresh: "\u27f3",
     up: "\u25b2",
     down: "\u25bc",
 };
