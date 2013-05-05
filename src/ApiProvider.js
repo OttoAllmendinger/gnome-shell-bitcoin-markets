@@ -245,7 +245,7 @@ BaseApi.prototype = {
     },
 
     destroy: function () {
-        for (let [key, handler] in Iterator(this._urlHandlers)) {
+        for each (let handler in this._urlHandlers) {
             handler.destroy();
         };
     }
@@ -325,7 +325,7 @@ const ApiProvider = function () {
     };
 
     this.destroy = function () {
-        for (let [key, api] in Iterator(apis)) {
+        for each (let api in apis) {
             api.destroy();
         }
     };
