@@ -295,6 +295,8 @@ let BitcoinChartsApi = function () {
 
     this.name = 'BitcoinCharts';
 
+    this.currencies = ["USD", "CHF"];
+
     this.getUrl = function (options) {
         return "http://bitcoincharts.com/t/markets.json";
     };
