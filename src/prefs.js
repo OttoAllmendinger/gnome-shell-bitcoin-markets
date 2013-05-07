@@ -15,18 +15,6 @@ const ApiProvider = Extension.imports.ApiProvider;
 
 const INDICATORS_KEY = "indicators";
 
-const _defaults = [
-    {
-        api: 'mtgox',
-        currency: 'USD',
-        attribute: 'last_local'
-    }, {
-        api: 'mtgox',
-        currency: 'EUR',
-        attribute: 'last_local'
-    }
-];
-
 const ConfigModel = new Lang.Class({
     Name: "ConfigModel",
 

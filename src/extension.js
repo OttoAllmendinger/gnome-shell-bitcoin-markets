@@ -27,6 +27,7 @@ const ApiProvider = Extension.imports.ApiProvider;
 const Convenience = Extension.imports.convenience;
 
 const INDICATORS_KEY = "indicators";
+const FIRST_RUN_KEY = "first-run";
 
 
 /**
@@ -37,16 +38,29 @@ const INDICATORS_KEY = "indicators";
  * or pure JS impl
  */
 
-let _Symbols = {
+const _Symbols = {
     error: "\u26A0",
     refresh: "\u27f3",
     up: "\u25b2",
     down: "\u25bc",
 };
 
-let _Colors = {
+const _Colors = {
     error: '#ff0000',
 };
+
+const _Defaults = [
+    {
+        api: 'mtgox',
+        currency: 'USD',
+        attribute: 'last_local'
+    }, {
+        api: 'mtgox',
+        currency: 'EUR',
+        attribute: 'last_local'
+    }
+];
+
 
 const MarketIndicatorView = new Lang.Class({
     Name: 'MarketIndicatorView',
@@ -140,12 +154,21 @@ let IndicatorCollection = new Lang.Class({
         this._indicators = [];
         this._settings = Convenience.getSettings();
 
+        if (this._settings.get_boolean(FIRST_RUN_KEY)) {
+            this._initDefaults();
+            this._settings.set_boolean(FIRST_RUN_KEY, false);
+        }
+
         this._settingsChangedId = this._settings.connect(
             'changed::' + INDICATORS_KEY,
             Lang.bind(this, this._createIndicators)
         );
 
         this._createIndicators();
+    },
+
+    _initDefaults: function () {
+        this._settings.set_strv(INDICATORS_KEY, _Defaults.map(JSON.stringify));
     },
 
     _createIndicators: function () {
@@ -157,10 +180,7 @@ let IndicatorCollection = new Lang.Class({
     },
 
     _removeAll: function () {
-        this._indicators.forEach(function (i) {
-            i.destroy();
-        });
-
+        this._indicators.forEach(function (i) i.destroy());
         this._indicators = [];
     },
 
