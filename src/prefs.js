@@ -105,6 +105,10 @@ const IndicatorCollectionModel = new GObject.Class({
         this.connect('row-deleted', mutex(Lang.bind(this, this._onRowDeleted)));
     },
 
+    size: function () {
+        return this._configs.length;
+    },
+
     _getLabel: function (config) {
         return config.api + " " + config.currency;
     },
@@ -120,9 +124,9 @@ const IndicatorCollectionModel = new GObject.Class({
     _reloadFromSettings: function () {
         this.clear();
 
-        let configs = this._settings.get_strv(INDICATORS_KEY);
+        this._configs = this._settings.get_strv(INDICATORS_KEY);
 
-        for each (let json in configs) {
+        for each (let json in this._configs) {
             this.set(
                 this.append(),
                 [this.Columns.LABEL, this.Columns.CONFIG],
@@ -132,18 +136,16 @@ const IndicatorCollectionModel = new GObject.Class({
     },
 
     _writeSettings: function () {
-        let configs = [];
-
         let [res, iter] = this.get_iter_first();
 
+        this._configs = [];
+
         while (res) {
-            configs.push(this.get_value(iter, this.Columns.CONFIG));
+            this._configs.push(this.get_value(iter, this.Columns.CONFIG));
             res = this.iter_next(iter);
         };
 
-        log('writing ' + configs.length + ' configs');
-
-        this._settings.set_strv(INDICATORS_KEY, configs);
+        this._settings.set_strv(INDICATORS_KEY, this._configs);
     },
 
     _onRowChanged: function (self, path, iter) {
@@ -195,8 +197,6 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
 
         this._initLayout();
         this._initBehavior();
-
-        // this.add(new Gtk.Label({label: _("API Provider")}));
     },
 
     _getApis: function () {
@@ -248,7 +248,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     },
 
     _initToolbar: function () {
-        let toolbar = new Gtk.Toolbar({
+        let toolbar = this._toolbar = new Gtk.Toolbar({
             icon_size: 1
         });
 
@@ -267,11 +267,13 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
         toolbar.add(newButton);
 
         /* delete button */
-        let delButton = new Gtk.ToolButton({icon_name: "list-remove-symbolic"});
+        let delButton = this._delButton =
+            new Gtk.ToolButton({icon_name: "list-remove-symbolic"});
         delButton.connect('clicked', Lang.bind(this, this._delClicked));
 
         toolbar.add(delButton);
 
+        this._updateToolbar();
 
         return toolbar;
     },
@@ -356,8 +358,9 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
             this._config.connect(
                 "changed", Lang.bind(this, this._onConfigChanged)
             );
-            this._displayConfig(this._config);
-        };
+        }
+
+        this._displayConfig(this._config);
     },
 
     _displayConfig: function (config) {
@@ -367,11 +370,21 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
 
         this._configGridWidgets = [];
 
+        if (config === null) {
+            return;
+        }
+
+        /* utility function for adding widgets in grid */
+
+        let x, y;
+
         let add = Lang.bind(this, function (w) {
             w.margin = 10;
             this._configGridWidgets.push(w);
             this._configGrid.attach(w, x, y, 1, 1);
         });
+
+        /** TODO API Field */
 
         /*
         [x, y] = [0, 0];
@@ -393,17 +406,31 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
 
     _onSelectionChanged: function () {
         let [isSelected, model, iter] = this._selection.get_selected();
-        let json = this._store.get_value(iter, this._store.Columns.CONFIG);
-        this._setConfig(JSON.parse(json));
+        if (isSelected) {
+            let json = this._store.get_value(iter, this._store.Columns.CONFIG);
+            this._setConfig(JSON.parse(json));
+        } else {
+            this._setConfig(null);
+        }
+    },
+
+    _updateToolbar: function () {
+        this._delButton.set_sensitive(this._store.size() > 0);
     },
 
     _addClicked: function () {
         this._store.append();
+        this._updateToolbar();
     },
 
     _delClicked: function () {
         let [isSelected, model, iter] = this._selection.get_selected();
-        this._store.remove(iter);
+
+        if (isSelected) {
+            this._store.remove(iter);
+        }
+
+        this._updateToolbar();
     }
 });
 
