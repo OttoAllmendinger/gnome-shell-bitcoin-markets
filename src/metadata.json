@@ -3,7 +3,7 @@
     "uuid": "bitcoin-markets@ottoallmendinger.github.com",
     "name": "Bitcoin Markets",
     "url": "https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/",
-    "description": "Display info on various Bitcoin exchanges. Currently only MtGox, support for others is planned.",
+    "description": "Display info on various Bitcoin exchanges. Currently only MtGox, support for others is planned. \n Tip address 1645A1qhW3FHxr2JLdqLuYGQ6QSmN5BbNS.",
     "settings-schema":  "org.gnome.shell.extensions.bitcoin-markets",
     "gettext-domain": "bitcoin-markets"
 }
