@@ -259,8 +259,10 @@ const MtGoxApi = function () {
 
     this.name = "MtGox";
 
-    this.currencies = ["USD", "AUD", "CAD", "CHF", "CNY", "DKK", "EUR", "GBP", "HKD", "NZD", "PLN", "RUB", "SGD", "THB", "NOK", "CZK"];
-    
+    this.currencies = [
+        "USD", "EUR", "GBP", "AUD", "CAD", "CHF", "CNY", "DKK",
+        "HKD", "NZD", "PLN", "RUB", "SGD", "THB", "NOK", "CZK"];
+
     this.attributes = {
         last_local: function () {
             return {
