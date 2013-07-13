@@ -5,7 +5,7 @@ const Gio = imports.gi.Gio;
 const GObject = imports.gi.GObject;
 const Signals = imports.signals;
 
-const Gettext = imports.gettext.domain('gnome-shell-extensions');
+const Gettext = imports.gettext.domain('bitcoin-markets');
 const _ = Gettext.gettext;
 const N_ = function(e) { return e; };
 
