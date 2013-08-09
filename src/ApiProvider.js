@@ -8,9 +8,12 @@ const Mainloop = imports.mainloop;
  *
  */
 
-const _version = "0.1.0";
+const _version = "0.2.0";
+const _repository = "http://github.com/OttoAllmendinger/" +
+                    "gnome-shell-bitcoin-markets";
 
-const _userAgent = "gnome-shell-bitcoin-markets/" + _version;
+const _userAgent = "gnome-shell-bitcoin-markets/" + _version +
+                    " (" + _repository + ")";
 
 const _httpSession = new Soup.SessionAsync();
 
@@ -292,7 +295,39 @@ MtGoxApi.prototype = BaseApi.prototype;
 
 
 
-let BitcoinChartsApi = function () {
+const BitstampApi = function () {
+    BaseApi.prototype._init.apply(this);
+
+    this.name = 'Bitstamp';
+
+    this.currencies = ["USD"];
+
+    this.attributes = {
+        last: function () {
+            return {
+                text: new Selector("last"),
+                change: new ChangeRenderer(new Selector("last"))
+            };
+        }
+    };
+
+    this.getUrl = function (options) {
+        return "https://www.bitstamp.net/api/ticker/";
+    };
+
+    // Quote 2013-08-09  ---  https://www.bitstamp.net/api/
+    // `` Do not make more than 600 request per 10 minutes or we will ban your
+    //    IP address. "
+
+    this.interval = 10; // 60 requests per 10 minutes
+}
+
+BitstampApi.prototype = BaseApi.prototype;
+
+
+
+
+const BitcoinChartsApi = function () {
     BaseApi.prototype._init.apply(this);
 
     this.name = 'BitcoinCharts';
@@ -315,7 +350,8 @@ BitcoinChartsApi.prototype = BaseApi.prototype;
 const ApiProvider = function () {
     let apis = this.apis = {
         mtgox: new MtGoxApi(),
-        btcharts: new BitcoinChartsApi()
+        bitstamp: new BitstampApi(),
+        // btcharts: new BitcoinChartsApi()
     };
 
     this.get = function (name, options) {
@@ -342,9 +378,9 @@ if (this['ARGV'] !== undefined) {
 
     let apiProvider = new ApiProvider();
 
-    let options = {currency: "USD", attribute: "last_local"};
+    let options = {currency: "USD", attribute: "last"};
 
-    let indicator = apiProvider.get('mtgox', options);
+    let indicator = apiProvider.get('bitstamp', options);
 
     indicator.connect("update-start", function () {
         log("signal update-start");
@@ -352,9 +388,9 @@ if (this['ARGV'] !== undefined) {
 
     indicator.connect("update", function (obj, error, data) {
         log("signal update");
-        log(JSON.stringify(error));
-        log(JSON.stringify(data));
-        apiProvider.destroy();
+        log("error: " + JSON.stringify(error));
+        log("data: " + JSON.stringify(data));
+        // apiProvider.destroy();
     });
 
     Mainloop.run("main");
