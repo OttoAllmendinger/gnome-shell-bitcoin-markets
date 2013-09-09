@@ -15,21 +15,13 @@ const ApiProvider = Extension.imports.ApiProvider;
 
 const INDICATORS_KEY = "indicators";
 
+
+/*
 const ConfigModel = new Lang.Class({
     Name: "ConfigModel",
 
     _init: function (config) {
         this._config = config;
-    },
-
-    set: function (key, value) {
-        log("key: " + key + " value: " + value);
-        this._config[key] = value
-        this.emit('changed', key, value);
-    },
-
-    get: function (key) {
-      return this._config[key];
     },
 
     toString: function () {
@@ -42,6 +34,9 @@ const ConfigModel = new Lang.Class({
 });
 
 Signals.addSignalMethods(ConfigModel.prototype);
+*/
+
+
 
 
 const IndicatorCollectionModel = new GObject.Class({
@@ -52,18 +47,6 @@ const IndicatorCollectionModel = new GObject.Class({
     Columns: {
       LABEL: 0,
       CONFIG: 1
-    },
-
-    _preventRecursion: function (func) {
-        var flag;
-
-        return function () {
-            if (!flag) {
-                flag = true;
-                func.apply(null, arguments);
-                flag = false;
-            }
-        }
     },
 
     _init: function (params) {
@@ -170,27 +153,122 @@ const IndicatorCollectionModel = new GObject.Class({
     }
 });
 
-const BitcoinMarketsSettingsWidget = new GObject.Class({
-    Name: "BitcoinMarkets.BitcoinMarketsSettingsWidget",
-    GTypeName: "BitcoinMarketsSettingsWidget",
+
+
+
+const makeConfigLine = function (description, widget) {
+    let box = new Gtk.Box({
+        orientation: Gtk.Orientation.HORIZONTAL,
+        margin_bottom: 5,
+        hexpand: true,
+        vexpand: false
+    });
+
+    let label = new Gtk.Label({
+        label: description,
+        xalign: 0,
+        expand: true
+    });
+
+    box.add(label);
+    box.add(widget);
+
+    return box;
+};
+
+
+const GjsComboBox = new Lang.Class({
+    Name: "GjsComboBox",
+
+    _init: function (options) {
+        const Columns = { LABEL: 0, VALUE: 1 };
+
+        let model = new Gtk.ListStore();
+        model.set_column_types([GObject.TYPE_STRING, GObject.TYPE_STRING]);
+
+        let comboBox = new Gtk.ComboBox({model: model});
+        let renderer = new Gtk.CellRendererText();
+
+        comboBox.pack_start(renderer, true);
+        comboBox.add_attribute(renderer, 'text', 0);
+
+        for each (let o in options) {
+            let iter;
+
+            model.set(
+                iter = model.append(),
+                [Columns.LABEL, Columns.VALUE],
+                [o.label, o.value]
+            );
+
+            if (o.active) {
+                comboBox.set_active_iter(iter);
+            }
+        }
+
+        comboBox.connect('changed', function (entry) {
+            let [success, iter] = comboBox.get_active_iter();
+
+            if (success) {
+                this.emit('select', model.get_value(iter, Columns.VALUE));
+            }
+        });
+
+        this.widget = comboBox;
+        this.model = model;
+    }
+});
+
+GjsComboBox.Options = function () {
+    return Array.prototype.map.call(
+        arguments,
+        function ([value, label, active]) ({
+            value: value,
+            label: label,
+            active: !!active
+        })
+    )
+};
+
+Signals.addSignalMethods(GjsComboBox.prototype);
+
+
+
+
+
+const IndicatorConfigView = new GObject.Class({
+    Name: "BitcoinMarkets.IndicatorConfigView",
+    GTypeName: "IndicatorConfigView",
     Extends: Gtk.Box,
 
-    _init: function (params) {
-        this.parent(params);
-        this.margin = 10;
-        this.orientation = Gtk.Orientation.HORIZONTAL;
+    _init: function (indicatorConfig, onConfigChanged) {
+        this.parent({
+            orientation: Gtk.Orientation.VERTICAL,
+        });
 
-        this._apiProvider = new ApiProvider.ApiProvider();
-        this._store = new IndicatorCollectionModel();
+        this._indicatorConfig = indicatorConfig;
 
-        this._initLayout();
-        this._initBehavior();
-    },
+        this._comboBox = new GjsComboBox(GjsComboBox.Options(
+            ['mtgox',       'MtGox',    true],
+            ['bitstamp',    'BitStamp', false]
+        ));
 
+        let label = new Gtk.Label({
+            label: "Label"
+        });
+
+        this.add(makeConfigLine(_("Provider"), this._comboBox.widget));
+        this.add(makeConfigLine(_("Provider"), new Gtk.Label({label: 'Foo'})));
+
+        this.show_all();
+    }
+
+    /*
     _getApis: function () {
         return [
             { label: 'MtGox',           value: 'mtgox' },
-            { label: 'Bitcoin Charts',  value: 'btcharts' }
+            { label: 'BitStamp',        value: 'bitstamp' },
+            // { label: 'Bitcoin Charts',  value: 'btcharts' }
         ];
     },
 
@@ -199,25 +277,57 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
             function (c) ({label: c, value: c})
         );
     },
+    */
 
-    _initLayout: function () {
-        this._initIndicatorList();
-        this._initConfigGrid();
-    },
+});
 
-    _initIndicatorList: function () {
-        let layout = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            'width-request': 200
+
+const BitcoinMarketsSettingsWidget = new GObject.Class({
+    Name: "BitcoinMarkets.BitcoinMarketsSettingsWidget",
+    GTypeName: "BitcoinMarketsSettingsWidget",
+    Extends: Gtk.Box,
+
+    _init: function () {
+        this.parent({
+            orientation: Gtk.Orientation.HORIZONTAL
         });
 
-        layout.add(this._initTreeView());
-        layout.add(this._initToolbar());
+        this._apiProvider = new ApiProvider.ApiProvider();
+        this._store = new IndicatorCollectionModel();
 
-        this.add(layout);
+        /* sidebar (left) */
+
+        let sidebar = new Gtk.Box({
+            margin: 10,
+            orientation: Gtk.Orientation.VERTICAL,
+            width_request: 200
+        });
+
+        sidebar.add(this._getTreeView());
+        sidebar.add(this._getToolbar());
+
+        this.add(sidebar);
+
+        /* config (right) */
+
+        this._configLayout = new Gtk.Box({
+            margin: 10,
+            orientation: Gtk.Orientation.HORIZONTAL,
+            expand: true,
+        });
+
+        this.add(this._configLayout);
+
+        /* behavior */
+
+        this._selection = this._treeView.get_selection();
+        this._selection.connect(
+            'changed',
+            Lang.bind(this, this._onSelectionChanged)
+        );
     },
 
-    _initTreeView: function () {
+    _getTreeView: function () {
         this._treeView = new Gtk.TreeView({
             model: this._store,
             headers_visible: false,
@@ -235,7 +345,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
         return this._treeView;
     },
 
-    _initToolbar: function () {
+    _getToolbar: function () {
         let toolbar = this._toolbar = new Gtk.Toolbar({
             icon_size: 1
         });
@@ -266,13 +376,59 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
         return toolbar;
     },
 
-    _initConfigGrid: function()  {
-        this._configGrid = new Gtk.Grid({
-            orientation: Gtk.Orientation.VERTICAL,
-            margin: 10
+    _onSelectionChanged: function () {
+        let [isSelected, model, iter] = this._selection.get_selected();
+
+        if (isSelected) {
+            let json = this._store.get_value(iter, this._store.Columns.CONFIG);
+            this._showIndicatorConfig(iter, JSON.parse(json));
+        } else {
+            this._showIndicatorConfig(null, null);
+        }
+    },
+
+    _showIndicatorConfig: function (iter, indicatorConfig) {
+        if (this._indicatorConfigView) {
+            this._configLayout.remove(this._indicatorConfigView);
+            this._indicatorConfigView.destroy();
+            this._indicatorConfigView = null;
+        }
+
+        if ((iter === null) || (indicatorConfig === null)) {
+            return;
+        }
+
+        let onConfigChanged = function (config) {
+            this._store.set(
+                iter,
+                [this._store.Columns.CONFIG],
+                [JSON.stringify(config)]
+            );
+        }.bind(this);
+
+        this._indicatorConfigView = new IndicatorConfigView(
+            indicatorConfig, onConfigChanged
+        );
+
+        this._configLayout.add(this._indicatorConfigView);
+    },
+
+
+    /*
+    _initConfigPanel: function()  {
+        this._configPanel = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL
         });
 
-        this.add(this._configGrid);
+        this.add(this._configPanel);
+
+        this._panelSelectApi = new Gtk.Box({
+            orientation: Gtk.Orientation.HORIZONTAL
+        });
+
+        this._configPanel.add(this._panelSelectApi);
+
+        this._panelsConfigApi = [];
     },
 
     _getComboBox: function (config, key, options) {
@@ -311,18 +467,13 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
 
             let value = model.get_value(iter, Columns.VALUE);
 
-            config.set(key, value);
+            config.emit('select', key, value);
         }));
 
         return comboBox;
     },
 
     _initBehavior: function () {
-        this._selection = this._treeView.get_selection();
-        this._selection.connect(
-            'changed',
-            Lang.bind(this, this._onSelectionChanged)
-        );
     },
 
 
@@ -352,55 +503,13 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     },
 
     _displayConfig: function (config) {
-        for each (let w in this._configGridWidgets) {
-            this._configGrid.remove(w);
-        }
-
-        this._configGridWidgets = [];
-
-        if (config === null) {
-            return;
-        }
-
-        /* utility function for adding widgets in grid */
-
-        let x, y;
-
-        let add = Lang.bind(this, function (w) {
-            w.margin = 10;
-            this._configGridWidgets.push(w);
-            this._configGrid.attach(w, x, y, 1, 1);
-        });
-
-        /** TODO API Field */
-
-        /*
-        [x, y] = [0, 0];
-        add(new Gtk.Label({label: _("Api Provider")}));
-
-        [x, y] = [x + 1, y];
-        add(this._getComboBox(config, 'api', this._getApis()));
-        */
-
-        // [x, y] = [0, y + 1];
-        [x, y] = [0, 0];
         add(new Gtk.Label({label: _("Currency")}));
-
-        [x, y] = [x + 1, y];
         add(this._getComboBox(config, 'currency', this._getCurrencies(config)));
 
         this._configGrid.show_all();
     },
 
-    _onSelectionChanged: function () {
-        let [isSelected, model, iter] = this._selection.get_selected();
-        if (isSelected) {
-            let json = this._store.get_value(iter, this._store.Columns.CONFIG);
-            this._setConfig(JSON.parse(json));
-        } else {
-            this._setConfig(null);
-        }
-    },
+    */
 
     _updateToolbar: function () {
         this._delButton.set_sensitive(this._store.size() > 0);
