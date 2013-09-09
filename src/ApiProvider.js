@@ -317,7 +317,7 @@ const BitstampApi = function () {
 
     // Quote 2013-08-09  ---  https://www.bitstamp.net/api/
     // `` Do not make more than 600 request per 10 minutes or we will ban your
-    //    IP address. "
+    //    IP address. ''
 
     this.interval = 10; // 60 requests per 10 minutes
 }
@@ -342,8 +342,6 @@ const BitcoinChartsApi = function () {
 }
 
 BitcoinChartsApi.prototype = BaseApi.prototype;
-
-
 
 
 
