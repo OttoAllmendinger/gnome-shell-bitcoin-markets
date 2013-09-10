@@ -1,8 +1,7 @@
 SCHEMA = org.gnome.shell.extensions.bitcoin-markets.gschema.xml
 
-SOURCE = src/extension.js src/ApiProvider.js \
-		 src/convenience.js src/metadata.json \
-		 src/prefs.js \
+SOURCE = src/*.js \
+		 src/metadata.json \
 		 src/schemas/gschemas.compiled \
 		 src/schemas/$(SCHEMA)
 
