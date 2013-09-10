@@ -331,6 +331,35 @@ const BitstampApi = new Lang.Class({
 
 
 
+
+
+
+const BitcoinAverageApi = new Lang.Class({
+  Name: 'BitcoinAverageApi',
+  Extends: BaseApi,
+
+  apiName: "BitcoinAverage",
+
+  currencies: [ 'USD', 'EUR', 'GBP', 'CAD', 'RUB', 'AUD', 'BRL',
+                'CNY', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN'],
+
+  interval: 10, // 60 requests per 10 minutes
+
+  attributes: {
+    last: function () ({
+      text: function (data) ("$" + data.last),
+      change: new ChangeRenderer(new Selector("last"))
+    })
+  },
+
+  getUrl: function (options) (
+    "http://api.bitcoinaverage.com/ticker/" + options.currency
+  )
+});
+
+
+
+
 const BitcoinChartsApi = new Lang.Class({
   Name: "BitcoinChartsApi",
 
@@ -354,6 +383,7 @@ const ApiProvider = new Lang.Class({
   apis: {
     mtgox: new MtGoxApi(),
     bitstamp: new BitstampApi(),
+    bitcoinaverage: new BitcoinAverageApi()
     // btcharts: new BitcoinChartsApi()
   },
 

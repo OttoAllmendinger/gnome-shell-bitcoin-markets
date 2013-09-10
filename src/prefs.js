@@ -184,6 +184,33 @@ const MtGoxConfigView = new Lang.Class({
 
 
 
+
+const BitcoinAverageConfigView = new Lang.Class({
+  Name: "BitcoinAverageConfigView",
+  Extends: ProviderConfigView,
+
+  _init: function (configWidget, indicatorConfig) {
+    this.parent(configWidget, indicatorConfig);
+    this._addSelectCurrency(
+      (new ApiProvider.BitcoinAverageApi()).currencies
+    );
+  },
+
+  _setDefaults: function (config) {
+    if (config.get('api') !== 'bitcoinaverage') {
+      config.attributes = {
+        api: 'bitcoinaverage',
+        currency: 'USD',
+        attribute: 'last'
+      }
+
+      config.emit('update');
+    }
+  },
+});
+
+
+
 const IndicatorConfigView = new Lang.Class({
   Name: "BitcoinMarkets.IndicatorConfigView",
 
@@ -197,6 +224,7 @@ const IndicatorConfigView = new Lang.Class({
     let options = [
         {label: 'MtGox',    value: 'mtgox'},
         {label: 'BitStamp', value: 'bitstamp'},
+        {label: 'BitcoinAverage', value: 'bitcoinaverage'},
     ];
 
     for each (let o in options) {
@@ -228,6 +256,12 @@ const IndicatorConfigView = new Lang.Class({
 
       bitstamp: function () {
         return new BitStampConfigView(this.widget, this._indicatorConfig);
+      }.bind(this),
+
+      bitcoinaverage: function () {
+        return new BitcoinAverageConfigView(
+          this.widget, this._indicatorConfig
+        );
       }.bind(this)
     }
 
