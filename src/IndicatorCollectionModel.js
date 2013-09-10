@@ -104,9 +104,9 @@ const IndicatorCollectionModel = new GObject.Class({
 
   _getDefaults: function () {
     return {
-      api: 'mtgox',
+      api: 'bitcoinaverage',
       currency: 'USD',
-      attribute: 'last_local'
+      attribute: 'last'
     };
   },
 

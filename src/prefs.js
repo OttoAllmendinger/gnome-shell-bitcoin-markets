@@ -222,9 +222,9 @@ const IndicatorConfigView = new Lang.Class({
     });
 
     let options = [
-        {label: 'MtGox',    value: 'mtgox'},
-        {label: 'BitStamp', value: 'bitstamp'},
         {label: 'BitcoinAverage', value: 'bitcoinaverage'},
+        {label: 'MtGox',    value: 'mtgox'},
+        {label: 'BitStamp', value: 'bitstamp'}
     ];
 
     for each (let o in options) {
