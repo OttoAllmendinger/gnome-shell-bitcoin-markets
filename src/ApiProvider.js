@@ -5,6 +5,11 @@ const Signals = imports.signals;
 const Soup = imports.gi.Soup;
 const Mainloop = imports.mainloop;
 
+const Local = imports.misc.extensionUtils.getCurrentExtension();
+const Accounting = Local.imports.accounting.accounting;
+const CurrencyMap = Local.imports.CurrencyMap.CurrencyMap;
+
+
 /*
  * Init HTTP
  *
@@ -25,6 +30,7 @@ Soup.Session.prototype.add_feature.call(
   _httpSession,
   new Soup.ProxyResolverDefault()
 );
+
 
 const getJSON = function (url, callback) {
   // log('getJSON ' + url);
@@ -92,6 +98,44 @@ const ChangeRenderer = function (getValue)  {
     return ret;
   }
 };
+
+
+
+const CurrencyRenderer = function ({currency}) {
+  const getFormat = function (currency) {
+    /* determined after mtgox api */
+    const front = "%s%v";
+    const back = "%v %s";
+    const frontFormats = {
+      USD: front, CAD: front, AUD: front, GBP: front,
+      HKD: front, NZD: front, SGD: front, THB: front
+    };
+
+    return frontFormats[currency] || back;
+  }
+
+  let format = getFormat(currency);
+  let symbol = currency;
+  let precision = 2;
+
+  let info = CurrencyMap[currency];
+
+  if (info) {
+    symbol = info.symbol_native;
+
+    /* disambiguate dollar currencies */
+    if (symbol === '$') symbol = info.symbol;
+
+    precision = info.decimal_digits;
+  }
+
+  return function (number)
+    Accounting.formatMoney(number, {
+      symbol: symbol,
+      format: format,
+      precision: precision
+    });
+}
 
 
 /**
@@ -239,7 +283,7 @@ const BaseApi = new Lang.Class({
 
   getFormatter: function (options) {
     if (this.attributes[options.attribute]) {
-      return this.attributes[options.attribute]();
+      return this.attributes[options.attribute](options);
     } else {
       throw new Error("unknown attribute: " + options.attribute);
     }
@@ -275,7 +319,7 @@ const MtGoxApi = new Lang.Class({
   ],
 
   attributes: {
-    last_local: function () {
+    last_local: function (options) {
       return {
         text: new Selector("data.last_local.display"),
         change: new ChangeRenderer(
@@ -313,14 +357,13 @@ const BitstampApi = new Lang.Class({
   interval: 10, // 60 requests per 10 minutes
 
   attributes: {
-    last: function () {
-      return {
-        text: function (data) {
-          return "$" + data.last;
-        },
+    last: function (options) {
+      let currencyRenderer = new CurrencyRenderer(options);
 
+      return {
+        text: function (data) currencyRenderer(data.last),
         change: new ChangeRenderer(new Selector("last"))
-      };
+      }
     }
   },
 
@@ -346,10 +389,14 @@ const BitcoinAverageApi = new Lang.Class({
   interval: 10, // 60 requests per 10 minutes
 
   attributes: {
-    last: function () ({
-      text: function (data) ("$" + data.last),
-      change: new ChangeRenderer(new Selector("last"))
-    })
+    last: function (options) {
+      let currencyRenderer = new CurrencyRenderer(options);
+
+      return {
+        text: function (data) currencyRenderer(data.last),
+        change: new ChangeRenderer(new Selector("last"))
+      }
+    }
   },
 
   getUrl: function (options) (
