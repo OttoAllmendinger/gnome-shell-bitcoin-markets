@@ -51,13 +51,9 @@ const _Colors = {
 
 const _Defaults = [
   {
-    api: 'mtgox',
+    api: 'bitcoinaverage',
     currency: 'USD',
-    attribute: 'last_local'
-  }, {
-    api: 'mtgox',
-    currency: 'EUR',
-    attribute: 'last_local'
+    attribute: 'last'
   }
 ];
 
