@@ -1,7 +1,7 @@
 SCHEMA = org.gnome.shell.extensions.bitcoin-markets.gschema.xml
 
 SOURCE = src/*.js \
-		 src/currencymap.js \
+		 src/CurrencyMap.js \
 		 src/metadata.json \
 		 src/schemas/gschemas.compiled \
 		 src/schemas/$(SCHEMA) \
@@ -17,7 +17,7 @@ ZIPFILE = gnome-shell-bitcoin-markets.zip
 
 all: schemas archive translations
 
-src/currencymap.js:
+src/CurrencyMap.js:
 	gjs util/MakeCurrencyMap.js > src/CurrencyMap.js
 
 src/locale/%/LC_MESSAGES/bitcoin-markets.mo: src/%.po
