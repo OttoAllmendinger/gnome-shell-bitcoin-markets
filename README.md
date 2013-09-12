@@ -1,7 +1,11 @@
 ![Screenshot](https://raw.github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/master/data/screenshot.png)
 
-Displays bitcoin market information in the gnome shell. Currently only shows
-last MtGox trades.
+Displays Bitcoin market information in the gnome shell. Available APIs:
+
+* BitcoinAverage.com
+* BitStamp
+* MtGox
+
 
 ## Installation
 
@@ -24,7 +28,6 @@ gnome-tweak-tool.
 ## TODO
 
 * Show tooltip info (last refresh, buy/sell prices)
-* Add markets besides MtGox
 * Charts
 
 Tip address 1645A1qhW3FHxr2JLdqLuYGQ6QSmN5BbNS
