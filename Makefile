@@ -12,6 +12,8 @@ TRANSLATION_SOURCE=$(wildcard src/*.po)
 
 ZIPFILE = gnome-shell-bitcoin-markets.zip
 
+UUID = bitcoin-markets@ottoallmendinger.github.com
+EXTENSION_PATH = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
 
 .PHONY: all
 
@@ -34,4 +36,9 @@ schemas: src/schemas/gschemas.compiled
 archive: schemas translations $(SOURCE)
 	-rm $(ZIPFILE)
 	cd src && zip -r ../$(ZIPFILE) $(patsubst src/%,%,$(SOURCE))
+
+install: archive
+	-rm -r $(EXTENSION_PATH)
+	mkdir -p $(EXTENSION_PATH)
+	unzip $(ZIPFILE) -d $(EXTENSION_PATH)
 
