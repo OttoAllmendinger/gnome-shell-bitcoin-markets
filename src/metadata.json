@@ -1,5 +1,5 @@
 {
-    "shell-version": ["3.6", "3.8"],
+    "shell-version": ["3.8", "3.10"],
     "uuid": "bitcoin-markets@ottoallmendinger.github.com",
     "name": "Bitcoin Markets",
     "url": "https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/",
