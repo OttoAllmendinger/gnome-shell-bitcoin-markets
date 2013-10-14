@@ -386,7 +386,13 @@ const BitcoinAverageApi = new Lang.Class({
   currencies: [ 'USD', 'EUR', 'GBP', 'CAD', 'RUB', 'AUD', 'BRL',
                 'CNY', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN'],
 
-  interval: 10, // 60 requests per 10 minutes
+  /* quote https://bitcoinaverage.com/api.htm
+   *
+   * > API is updated along with the site, normally around every minute. There
+   * > is no explicit restriction about how often you can call the API, yet
+   * > calling it more often than once a minute makes no sense. Please be good.
+   */
+  interval: 60,
 
   attributes: {
     last: function (options) {
