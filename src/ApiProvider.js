@@ -433,11 +433,13 @@ const BitcoinChartsApi = new Lang.Class({
 const ApiProvider = new Lang.Class({
   Name: "ApiProvider",
 
-  apis: {
-    mtgox: new MtGoxApi(),
-    bitstamp: new BitstampApi(),
-    bitcoinaverage: new BitcoinAverageApi()
-    // btcharts: new BitcoinChartsApi()
+  _init: function () {
+    this.apis = {
+      mtgox: new MtGoxApi(),
+      bitstamp: new BitstampApi(),
+      bitcoinaverage: new BitcoinAverageApi()
+      // btcharts: new BitcoinChartsApi()
+    }
   },
 
   get: function (name, options) {
