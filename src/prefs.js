@@ -13,6 +13,7 @@ const N_ = function(e) { return e; };
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Convenience = Local.imports.convenience;
 const ApiProvider = Local.imports.ApiProvider;
+const ExchangeData = Local.imports.ExchangeData.ExchangeData;
 
 const IndicatorCollectionModel =
   Local.imports.IndicatorCollectionModel.IndicatorCollectionModel;
@@ -42,8 +43,9 @@ const makeConfigRow = function (description, widget) {
 const ComboBoxView = new Lang.Class({
   Name: "ComboBoxView",
 
+  Columns: { LABEL: 0, VALUE: 1 },
+
   _init: function (options) {
-    const Columns = { LABEL: 0, VALUE: 1 };
 
     let model = new Gtk.ListStore();
     model.set_column_types([GObject.TYPE_STRING, GObject.TYPE_STRING]);
@@ -54,30 +56,34 @@ const ComboBoxView = new Lang.Class({
     comboBox.pack_start(renderer, true);
     comboBox.add_attribute(renderer, 'text', 0);
 
-    for each (let o in options) {
-      let iter;
-
-      model.set(
-        iter = model.append(),
-        [Columns.LABEL, Columns.VALUE],
-        [o.label, o.value]
-      );
-
-      if (o.active) {
-        comboBox.set_active_iter(iter);
-      }
-    }
-
     comboBox.connect('changed', function (entry) {
       let [success, iter] = comboBox.get_active_iter();
 
       if (success) {
-        this.emit('changed', model.get_value(iter, Columns.VALUE));
+        this.emit('changed', model.get_value(iter, this.Columns.VALUE));
       }
     }.bind(this));
 
     this.widget = comboBox;
     this.model = model;
+
+    this.setOptions(options);
+  },
+
+  setOptions: function (options) {
+    for each (let o in options) {
+      let iter;
+
+      this.model.set(
+        iter = this.model.append(),
+        [this.Columns.LABEL, this.Columns.VALUE],
+        [o.label, o.value]
+      );
+
+      if (o.active) {
+        this.widget.set_active_iter(iter);
+      }
+    }
   }
 });
 
@@ -94,8 +100,6 @@ const makeComboBoxCurrency = function (currencies, selected) {
   return new ComboBoxView(options);
 }
 
-
-
 const ProviderConfigView = new Lang.Class({
   Name: "ProviderConfigView",
 
@@ -110,6 +114,8 @@ const ProviderConfigView = new Lang.Class({
     let rowWidget = makeConfigRow(label, widget);
     this._configWidget.add(rowWidget);
     this._widgets.push(rowWidget);
+
+    return rowWidget;
   },
 
   _addSelectCurrency: function (currencies) {
@@ -121,7 +127,12 @@ const ProviderConfigView = new Lang.Class({
       this._indicatorConfig.set('currency', value);
     }.bind(this));
 
-    this._addRow(_("Currency"), comboBoxCurrency.widget);
+    let rowWidget = this._addRow(_("Currency"), comboBoxCurrency.widget);
+
+    return {
+      rowWidget: rowWidget,
+      comboBoxView: comboBoxCurrency
+    };
   },
 
   _setDefaults: function (config) {},
@@ -191,23 +202,97 @@ const BitcoinAverageConfigView = new Lang.Class({
 
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency(
-      (new ApiProvider.BitcoinAverageApi()).currencies
+
+    let api = new ApiProvider.BitcoinAverageApi();
+
+    let currencySelect = this._addSelectCurrency(api.currencies);
+    let exchangeSelect = this._addSelectExchange();
+
+    let updateExchangeSelect = function (currency) {
+      exchangeSelect.comboBoxView.setOptions(
+        this._makeExchangeOptions(currency)
+      );
+    }.bind(this);
+
+    currencySelect.comboBoxView.connect(
+      'changed', function (view, currency) updateExchangeSelect(currency)
     );
+
+    updateExchangeSelect(this._indicatorConfig.get('currency'));
+  },
+
+  _addSelectExchange: function () {
+    let comboBoxExchange = new ComboBoxView();
+
+    comboBoxExchange.connect("changed", function (view, value) {
+      this._indicatorConfig.set('exchange', value);
+    });
+
+    let rowWidget = this._addRow(_("Exchange"), comboBoxExchange.widget);
+
+    return {
+      rowWidget: rowWidget,
+      comboBoxView: comboBoxExchange
+    }
+  },
+
+  _makeExchangeOptions: function (currency) {
+    let currentExchange = this._indicatorConfig.get('exchange');
+    let exchanges = ApiProvider.getCurrencyToExchange()[currency];
+
+    let options = [
+      {label: 'Average', value: 'average', active: false}
+    ];
+
+    exchanges.forEach(function (e) {
+      log("exchanges.forEach() e=" + e);
+      options.push({label: e, value: e, active: e == currentExchange});
+    });
+
+    return options;
   },
 
   _setDefaults: function (config) {
     if (config.get('api') !== 'bitcoinaverage') {
       config.attributes = {
         api: 'bitcoinaverage',
+        exchange: 'average',
+        currency: 'USD',
+        attribute: 'last'
+      };
+
+      config.emit('update');
+    }
+  },
+});
+
+
+
+
+const BitcoinChartsConfigView = new Lang.Class({
+  Name: "BitcoinChartsConfigView",
+  Extends: ProviderConfigView,
+
+  _init: function (configWidget, indicatorConfig) {
+    this.parent(configWidget, indicatorConfig);
+    let api = new ApiProvider.BitcoinCharts();
+    this._addSelectCurrency((new ApiProvider.BitcoinChartsApi()).currencies);
+  },
+
+  _setDefaults: function (config) {
+    if (config.get('api') !== 'bitstamp') {
+      config.attributes = {
+        api: 'bitcoincharts',
+        exchange: 'mtgox',
         currency: 'USD',
         attribute: 'last'
       }
 
       config.emit('update');
     }
-  },
+  }
 });
+
 
 
 

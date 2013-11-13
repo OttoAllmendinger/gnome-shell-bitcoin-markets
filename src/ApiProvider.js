@@ -8,6 +8,7 @@ const Mainloop = imports.mainloop;
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Accounting = Local.imports.accounting.accounting;
 const CurrencyMap = Local.imports.CurrencyMap.CurrencyMap;
+const ExchangeData = Local.imports.ExchangeData.ExchangeData;
 
 
 /*
@@ -30,6 +31,19 @@ Soup.Session.prototype.add_feature.call(
   _httpSession,
   new Soup.ProxyResolverDefault()
 );
+
+
+const getCurrencyToExchange = function () ExchangeData
+
+const getExchangeToCurrency = function ()
+  Object.keys(ExchangeData).reduce(function (o, currency) {
+    ExchangeData[currency].forEach(function (exchange) {
+      let a = o[exchange] || [];
+      a.push(currency);
+      o[exchange] = a;
+    });
+    return o;
+  }, {})
 
 
 const getJSON = function (url, callback) {
@@ -383,6 +397,8 @@ const BitcoinAverageApi = new Lang.Class({
 
   apiName: "BitcoinAverage",
 
+  exchanges: Object.keys(getExchangeToCurrency()),
+
   currencies: [ 'USD', 'EUR', 'GBP', 'CAD', 'RUB', 'AUD', 'BRL',
                 'CNY', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN'],
 
@@ -420,6 +436,10 @@ const BitcoinChartsApi = new Lang.Class({
 
   apiName: "BitcoinCharts",
 
+  /* http://bitcoincharts.com/about/markets-api/:
+   *
+   * > Don't query more often than once every 15 minutes!
+   */
   interval: 15 * 60 * 1000,
 
   currencies: ["USD", "CHF"],
@@ -437,7 +457,7 @@ const ApiProvider = new Lang.Class({
     this.apis = {
       mtgox: new MtGoxApi(),
       bitstamp: new BitstampApi(),
-      bitcoinaverage: new BitcoinAverageApi()
+      bitcoinaverage: new BitcoinAverageApi(),
       // btcharts: new BitcoinChartsApi()
     }
   },

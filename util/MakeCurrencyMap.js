@@ -7,7 +7,7 @@
       Soup.Message.new("GET", url),
       function (session, message) {
         let json = message.response_body.data;
-        print("const CurrencyMap = " + JSON.stringify(
+        print("const CurrencyData = " + JSON.stringify(
           JSON.parse(json), null, 4
         ) + ";");
         // this makes it a quine ;-)
