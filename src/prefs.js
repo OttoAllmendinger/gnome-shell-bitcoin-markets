@@ -71,6 +71,8 @@ const ComboBoxView = new Lang.Class({
   },
 
   setOptions: function (options) {
+    this.model.clear();
+
     for each (let o in options) {
       let iter;
 
@@ -206,19 +208,40 @@ const BitcoinAverageConfigView = new Lang.Class({
     let api = new ApiProvider.BitcoinAverageApi();
 
     let currencySelect = this._addSelectCurrency(api.currencies);
+    let averageSwitch = this._addAverageSwitch();
     let exchangeSelect = this._addSelectExchange();
 
-    let updateExchangeSelect = function (currency) {
+    let updateExchangeSelect = function () {
+      let useAverage = this._indicatorConfig.get('use_average');
+      let currency = this._indicatorConfig.get('currency');
+      exchangeSelect.rowWidget.sensitive = useAverage === false;
       exchangeSelect.comboBoxView.setOptions(
         this._makeExchangeOptions(currency)
       );
     }.bind(this);
 
-    currencySelect.comboBoxView.connect(
-      'changed', function (view, currency) updateExchangeSelect(currency)
-    );
+    currencySelect.comboBoxView.connect('changed', updateExchangeSelect);
 
-    updateExchangeSelect(this._indicatorConfig.get('currency'));
+    // TODO use proper view method: connect("changed")
+    averageSwitch.switchView.connect('notify::active', function (obj) {
+      this._indicatorConfig.set('use_average', obj.active);
+      updateExchangeSelect();
+    }.bind(this));
+
+    updateExchangeSelect();
+  },
+
+  _addAverageSwitch: function () {
+    let switchView = new Gtk.Switch({
+      active: this._indicatorConfig.get('use_average')
+    });
+
+    let rowWidget = this._addRow(_("Average"), switchView);
+
+    return {
+      rowWidget: rowWidget,
+      switchView: switchView
+    };
   },
 
   _addSelectExchange: function () {
@@ -237,15 +260,11 @@ const BitcoinAverageConfigView = new Lang.Class({
   },
 
   _makeExchangeOptions: function (currency) {
-    let currentExchange = this._indicatorConfig.get('exchange') || 'average';
+    let currentExchange = this._indicatorConfig.get('exchange');
     let exchanges = ApiProvider.getCurrencyToExchange()[currency];
 
-    let options = [
-      {label: 'Average', value: 'average', active: (currentExchange === 'average')}
-    ];
-
-    exchanges.forEach(function (e) {
-      options.push({label: e, value: e, active: e === currentExchange});
+    let options = exchanges.map(function (e) {
+      return {label: e, value: e, active: e === currentExchange}
     });
 
     return options;
