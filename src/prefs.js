@@ -226,7 +226,7 @@ const BitcoinAverageConfigView = new Lang.Class({
 
     comboBoxExchange.connect("changed", function (view, value) {
       this._indicatorConfig.set('exchange', value);
-    });
+    }.bind(this));
 
     let rowWidget = this._addRow(_("Exchange"), comboBoxExchange.widget);
 
@@ -237,16 +237,15 @@ const BitcoinAverageConfigView = new Lang.Class({
   },
 
   _makeExchangeOptions: function (currency) {
-    let currentExchange = this._indicatorConfig.get('exchange');
+    let currentExchange = this._indicatorConfig.get('exchange') || 'average';
     let exchanges = ApiProvider.getCurrencyToExchange()[currency];
 
     let options = [
-      {label: 'Average', value: 'average', active: false}
+      {label: 'Average', value: 'average', active: (currentExchange === 'average')}
     ];
 
     exchanges.forEach(function (e) {
-      log("exchanges.forEach() e=" + e);
-      options.push({label: e, value: e, active: e == currentExchange});
+      options.push({label: e, value: e, active: e === currentExchange});
     });
 
     return options;
