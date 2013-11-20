@@ -3,7 +3,9 @@
   const makeExchangeData = function (tickerData)
       Object.keys(tickerData).reduce(function (o, k) {
           if (k !== "timestamp") {
-              o[k] = Object.keys(tickerData[k]);
+              o[k] = Object.keys(tickerData[k]).sort(function (a, b)
+                tickerData[k][b].volume_btc - tickerData[k][a].volume_btc
+              );
           }
           return o;
       }, {});
