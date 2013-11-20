@@ -42,3 +42,8 @@ install: archive
 	mkdir -p $(EXTENSION_PATH)
 	unzip $(ZIPFILE) -d $(EXTENSION_PATH)
 
+testprefs: install
+	gnome-shell-extension-prefs $(UUID)
+
+restart: install
+	gjs util/restartShell.js
