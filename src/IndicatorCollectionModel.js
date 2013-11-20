@@ -52,8 +52,11 @@ const IndicatorCollectionModel = new GObject.Class({
     CONFIG: 1
   },
 
-  _init: function (params) {
+  _init: function (params, apiProvider) {
     this.parent(params);
+
+    this._apiProvider = apiProvider;
+
     this.set_column_types([GObject.TYPE_STRING, GObject.TYPE_STRING]);
 
     this._settings = Convenience.getSettings();
@@ -99,7 +102,7 @@ const IndicatorCollectionModel = new GObject.Class({
   },
 
   _getLabel: function (config) {
-    return config.api + " " + config.currency;
+    return this._apiProvider.apis[config.api].getLabel(config);
   },
 
   _getDefaults: function () {

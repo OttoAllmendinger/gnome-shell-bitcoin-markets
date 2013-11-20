@@ -311,6 +311,10 @@ const BaseApi = new Lang.Class({
     );
   },
 
+  getLabel: function (options) {
+    return options.api + " " + options.currency;
+  },
+
   destroy: function () {
     for each (let handler in this._urlHandlers) {
       handler.destroy();

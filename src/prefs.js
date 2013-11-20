@@ -403,14 +403,14 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     });
 
     this._apiProvider = new ApiProvider.ApiProvider();
-    this._store = new IndicatorCollectionModel();
+    this._store = new IndicatorCollectionModel(undefined, this._apiProvider);
 
     /* sidebar (left) */
 
     let sidebar = new Gtk.Box({
       margin: 10,
       orientation: Gtk.Orientation.VERTICAL,
-      width_request: 200
+      width_request: 240
     });
 
     sidebar.add(this._getTreeView());
