@@ -414,20 +414,50 @@ const BitcoinAverageApi = new Lang.Class({
    */
   interval: 60,
 
+  _invalidExchangeError: function () {
+    return new Error("use_average !== true and no exchange defined");
+  },
+
   attributes: {
     last: function (options) {
       let currencyRenderer = new CurrencyRenderer(options);
 
+      let getNumber = function (data) {
+        if (options.use_average !== false) {
+          return currencyRenderer(data.last);
+        } else if (options.exchange !== undefined) {
+          return currencyRenderer(data[options.exchange].rates.last)
+        } else {
+          throw this._invalidExchangeError();
+        }
+      };
+
       return {
-        text: function (data) currencyRenderer(data.last),
-        change: new ChangeRenderer(new Selector("last"))
+        text: function (data) currencyRenderer(getNumber(data)),
+        change: new ChangeRenderer(getNumber)
       }
     }
   },
 
-  getUrl: function (options) (
-    "http://api.bitcoinaverage.com/ticker/" + options.currency
-  )
+  getUrl: function (options) {
+    if (options.use_average !== false) {
+      return "http://api.bitcoinaverage.com/ticker/" + options.currency;
+    } else if (options.exchange !== undefined) {
+      return "http://api.bitcoinaverage.com/exchanges/" + options.currency;
+    } else {
+      throw this._invalidExchangeError();
+    }
+  },
+
+  getLabel: function (options) {
+    if (options.use_average !== false) {
+      return options.api + " " + options.currency + "/average";
+    } else if (options.exchange !== undefined) {
+      return options.api + " " + options.currency + "/" + options.exchange;
+    } else {
+      throw this._invalidExchangeError();
+    }
+  }
 });
 
 
