@@ -205,6 +205,12 @@ const BitcoinAverageConfigView = new Lang.Class({
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
 
+    // set defaults
+    indicatorConfig.set(
+      'use_average',
+      indicatorConfig.get('use_average') !== false
+    );
+
     let api = new ApiProvider.BitcoinAverageApi();
 
     let currencySelect = this._addSelectCurrency(api.currencies);
@@ -233,7 +239,7 @@ const BitcoinAverageConfigView = new Lang.Class({
 
   _addAverageSwitch: function () {
     let switchView = new Gtk.Switch({
-      active: this._indicatorConfig.get('use_average')
+      active: this._indicatorConfig.get('use_average') !== false
     });
 
     let rowWidget = this._addRow(_("Average"), switchView);
@@ -266,6 +272,10 @@ const BitcoinAverageConfigView = new Lang.Class({
     let options = exchanges.map(function (e) {
       return {label: e, value: e, active: e === currentExchange}
     });
+
+    if (currentExchange === undefined) {
+      options[0].active = true;
+    }
 
     return options;
   },
