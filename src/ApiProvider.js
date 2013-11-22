@@ -168,10 +168,14 @@ const IndicatorModel = new Lang.Class({
       if (error) {
         this.emit("update", error, null);
       } else {
-        this.emit("update", null, {
-          text: formatter.text(data, options),
-          change: formatter.change(data, options)
-        });
+        try {
+          this.emit("update", null, {
+            text: formatter.text(data, options),
+            change: formatter.change(data, options)
+          });
+        } catch (formatError) {
+          this.emit("update", formatError, null);
+        }
       }
     });
 
