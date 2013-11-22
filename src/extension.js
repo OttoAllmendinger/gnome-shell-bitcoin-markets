@@ -71,11 +71,14 @@ const MarketIndicatorView = new Lang.Class({
 
   _initLayout: function () {
     let layout = new St.BoxLayout();
-    this._indicatorView = new St.Label();
+
+    this._indicatorView = new St.Label({
+      y_align: Clutter.ActorAlign.CENTER
+    });
+
     this._statusView = new St.Label({
-      width: 24
-      // , x_fill: true
-      // , x_align: Clutter.ActorAlign.CENTER
+      width: 24,
+      y_align: Clutter.ActorAlign.CENTER
     });
 
     layout.add_actor(this._statusView);
