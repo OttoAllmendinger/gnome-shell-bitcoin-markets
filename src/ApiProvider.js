@@ -497,27 +497,6 @@ const BitcoinAverageApi = new Lang.Class({
 
 
 
-const BitcoinChartsApi = new Lang.Class({
-  Name: "BitcoinChartsApi",
-
-  Extends: BaseApi,
-
-  apiName: "BitcoinCharts",
-
-  /* http://bitcoincharts.com/about/markets-api/:
-   *
-   * > Don't query more often than once every 15 minutes!
-   */
-  interval: 15 * 60 * 1000,
-
-  currencies: ["USD", "CHF"],
-
-  getUrl: function (options) {
-    return "http://bitcoincharts.com/t/markets.json";
-  }
-});
-
-
 const ApiProvider = new Lang.Class({
   Name: "ApiProvider",
 
