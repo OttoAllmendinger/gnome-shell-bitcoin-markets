@@ -199,6 +199,60 @@ const MtGoxConfigView = new Lang.Class({
 
 
 
+const BitPayConfigView = new Lang.Class({
+  Name: "BitPayConfigView",
+  Extends: ProviderConfigView,
+
+  _init: function (configWidget, indicatorConfig) {
+    this.parent(configWidget, indicatorConfig);
+    this._addSelectCurrency((new ApiProvider.BitPayApi()).currencies);
+  },
+
+  _setDefaults: function (config) {
+    if (config.get('api') !== 'bitpay') {
+      config.attributes = {
+        api: 'bitpay',
+        currency: 'USD',
+        attribute: 'last'
+      };
+
+      config.emit('update');
+    }
+  },
+});
+
+Signals.addSignalMethods(BitPayConfigView.prototype);
+
+
+
+
+const CoinbaseConfigView = new Lang.Class({
+  Name: "CoinbaseConfigView",
+  Extends: ProviderConfigView,
+
+  _init: function (configWidget, indicatorConfig) {
+    this.parent(configWidget, indicatorConfig);
+    this._addSelectCurrency((new ApiProvider.CoinbaseApi()).currencies);
+  },
+
+  _setDefaults: function (config) {
+    if (config.get('api') !== 'coinbase') {
+      config.attributes = {
+        api: 'coinbase',
+        currency: 'USD',
+        attribute: 'last'
+      };
+
+      config.emit('update');
+    }
+  },
+});
+
+Signals.addSignalMethods(CoinbaseConfigView.prototype);
+
+
+
+
 
 const BitcoinAverageConfigView = new Lang.Class({
   Name: "BitcoinAverageConfigView",
@@ -299,32 +353,6 @@ const BitcoinAverageConfigView = new Lang.Class({
 
 
 
-const BitcoinChartsConfigView = new Lang.Class({
-  Name: "BitcoinChartsConfigView",
-  Extends: ProviderConfigView,
-
-  _init: function (configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
-    let api = new ApiProvider.BitcoinCharts();
-    this._addSelectCurrency((new ApiProvider.BitcoinChartsApi()).currencies);
-  },
-
-  _setDefaults: function (config) {
-    if (config.get('api') !== 'bitstamp') {
-      config.attributes = {
-        api: 'bitcoincharts',
-        exchange: 'mtgox',
-        currency: 'USD',
-        attribute: 'last'
-      };
-
-      config.emit('update');
-    }
-  }
-});
-
-
-
 
 const IndicatorConfigView = new Lang.Class({
   Name: "BitcoinMarkets.IndicatorConfigView",
@@ -339,7 +367,9 @@ const IndicatorConfigView = new Lang.Class({
     let options = [
         {label: 'BitcoinAverage', value: 'bitcoinaverage'},
         {label: 'MtGox',    value: 'mtgox'},
-        {label: 'BitStamp', value: 'bitstamp'}
+        {label: 'BitStamp', value: 'bitstamp'},
+        {label: 'BitPay',   value: 'bitpay'},
+        {label: 'CoinBase', value: 'coinbase'}
     ];
 
     for each (let o in options) {
@@ -377,6 +407,18 @@ const IndicatorConfigView = new Lang.Class({
 
       bitcoinaverage: function () {
         return new BitcoinAverageConfigView(
+          this.widget, this._indicatorConfig
+        );
+      }.bind(this),
+
+      bitpay: function () {
+        return new BitPayConfigView(
+          this.widget, this._indicatorConfig
+        );
+      }.bind(this),
+
+      coinbase: function () {
+        return new CoinbaseConfigView(
           this.widget, this._indicatorConfig
         );
       }.bind(this)
@@ -424,6 +466,9 @@ const IndicatorConfigView = new Lang.Class({
 });
 
 Signals.addSignalMethods(IndicatorConfigView.prototype);
+
+
+
 
 
 

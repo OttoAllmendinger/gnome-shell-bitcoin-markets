@@ -34,6 +34,12 @@ Soup.Session.prototype.add_feature.call(
 );
 
 
+const DefaultCurrencies = [
+      'USD', 'EUR', 'CNY', 'GBP', 'CAD', 'RUB', 'AUD',
+      'BRL', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN'
+];
+
+
 const getCurrencyToExchange = function () ExchangeData;
 
 const getExchangeToCurrency = function ()
@@ -346,10 +352,7 @@ const MtGoxApi = new Lang.Class({
 
   interval: 30,
 
-  currencies: [
-    "USD", "EUR", "GBP", "AUD", "CAD", "CHF", "CNY", "DKK",
-    "HKD", "NZD", "PLN", "RUB", "SGD", "THB", "NOK", "CZK"
-  ],
+  currencies: DefaultCurrencies,
 
   attributes: {
     last_local: function (options) {
@@ -433,9 +436,7 @@ const BitcoinAverageApi = new Lang.Class({
 
   exchanges: Object.keys(getExchangeToCurrency()),
 
-  currencies: [ 'USD', 'EUR', 'GBP', 'CAD', 'RUB', 'AUD', 'BRL',
-                'CNY', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN'],
-
+  currencies: DefaultCurrencies,
   /* quote https://bitcoinaverage.com/api.htm
    *
    * > API is updated along with the site, normally around every minute. There
@@ -495,6 +496,85 @@ const BitcoinAverageApi = new Lang.Class({
 });
 
 
+const BitPayApi = new Lang.Class({
+  Name: 'BitPayApi',
+  Extends: BaseApi,
+
+  apiName: "BitPay",
+
+  currencies: DefaultCurrencies,
+
+  interval: 60, // unclear, should be safe
+
+  attributes: {
+    last: function (options) {
+      let renderCurrency = new CurrencyRenderer(options);
+      let renderChange = new ChangeRenderer();
+
+      let find = function (currency, arr) {
+        for (let {code, rate} of arr) {
+          if (code === currency) {
+            return rate;
+          }
+        }
+
+        throw Error("currency " + currency + " not found");
+      };
+
+      return {
+        text: function (data)
+          renderCurrency(find(options.currency, data)),
+        change: function (data)
+          renderChange(find(options.currency, data))
+      };
+    }
+  },
+
+  getLabel: function (options) {
+    return "BitPay " + options.currency;
+  },
+
+  getUrl: function (options) {
+    return "https://bitpay.com/api/rates";
+  }
+});
+
+
+
+const CoinbaseApi = new Lang.Class({
+  Name: 'CoinbaseApi',
+  Extends: BaseApi,
+
+  apiName: "Coinbase",
+
+  currencies: DefaultCurrencies,
+
+  interval: 60, // unclear, should be safe
+
+  attributes: {
+    last: function (options) {
+      let renderCurrency = new CurrencyRenderer(options);
+      let renderChange = new ChangeRenderer();
+
+      let key = 'btc_to_' + options.currency.toLowerCase();
+
+      return {
+        text: function (data)
+          renderCurrency(data[key]),
+        change: function (data)
+          renderChange(data[key])
+      };
+    }
+  },
+
+  getLabel: function (options) {
+    return "Coinbase " + options.currency;
+  },
+
+  getUrl: function (options) {
+    return "https://coinbase.com/api/v1/currencies/exchange_rates";
+  }
+});
 
 
 const ApiProvider = new Lang.Class({
@@ -502,10 +582,11 @@ const ApiProvider = new Lang.Class({
 
   _init: function () {
     this.apis = {
+      bitcoinaverage: new BitcoinAverageApi(),
       mtgox: new MtGoxApi(),
       bitstamp: new BitstampApi(),
-      bitcoinaverage: new BitcoinAverageApi(),
-      // btcharts: new BitcoinChartsApi()
+      bitpay: new BitPayApi(),
+      coinbase: new CoinbaseApi(),
     };
   },
 
@@ -535,7 +616,7 @@ if (this.ARGV !== undefined) {
 
   let options = {currency: "USD", attribute: "last"};
 
-  let indicator = apiProvider.get('bitstamp', options);
+  let indicator = apiProvider.get('bitpay', options);
 
   indicator.connect("update-start", function () {
     log("signal update-start");
