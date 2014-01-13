@@ -399,21 +399,22 @@ const IndicatorConfigView = new Lang.Class({
   _addSelectUnit: function () {
     let preset = this._indicatorConfig.get('unit') || 'mBTC';
 
-    let unitView = makeComboBox([
+    let unitView = new ComboBoxView([
       {label: 'mBTC', value: 'mBTC', active: (preset === 'mBTC')},
       {label: 'BTC',  value: 'BTC',  active: (preset === 'BTC')}
     ]);
+
+    if (this._indicatorConfig.get('unit') === undefined) {
+      this._indicatorConfig.set('unit', 'mBTC');
+    }
 
     unitView.connect('changed', function (view, value) {
       this._indicatorConfig.set('unit', value);
     }.bind(this));
 
-    let rowWidget = this._addRow(_("Currency unit"), unitView);
+    let rowWidget = makeConfigRow(_("Unit"), unitView.widget);
 
-    return {
-      rowWidget: rowWidget,
-      unitView: unitView
-    };
+    return rowWidget;
   },
 
   destroy: function () {

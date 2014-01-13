@@ -89,16 +89,15 @@ const IndicatorChange = {
 };
 
 
-const ChangeRenderer = function (getValue)  {
+const ChangeRenderer = function (options) {
   /**
    * Returns a function that returns the change
    * in value between consecutive calls.
    */
   let lastValue;
 
-  return function (data) {
+  return function (newValue) {
     let ret = IndicatorChange.unchanged;
-    let newValue = getValue(data);
 
     if (lastValue !== undefined) {
       if (lastValue > newValue) {
@@ -116,7 +115,9 @@ const ChangeRenderer = function (getValue)  {
 
 
 
-const CurrencyRenderer = function ({currency}) {
+const CurrencyRenderer = function ({unit, currency}) {
+  unit = unit || 'mBTC';
+
   const getFormat = function (currency) {
     /* determined after mtgox api */
     const front = "%s%v";
@@ -127,6 +128,14 @@ const CurrencyRenderer = function ({currency}) {
     };
 
     return frontFormats[currency] || back;
+  };
+
+  const changeUnit = function (number) {
+    if (unit === 'mBTC') {
+      return Number(number) / 1000.0;
+    } else {
+      return Number(number);
+    }
   };
 
   let format = getFormat(currency);
@@ -145,7 +154,7 @@ const CurrencyRenderer = function ({currency}) {
   }
 
   return function (number)
-    Accounting.formatMoney(number, {
+    Accounting.formatMoney(changeUnit(number), {
       symbol: symbol,
       format: format,
       precision: precision
@@ -175,6 +184,7 @@ const IndicatorModel = new Lang.Class({
             change: formatter.change(data, options)
           });
         } catch (formatError) {
+          log("formatError " + formatError);
           this.emit("update", formatError, null);
         }
       }
@@ -343,11 +353,15 @@ const MtGoxApi = new Lang.Class({
 
   attributes: {
     last_local: function (options) {
+      let renderCurrency = new CurrencyRenderer(options);
+      let renderChange = new ChangeRenderer();
+
       return {
-        text: new Selector("data.last_local.display"),
-        change: new ChangeRenderer(
-          new Selector('data.last_local.value_int')
-        )
+        text: function (data)
+          renderCurrency(data.data.last_local.value),
+
+        change: function (data)
+          renderChange(data.data.last_local.value)
       };
     }
   },
@@ -356,10 +370,14 @@ const MtGoxApi = new Lang.Class({
     return "mtgox://" + options.currency;
   },
 
+  getLabel: function (options) {
+    return "MtGox " + options.currency;
+  },
+
   getUrl: function (options) {
     return "http://data.mtgox.com/" +
       "api/2/BTC" + (options.currency) +
-      "/money/ticker";
+      "/money/ticker_fast";
   },
 });
 
@@ -381,13 +399,20 @@ const BitstampApi = new Lang.Class({
 
   attributes: {
     last: function (options) {
-      let currencyRenderer = new CurrencyRenderer(options);
+      let renderCurrency = new CurrencyRenderer(options);
+      let renderChange = new ChangeRenderer();
 
       return {
-        text: function (data) currencyRenderer(data.last),
-        change: new ChangeRenderer(new Selector("last"))
+        text: function (data)
+          renderCurrency(data.last),
+        change: function (data)
+          renderChange(data.last)
       };
     }
+  },
+
+  getLabel: function (options) {
+    return "BitStamp " + options.currency;
   },
 
   getUrl: function (options) {
@@ -425,21 +450,25 @@ const BitcoinAverageApi = new Lang.Class({
 
   attributes: {
     last: function (options) {
-      let currencyRenderer = new CurrencyRenderer(options);
+      let renderCurrency = new CurrencyRenderer(options);
+      let renderChange = new ChangeRenderer();
 
       let getNumber = function (data) {
         if (options.use_average !== false) {
-          return currencyRenderer(data.last);
+          return data.last;
         } else if (options.exchange !== undefined) {
-          return currencyRenderer(data[options.exchange].rates.last);
+          return data[options.exchange].rates.last;
         } else {
           throw this._invalidExchangeError();
         }
       };
 
       return {
-        text: function (data) currencyRenderer(getNumber(data)),
-        change: new ChangeRenderer(getNumber)
+        text: function (data)
+          renderCurrency(getNumber(data)),
+
+        change: function (data)
+          renderChange(getNumber(data))
       };
     }
   },
@@ -456,9 +485,9 @@ const BitcoinAverageApi = new Lang.Class({
 
   getLabel: function (options) {
     if (options.use_average !== false) {
-      return options.api + " " + options.currency + "/average";
+      return "BitAvg " + options.currency;
     } else if (options.exchange !== undefined) {
-      return options.api + " " + options.currency + "/" + options.exchange;
+      return "BitAvg " + options.currency + "@" + options.exchange;
     } else {
       throw this._invalidExchangeError();
     }
