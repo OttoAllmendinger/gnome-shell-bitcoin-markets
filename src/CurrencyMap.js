@@ -1,4 +1,5 @@
-const CurrencyMap = {
+/*jshint -W100, moz:true */
+const CurrencyData = {
     "AED": {
         "symbol": "AED",
         "symbol_native": "د.إ.‏",

@@ -1,3 +1,4 @@
+/*jshint moz:true */
 /* -*- mode: js -*- */
 /*
   Copyright (c) 2011-2012, Giovanni Campagna <scampa.giovanni@gmail.com>
@@ -85,8 +86,9 @@ function getSettings(schema) {
 
     let schemaObj = schemaSource.lookup(schema, true);
     if (!schemaObj)
-        throw new Error('Schema ' + schema + ' could not be found for extension '
-                        + extension.metadata.uuid + '. Please check your installation.');
+        throw new Error(
+                'Schema ' + schema + ' could not be found for extension ' +
+                extension.metadata.uuid + '. Please check your installation.');
 
     return new Gio.Settings({ settings_schema: schemaObj });
 }

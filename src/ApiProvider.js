@@ -1,3 +1,4 @@
+/*jshint moz:true */
 // vi: sw=2 sts=2 et
 
 const Lang = imports.lang;
@@ -7,7 +8,7 @@ const Mainloop = imports.mainloop;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Accounting = Local.imports.accounting.accounting;
-const CurrencyMap = Local.imports.CurrencyMap.CurrencyMap;
+const CurrencyData = Local.imports.CurrencyData.CurrencyData;
 const ExchangeData = Local.imports.ExchangeData.ExchangeData;
 
 
@@ -33,7 +34,7 @@ Soup.Session.prototype.add_feature.call(
 );
 
 
-const getCurrencyToExchange = function () ExchangeData
+const getCurrencyToExchange = function () ExchangeData;
 
 const getExchangeToCurrency = function ()
   Object.keys(ExchangeData).reduce(function (o, currency) {
@@ -43,7 +44,7 @@ const getExchangeToCurrency = function ()
       o[exchange] = a;
     });
     return o;
-  }, {})
+  }, {});
 
 
 const getJSON = function (url, callback) {
@@ -110,7 +111,7 @@ const ChangeRenderer = function (getValue)  {
     lastValue = newValue;
 
     return ret;
-  }
+  };
 };
 
 
@@ -126,13 +127,13 @@ const CurrencyRenderer = function ({currency}) {
     };
 
     return frontFormats[currency] || back;
-  }
+  };
 
   let format = getFormat(currency);
   let symbol = currency;
   let precision = 2;
 
-  let info = CurrencyMap[currency];
+  let info = CurrencyData[currency];
 
   if (info) {
     symbol = info.symbol_native;
@@ -149,7 +150,7 @@ const CurrencyRenderer = function ({currency}) {
       format: format,
       precision: precision
     });
-}
+};
 
 
 /**
@@ -224,7 +225,7 @@ const Handler = new Lang.Class({
   _init: function (id, options, poll, interval) {
     if ((!interval) || (interval < 1)) {
       throw new Error('invalid interval ' + interval);
-    };
+    }
 
     this._id = id;
 
@@ -322,7 +323,7 @@ const BaseApi = new Lang.Class({
   destroy: function () {
     for each (let handler in this._urlHandlers) {
       handler.destroy();
-    };
+    }
   }
 });
 
@@ -356,9 +357,9 @@ const MtGoxApi = new Lang.Class({
   },
 
   getUrl: function (options) {
-    return "http://data.mtgox.com/"
-      + "api/2/BTC" + (options.currency)
-      + "/money/ticker";
+    return "http://data.mtgox.com/" +
+      "api/2/BTC" + (options.currency) +
+      "/money/ticker";
   },
 });
 
@@ -385,7 +386,7 @@ const BitstampApi = new Lang.Class({
       return {
         text: function (data) currencyRenderer(data.last),
         change: new ChangeRenderer(new Selector("last"))
-      }
+      };
     }
   },
 
@@ -430,7 +431,7 @@ const BitcoinAverageApi = new Lang.Class({
         if (options.use_average !== false) {
           return currencyRenderer(data.last);
         } else if (options.exchange !== undefined) {
-          return currencyRenderer(data[options.exchange].rates.last)
+          return currencyRenderer(data[options.exchange].rates.last);
         } else {
           throw this._invalidExchangeError();
         }
@@ -439,7 +440,7 @@ const BitcoinAverageApi = new Lang.Class({
       return {
         text: function (data) currencyRenderer(getNumber(data)),
         change: new ChangeRenderer(getNumber)
-      }
+      };
     }
   },
 
@@ -497,7 +498,7 @@ const ApiProvider = new Lang.Class({
       bitstamp: new BitstampApi(),
       bitcoinaverage: new BitcoinAverageApi(),
       // btcharts: new BitcoinChartsApi()
-    }
+    };
   },
 
   get: function (name, options) {
@@ -518,7 +519,7 @@ const ApiProvider = new Lang.Class({
 });
 
 
-if (this['ARGV'] !== undefined) {
+if (this.ARGV !== undefined) {
   // run by gjs
   log("command line");
 

@@ -1,3 +1,4 @@
+/*jshint moz:true */
 // vi: sw=2 sts=2 et
 
 const Lang = imports.lang;
@@ -97,10 +98,10 @@ Signals.addSignalMethods(ComboBoxView.prototype);
 const makeComboBoxCurrency = function (currencies, selected) {
   let options = currencies.map(
     function (c) ({label: c, value: c, active: (c === selected)})
-  )
+  );
 
   return new ComboBoxView(options);
-}
+};
 
 const ProviderConfigView = new Lang.Class({
   Name: "ProviderConfigView",
@@ -119,6 +120,7 @@ const ProviderConfigView = new Lang.Class({
 
     return rowWidget;
   },
+
 
   _addSelectCurrency: function (currencies) {
     let comboBoxCurrency = makeComboBoxCurrency(
@@ -165,7 +167,7 @@ const BitStampConfigView = new Lang.Class({
         api: 'bitstamp',
         currency: 'USD',
         attribute: 'last'
-      }
+      };
 
       config.emit('update');
     }
@@ -188,7 +190,7 @@ const MtGoxConfigView = new Lang.Class({
         api: 'mtgox',
         currency: 'USD',
         attribute: 'last_local'
-      }
+      };
 
       config.emit('update');
     }
@@ -262,16 +264,16 @@ const BitcoinAverageConfigView = new Lang.Class({
     return {
       rowWidget: rowWidget,
       comboBoxView: comboBoxExchange
-    }
+    };
   },
 
   _makeExchangeOptions: function (currency) {
     let currentExchange = this._indicatorConfig.get('exchange');
     let exchanges = ApiProvider.getCurrencyToExchange()[currency];
 
-    let options = exchanges.map(function (e) {
-      return {label: e, value: e, active: e === currentExchange}
-    });
+    let options = exchanges.map(function (e) 
+      ({label: e, value: e, active: e === currentExchange})
+    );
 
     if (currentExchange === undefined) {
       options[0].active = true;
@@ -314,7 +316,7 @@ const BitcoinChartsConfigView = new Lang.Class({
         exchange: 'mtgox',
         currency: 'USD',
         attribute: 'last'
-      }
+      };
 
       config.emit('update');
     }
@@ -376,7 +378,7 @@ const IndicatorConfigView = new Lang.Class({
           this.widget, this._indicatorConfig
         );
       }.bind(this)
-    }
+    };
 
     if (this._apiConfigView) {
       this._apiConfigView.destroy();
@@ -457,7 +459,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     });
 
     let label = new Gtk.TreeViewColumn({title: "Label"});
-    let renderer = new Gtk.CellRendererText()
+    let renderer = new Gtk.CellRendererText();
     label.pack_start(renderer, true);
     label.add_attribute(renderer, "text", 0);
     this._treeView.insert_column(label, 0);

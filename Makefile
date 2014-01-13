@@ -1,11 +1,14 @@
 SCHEMA = org.gnome.shell.extensions.bitcoin-markets.gschema.xml
 
 SOURCE = src/*.js \
-		 src/CurrencyMap.js \
+		 src/CurrencyData.js \
+		 src/ExchangeData.js \
 		 src/metadata.json \
 		 src/schemas/gschemas.compiled \
 		 src/schemas/$(SCHEMA) \
 		 src/locale/*
+
+VENDOR = src/vendor/*.js
 
 
 TRANSLATION_SOURCE=$(wildcard src/*.po)
@@ -19,8 +22,14 @@ EXTENSION_PATH = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
 
 all: schemas archive translations
 
-src/CurrencyMap.js:
-	gjs util/MakeCurrencyMap.js > src/CurrencyMap.js
+lint: src/*.js
+	jshint $?
+
+src/CurrencyData.js:
+	gjs util/MakeCurrencyData.js > src/CurrencyData.js
+
+src/ExchangeData.js:
+	gjs util/MakeExchangeData.js > src/ExchangeData.js
 
 src/locale/%/LC_MESSAGES/bitcoin-markets.mo: src/%.po
 	mkdir -p $(dir $@)
@@ -33,9 +42,12 @@ src/schemas/gschemas.compiled: src/schemas/$(SCHEMA)
 
 schemas: src/schemas/gschemas.compiled
 
-archive: schemas translations $(SOURCE)
+archive: schemas translations $(SOURCE) $(VENDOR)
 	-rm $(ZIPFILE)
-	cd src && zip -r ../$(ZIPFILE) $(patsubst src/%,%,$(SOURCE))
+	cd src/ && \
+		zip -r ../$(ZIPFILE) $(patsubst src/%,%,$(SOURCE))
+	cd src/vendor/ && \
+		zip -r ../../$(ZIPFILE) $(patsubst src/vendor/%,%,$(VENDOR))
 
 install: archive
 	-rm -r $(EXTENSION_PATH)

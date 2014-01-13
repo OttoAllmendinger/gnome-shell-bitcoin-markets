@@ -1,3 +1,4 @@
+/*jshint moz:true */
 // vi: sw=2 sts=2 et
 
 const Gdk = imports.gi.Gdk;
@@ -17,7 +18,7 @@ const Panel = imports.ui.panel;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
-const N_ = function(e) { return e };
+const N_ = function(e) e;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Extension = ExtensionUtils.getCurrentExtension();

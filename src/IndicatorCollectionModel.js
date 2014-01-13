@@ -1,3 +1,4 @@
+/*jshint moz:true */
 // vi: sw=2 sts=2 et
 
 const Lang = imports.lang;
@@ -72,7 +73,7 @@ const IndicatorCollectionModel = new GObject.Class({
           func.apply(null, arguments);
           flag = false;
         }
-      }
+      };
     };
 
     this.connect('row-changed', mutex(Lang.bind(this, this._onRowChanged)));
@@ -135,14 +136,14 @@ const IndicatorCollectionModel = new GObject.Class({
     while (res) {
       this._configs.push(this.get_value(iter, this.Columns.CONFIG));
       res = this.iter_next(iter);
-    };
+    }
 
     this._settings.set_strv(INDICATORS_KEY, this._configs);
   },
 
   _onRowChanged: function (self, path, iter) {
     let configs = this._settings.get_strv(INDICATORS_KEY);
-    let [i, ] = path.get_indices();
+    let [i, _] = path.get_indices();
 
     let config = configs[i] = this.get_value(iter, this.Columns.CONFIG);
 
@@ -156,7 +157,7 @@ const IndicatorCollectionModel = new GObject.Class({
   },
 
   _onRowInserted: function (self, path, iter) {
-    let [i, ] = path.get_indices();
+    let [i, _] = path.get_indices();
     let configs = this._settings.get_strv(INDICATORS_KEY);
     let defaults = this._getDefaults();
 
