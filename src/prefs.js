@@ -358,6 +358,8 @@ const IndicatorConfigView = new Lang.Class({
       makeConfigRow(_("Provider"), this._selectApiView.widget)
     );
 
+    this.widget.add(this._addSelectUnit());
+
     this._selectApi(indicatorConfig.get('api'));
 
     this.widget.show_all();
@@ -392,6 +394,26 @@ const IndicatorConfigView = new Lang.Class({
     }
 
     this.widget.show_all();
+  },
+
+  _addSelectUnit: function () {
+    let preset = this._indicatorConfig.get('unit') || 'mBTC';
+
+    let unitView = makeComboBox([
+      {label: 'mBTC', value: 'mBTC', active: (preset === 'mBTC')},
+      {label: 'BTC',  value: 'BTC',  active: (preset === 'BTC')}
+    ]);
+
+    unitView.connect('changed', function (view, value) {
+      this._indicatorConfig.set('unit', value);
+    }.bind(this));
+
+    let rowWidget = this._addRow(_("Currency unit"), unitView);
+
+    return {
+      rowWidget: rowWidget,
+      unitView: unitView
+    };
   },
 
   destroy: function () {
