@@ -5,6 +5,8 @@ Displays Bitcoin market information in the gnome shell. Available APIs:
 * BitcoinAverage.com
 * BitStamp
 * MtGox
+* BitPay
+* Coinbase
 
 
 ## Installation
@@ -18,9 +20,9 @@ https://extensions.gnome.org/extension/648/bitcoin-markets/
 
 The latest development version can be installed manually with these commands
 
-        cd && git clone https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets.git
-        cd ~/.local/share/gnome-shell/extensions
-        ln -s ~/gnome-shell-bitcoin-markets/src bitcoin-markets@ottoallmendinger.github.com
+        git clone https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets.git
+        cd gnome-shell-bitcoin-markets
+        make install
 
 Then go to https://extensions.gnome.org/local/ to turn on the extension or use
 gnome-tweak-tool.
