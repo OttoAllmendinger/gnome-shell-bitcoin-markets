@@ -6,5 +6,5 @@
     "description": "Display info on various Bitcoin exchanges. \n Tip address 1645A1qhW3FHxr2JLdqLuYGQ6QSmN5BbNS.",
     "settings-schema":  "org.gnome.shell.extensions.bitcoin-markets",
     "gettext-domain": "bitcoin-markets",
-    "git-version": "4b08-dirty"
+    "git-version": "_gitversion_"
 }

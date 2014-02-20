@@ -10,21 +10,52 @@ const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Accounting = Local.imports.accounting.accounting;
 const CurrencyData = Local.imports.CurrencyData.CurrencyData;
 const ExchangeData = Local.imports.ExchangeData.ExchangeData;
-
+const Config = imports.misc.config;
 
 /*
  * Init HTTP
  *
  */
 
-const _version = "0.2.0";
+const getExtensionVersion = function () {
+  if (Local.metadata['git-version']) {
+    return 'git-' + Local.metadata['git-version'];
+  } else if (Local.metadata.version) {
+    return 'v' + Local.metadata.version;
+  } else {
+    return 'unknown';
+  }
+};
+
+const getGnomeVersion = function () {
+  return Config.PACKAGE_VERSION;
+};
+
 const _repository = "http://github.com/OttoAllmendinger/" +
                     "gnome-shell-bitcoin-markets";
 
-const _userAgent =  "gnome-shell-bitcoin-markets/" + _version +
+const _userAgent =  "gnome-shell-bitcoin-markets" +
+                    "/" + getExtensionVersion() +
+                    "/Gnome" + getGnomeVersion() +
                     " (" + _repository + ")";
 
+
+// Some API providers have had issues with high traffic coming from single IPs
+// this code helps determine if these are actually different clients from behind
+// a NAT or if some clients really do many requests
+const getClientId = function () {
+  // GUID code from http://stackoverflow.com/a/2117523/92493
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+      return v.toString(16);
+  });
+};
+
+const _clientId = getClientId();
+
 const _httpSession = new Soup.SessionAsync();
+
+const HTTP_TOO_MANY_REQUESTS = 429;
 
 _httpSession['user-agent'] = _userAgent;
 
@@ -52,11 +83,13 @@ const getExchangeToCurrency = function ()
     return o;
   }, {});
 
-
 const getJSON = function (url, callback) {
-  // log('getJSON ' + url);
+  // log((new Date()) + ' getJSON ' + url);
+  let message = Soup.Message.new("GET", url);
+  let headers = message.request_headers;
+  headers.append('X-Client-Id', _clientId);
   _httpSession.queue_message(
-    Soup.Message.new("GET", url),
+    message,
     function (session, message) {
       if (message.status_code == 200) {
         callback(null, JSON.parse(message.response_body.data));
@@ -239,6 +272,8 @@ const Handler = new Lang.Class({
   Name: "Handler",
 
   _init: function (id, options, poll, interval) {
+    this.disabled = false;
+
     if ((!interval) || (interval < 1)) {
       throw new Error('invalid interval ' + interval);
     }
@@ -249,14 +284,25 @@ const Handler = new Lang.Class({
       this.emit("update-start");
 
       poll(options, Lang.bind(this, function (error, data) {
+        if (this.disabled) {
+          return;
+        }
+
         this._lastError = error;
         this._lastData = data;
         this.emit("update", error, data);
+
+        if (Number(error) == HTTP_TOO_MANY_REQUESTS) {
+          log("error " + HTTP_TOO_MANY_REQUESTS + " - disable handler " + id);
+          this.disabled = true;
+        }
       }));
 
-      this._signalTimeout = Mainloop.timeout_add_seconds(
-        interval, loop
-      );
+      if (!this.disabled) {
+        this._signalTimeout = Mainloop.timeout_add_seconds(
+          interval, loop
+        );
+      }
     });
 
     Mainloop.idle_add(loop);

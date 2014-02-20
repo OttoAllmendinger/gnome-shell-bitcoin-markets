@@ -1,5 +1,7 @@
 SCHEMA = org.gnome.shell.extensions.bitcoin-markets.gschema.xml
 
+GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always)
+
 SOURCE = src/*.js \
 		 src/CurrencyData.js \
 		 src/ExchangeData.js \
@@ -18,12 +20,15 @@ ZIPFILE = gnome-shell-bitcoin-markets.zip
 UUID = bitcoin-markets@ottoallmendinger.github.com
 EXTENSION_PATH = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
 
-.PHONY: all
+.PHONY: all schemas metadata
 
 all: schemas archive translations
 
 lint: src/*.js
 	jshint $?
+
+metadata:
+	sed 's/_gitversion_/$(GIT_VERSION)/' src/metadata.json.in > src/metadata.json
 
 src/CurrencyData.js:
 	gjs util/MakeCurrencyData.js > src/CurrencyData.js
@@ -42,7 +47,7 @@ src/schemas/gschemas.compiled: src/schemas/$(SCHEMA)
 
 schemas: src/schemas/gschemas.compiled
 
-archive: schemas translations $(SOURCE) $(VENDOR)
+archive: schemas metadata translations $(SOURCE) $(VENDOR)
 	-rm $(ZIPFILE)
 	cd src/ && \
 		zip -r ../$(ZIPFILE) $(patsubst src/%,%,$(SOURCE))
