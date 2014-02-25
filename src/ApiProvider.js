@@ -390,48 +390,6 @@ const BaseApi = new Lang.Class({
 });
 
 
-const MtGoxApi = new Lang.Class({
-  Name: "MtGoxApi",
-  Extends: BaseApi,
-
-  apiName: "MtGox",
-
-  interval: 30,
-
-  currencies: DefaultCurrencies,
-
-  attributes: {
-    last_local: function (options) {
-      let renderCurrency = new CurrencyRenderer(options);
-      let renderChange = new ChangeRenderer();
-
-      return {
-        text: function (data)
-          renderCurrency(data.data.last_local.value),
-
-        change: function (data)
-          renderChange(data.data.last_local.value)
-      };
-    }
-  },
-
-  _getHandlerId: function (options) {
-    return "mtgox://" + options.currency;
-  },
-
-  getLabel: function (options) {
-    return "MtGox " + options.currency;
-  },
-
-  getUrl: function (options) {
-    return "http://data.mtgox.com/" +
-      "api/2/BTC" + (options.currency) +
-      "/money/ticker_fast";
-  },
-});
-
-
-
 
 const BitstampApi = new Lang.Class({
   Name: 'BitstampApi',
@@ -629,7 +587,6 @@ const ApiProvider = new Lang.Class({
   _init: function () {
     this.apis = {
       bitcoinaverage: new BitcoinAverageApi(),
-      mtgox: new MtGoxApi(),
       bitstamp: new BitstampApi(),
       bitpay: new BitPayApi(),
       coinbase: new CoinbaseApi(),

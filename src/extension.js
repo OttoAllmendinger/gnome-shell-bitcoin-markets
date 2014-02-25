@@ -31,14 +31,6 @@ const INDICATORS_KEY = "indicators";
 const FIRST_RUN_KEY = "first-run";
 
 
-/**
- * TODO: use WebSockets for MtGox streaming api
- * Depends on libsoup websocket support
- * https://github.com/djdeath/libsoup
- *
- * or pure JS impl
- */
-
 const _Symbols = {
   error: "\u26A0",
   refresh: "\u27f3",

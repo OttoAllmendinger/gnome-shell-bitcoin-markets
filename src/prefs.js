@@ -175,29 +175,6 @@ const BitStampConfigView = new Lang.Class({
 });
 
 
-const MtGoxConfigView = new Lang.Class({
-  Name: "MtGoxConfigView",
-  Extends: ProviderConfigView,
-
-  _init: function (configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ApiProvider.MtGoxApi()).currencies);
-  },
-
-  _setDefaults: function (config) {
-    if (config.get('api') !== 'mtgox') {
-      config.attributes = {
-        api: 'mtgox',
-        currency: 'USD',
-        attribute: 'last_local'
-      };
-
-      config.emit('update');
-    }
-  },
-});
-
-
 
 const BitPayConfigView = new Lang.Class({
   Name: "BitPayConfigView",
@@ -366,7 +343,6 @@ const IndicatorConfigView = new Lang.Class({
 
     let options = [
         {label: 'BitcoinAverage', value: 'bitcoinaverage'},
-        {label: 'MtGox',    value: 'mtgox'},
         {label: 'BitStamp', value: 'bitstamp'},
         {label: 'BitPay',   value: 'bitpay'},
         {label: 'CoinBase', value: 'coinbase'}
@@ -397,10 +373,6 @@ const IndicatorConfigView = new Lang.Class({
 
   _selectApi: function (api) {
     let apiConfigViews = {
-      mtgox: function () {
-        return new MtGoxConfigView(this.widget, this._indicatorConfig);
-      }.bind(this),
-
       bitstamp: function () {
         return new BitStampConfigView(this.widget, this._indicatorConfig);
       }.bind(this),

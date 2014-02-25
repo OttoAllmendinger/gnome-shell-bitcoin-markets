@@ -3,7 +3,6 @@
 const ExchangeData = {
     "AUD": [
         "localbitcoins",
-        "mtgox",
         "btcmarkets",
         "weex"
     ],
@@ -13,51 +12,46 @@ const ExchangeData = {
     ],
     "CAD": [
         "cavirtex",
-        "mtgox",
+        "vaultofsatoshi",
+        "quadrigacx",
         "localbitcoins"
     ],
     "CHF": [
-        "localbitcoins",
-        "mtgox"
+        "localbitcoins"
     ],
     "CNY": [
-        "okcoin",
-        "fxbtc",
-        "btctrade",
         "btcchina",
         "bter",
         "bitxf",
-        "mtgox",
         "localbitcoins",
-        "goxbtc",
         "anx_hk"
     ],
     "EUR": [
-        "mtgox",
-        "bitcoin_de",
         "kraken",
-        "btce",
+        "bitcoin_de",
         "bitonic",
+        "btce",
         "bitcoin_central",
         "localbitcoins",
+        "itbit",
         "justcoin",
         "rocktrading",
         "bitcurex",
+        "vircurex",
         "intersango",
-        "vircurex"
+        "btceur"
     ],
     "GBP": [
         "localbitcoins",
-        "mtgox",
         "bitbargain",
-        "bittylicious"
+        "bittylicious",
+        "quickbitcoin",
+        "bit121"
     ],
     "ILS": [
-        "bit2c",
-        "localbitcoins"
+        "bit2c"
     ],
     "JPY": [
-        "mtgox",
         "localbitcoins"
     ],
     "NOK": [
@@ -66,29 +60,25 @@ const ExchangeData = {
     ],
     "NZD": [
         "bitnz",
-        "mtgox",
         "localbitcoins"
     ],
     "PLN": [
         "bitcurex",
-        "mtgox",
         "localbitcoins"
     ],
     "RUB": [
         "btce",
-        "localbitcoins",
-        "mtgox"
+        "localbitcoins"
     ],
     "SEK": [
         "fybse",
-        "mtgox",
         "localbitcoins",
         "kapiton"
     ],
     "SGD": [
-        "localbitcoins",
         "fybsg",
-        "mtgox"
+        "itbit",
+        "localbitcoins"
     ],
     "TRY": [
         "btcturk"
@@ -96,17 +86,18 @@ const ExchangeData = {
     "USD": [
         "bitstamp",
         "btce",
-        "mtgox",
         "bitfinex",
+        "itbit",
         "localbitcoins",
         "campbx",
+        "vaultofsatoshi",
         "kraken",
-        "cryptotrade",
-        "rocktrading",
-        "justcoin",
         "anx_hk",
+        "vircurex",
         "bitkonan",
-        "vircurex"
+        "justcoin",
+        "rocktrading",
+        "cryptotrade"
     ],
     "ZAR": [
         "bitx",
