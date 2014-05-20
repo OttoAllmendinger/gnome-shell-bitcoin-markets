@@ -480,9 +480,9 @@ const BitcoinAverageApi = new Lang.Class({
 
   getUrl: function (options) {
     if (options.use_average !== false) {
-      return "http://api.bitcoinaverage.com/ticker/" + options.currency;
+      return "https://api.bitcoinaverage.com/ticker/" + options.currency;
     } else if (options.exchange !== undefined) {
-      return "http://api.bitcoinaverage.com/exchanges/" + options.currency;
+      return "https://api.bitcoinaverage.com/exchanges/" + options.currency;
     } else {
       throw this._invalidExchangeError();
     }
