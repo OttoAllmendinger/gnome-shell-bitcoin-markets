@@ -5,6 +5,7 @@ GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always)
 SOURCE = src/*.js \
 		 src/CurrencyData.js \
 		 src/ExchangeData.js \
+		 src/stylesheet.css \
 		 src/metadata.json \
 		 src/schemas/gschemas.compiled \
 		 src/schemas/$(SCHEMA) \

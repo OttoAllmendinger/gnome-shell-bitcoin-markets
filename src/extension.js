@@ -36,6 +36,7 @@ const _Symbols = {
   refresh: "\u27f3",
   up: "\u25b2",
   down: "\u25bc",
+  unchanged: " ",
 };
 
 const _Colors = {
@@ -70,8 +71,8 @@ const MarketIndicatorView = new Lang.Class({
     });
 
     this._statusView = new St.Label({
-      width: 24,
-      y_align: Clutter.ActorAlign.CENTER
+      y_align: Clutter.ActorAlign.CENTER,
+      style_class: "status"
     });
 
     layout.add_actor(this._statusView);
@@ -123,7 +124,7 @@ const MarketIndicatorView = new Lang.Class({
   },
 
   _displayStatus: function (text) {
-    this._statusView.text = " " + text + " ";
+    this._statusView.text = text;
   },
 
   _displayText: function (text) {
