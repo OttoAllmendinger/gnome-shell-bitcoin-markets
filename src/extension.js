@@ -67,7 +67,8 @@ const MarketIndicatorView = new Lang.Class({
     let layout = new St.BoxLayout();
 
     this._indicatorView = new St.Label({
-      y_align: Clutter.ActorAlign.CENTER
+      y_align: Clutter.ActorAlign.CENTER,
+      style_class: "indicator"
     });
 
     this._statusView = new St.Label({
