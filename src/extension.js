@@ -121,7 +121,14 @@ const MarketIndicatorView = new Lang.Class({
     };
 
     this._displayText(data.text);
-    this._displayStatus(_StatusToSymbol[data.change]);
+
+    let symbol = " ";
+
+    if (this._options.show_change) {
+      symbol = _StatusToSymbol[data.change];
+    }
+
+    this._displayStatus(symbol);
   },
 
   _displayStatus: function (text) {

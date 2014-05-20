@@ -111,6 +111,7 @@ const ProviderConfigView = new Lang.Class({
     this._indicatorConfig = indicatorConfig;
     this._widgets = [];
     this._setDefaults(indicatorConfig);
+    this._setApiDefaults(indicatorConfig);
   },
 
   _addRow: function (label, widget) {
@@ -139,7 +140,9 @@ const ProviderConfigView = new Lang.Class({
     };
   },
 
-  _setDefaults: function (config) {},
+  _setDefaults: function (config) {
+    config.set('show_change', config.get('show_change') !== false);
+  },
 
   destroy: function () {
     for each (let widget in this._widgets) {
@@ -161,7 +164,7 @@ const BitStampConfigView = new Lang.Class({
     this._addSelectCurrency((new ApiProvider.BitstampApi()).currencies);
   },
 
-  _setDefaults: function (config) {
+  _setApiDefaults: function (config) {
     if (config.get('api') !== 'bitstamp') {
       config.attributes = {
         api: 'bitstamp',
@@ -185,7 +188,7 @@ const BitPayConfigView = new Lang.Class({
     this._addSelectCurrency((new ApiProvider.BitPayApi()).currencies);
   },
 
-  _setDefaults: function (config) {
+  _setApiDefaults: function (config) {
     if (config.get('api') !== 'bitpay') {
       config.attributes = {
         api: 'bitpay',
@@ -212,7 +215,7 @@ const CoinbaseConfigView = new Lang.Class({
     this._addSelectCurrency((new ApiProvider.CoinbaseApi()).currencies);
   },
 
-  _setDefaults: function (config) {
+  _setApiDefaults: function (config) {
     if (config.get('api') !== 'coinbase') {
       config.attributes = {
         api: 'coinbase',
@@ -246,8 +249,8 @@ const BitcoinAverageConfigView = new Lang.Class({
 
     let api = new ApiProvider.BitcoinAverageApi();
 
-    let currencySelect = this._addSelectCurrency(api.currencies);
-    let averageSwitch = this._addAverageSwitch();
+    /* exchange selection */
+
     let exchangeSelect = this._addSelectExchange();
 
     let updateExchangeSelect = function () {
@@ -259,15 +262,22 @@ const BitcoinAverageConfigView = new Lang.Class({
       );
     }.bind(this);
 
+    /* currency selection */
+
+    let currencySelect = this._addSelectCurrency(api.currencies);
     currencySelect.comboBoxView.connect('changed', updateExchangeSelect);
 
+    /* use average switch */
     // TODO use proper view method: connect("changed")
+    let averageSwitch = this._addAverageSwitch();
     averageSwitch.switchView.connect('notify::active', function (obj) {
       this._indicatorConfig.set('use_average', obj.active);
       updateExchangeSelect();
     }.bind(this));
 
     updateExchangeSelect();
+
+
   },
 
   _addAverageSwitch: function () {
@@ -313,7 +323,7 @@ const BitcoinAverageConfigView = new Lang.Class({
     return options;
   },
 
-  _setDefaults: function (config) {
+  _setApiDefaults: function (config) {
     if (config.get('api') !== 'bitcoinaverage') {
       config.attributes = {
         api: 'bitcoinaverage',
@@ -365,6 +375,8 @@ const IndicatorConfigView = new Lang.Class({
     );
 
     this.widget.add(this._addSelectUnit());
+
+    this.widget.add(this._addShowChangeSwitch());
 
     this._selectApi(indicatorConfig.get('api'));
 
@@ -429,6 +441,18 @@ const IndicatorConfigView = new Lang.Class({
     let rowWidget = makeConfigRow(_("Unit"), unitView.widget);
 
     return rowWidget;
+  },
+
+  _addShowChangeSwitch: function () {
+    let preset = this._indicatorConfig.get('show_change') !== false;
+
+    let switchView = new Gtk.Switch({active: preset});
+
+    switchView.connect('notify::active', function (obj) {
+      this._indicatorConfig.set('show_change', obj.active);
+    }.bind(this));
+
+    return makeConfigRow(_("Show Change"), switchView);
   },
 
   destroy: function () {
