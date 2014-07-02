@@ -83,6 +83,9 @@ const ExchangeData = {
     "TRY": [
         "btcturk"
     ],
+    "THB": [
+        "bxinth"
+    ],
     "USD": [
         "bitstamp",
         "btce",
