@@ -339,6 +339,32 @@ const BitcoinAverageConfigView = new Lang.Class({
 
 
 
+const BXinTHConfigView = new Lang.Class({
+  Name: "BXinTHConfigView",
+  Extends: ProviderConfigView,
+
+  _init: function (configWidget, indicatorConfig) {
+    this.parent(configWidget, indicatorConfig);
+    this._addSelectCurrency((new ApiProvider.BXinTHApi()).currencies);
+  },
+
+  _setApiDefaults: function (config) {
+    if (config.get('api') !== 'bxinth') {
+      config.attributes = {
+        api: 'bxinth',
+        currency: 'THB',
+        attribute: 'last'
+      };
+
+      config.emit('update');
+    }
+  },
+});
+
+Signals.addSignalMethods(BXinTHConfigView.prototype);
+
+
+
 
 
 const IndicatorConfigView = new Lang.Class({
@@ -355,7 +381,8 @@ const IndicatorConfigView = new Lang.Class({
         {label: 'BitcoinAverage', value: 'bitcoinaverage'},
         {label: 'BitStamp', value: 'bitstamp'},
         {label: 'BitPay',   value: 'bitpay'},
-        {label: 'CoinBase', value: 'coinbase'}
+        {label: 'CoinBase', value: 'coinbase'},
+        {label: 'BXinTH', value: 'bxinth'}
     ];
 
     for each (let o in options) {
@@ -403,6 +430,12 @@ const IndicatorConfigView = new Lang.Class({
 
       coinbase: function () {
         return new CoinbaseConfigView(
+          this.widget, this._indicatorConfig
+        );
+      }.bind(this),
+
+      bxinth: function () {
+        return new BXinTHConfigView(
           this.widget, this._indicatorConfig
         );
       }.bind(this)
