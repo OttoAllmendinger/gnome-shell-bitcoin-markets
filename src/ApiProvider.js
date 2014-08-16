@@ -154,7 +154,7 @@ const ChangeRenderer = function (options) {
 
 
 
-const CurrencyRenderer = function ({unit, currency}) {
+const CurrencyRenderer = function ({unit, currency, decimals}) {
   unit = unit || 'mBTC';
 
   const getFormat = function (currency) {
@@ -190,6 +190,10 @@ const CurrencyRenderer = function ({unit, currency}) {
     if (symbol === '$') symbol = info.symbol;
 
     precision = info.decimal_digits;
+  }
+
+  if (decimals !== null) {
+    precision = decimals;
   }
 
   return function (number)

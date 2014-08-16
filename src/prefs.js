@@ -23,7 +23,7 @@ const IndicatorCollectionModel =
 const makeConfigRow = function (description, widget) {
   let box = new Gtk.Box({
     orientation: Gtk.Orientation.HORIZONTAL,
-    margin_bottom: 5,
+    margin_bottom: 8,
     hexpand: true,
     vexpand: false
   });
@@ -47,9 +47,8 @@ const ComboBoxView = new Lang.Class({
   Columns: { LABEL: 0, VALUE: 1 },
 
   _init: function (options) {
-
     let model = new Gtk.ListStore();
-    model.set_column_types([GObject.TYPE_STRING, GObject.TYPE_STRING]);
+    model.set_column_types([GObject.TYPE_STRING]);
 
     let comboBox = new Gtk.ComboBox({model: model});
     let renderer = new Gtk.CellRendererText();
@@ -57,30 +56,27 @@ const ComboBoxView = new Lang.Class({
     comboBox.pack_start(renderer, true);
     comboBox.add_attribute(renderer, 'text', 0);
 
-    comboBox.connect('changed', function (entry) {
-      let [success, iter] = comboBox.get_active_iter();
-
-      if (success) {
-        this.emit('changed', model.get_value(iter, this.Columns.VALUE));
-      }
-    }.bind(this));
-
     this.widget = comboBox;
     this.model = model;
-
     this.setOptions(options);
+
+    comboBox.connect('changed', function (entry) {
+      let i = comboBox.get_active();
+      if (i in this._options) {
+        this.emit('changed', this._options[i].value);
+      }
+    }.bind(this));
   },
 
   setOptions: function (options) {
     this.model.clear();
+    this._options = options || [];
 
     for each (let o in options) {
       let iter;
 
       this.model.set(
-        iter = this.model.append(),
-        [this.Columns.LABEL, this.Columns.VALUE],
-        [o.label, o.value]
+        iter = this.model.append(), [this.Columns.LABEL], [o.label]
       );
 
       if (o.active) {
@@ -249,9 +245,7 @@ const BitcoinAverageConfigView = new Lang.Class({
 
     let api = new ApiProvider.BitcoinAverageApi();
 
-    /* exchange selection */
-
-    let exchangeSelect = this._addSelectExchange();
+    /* currency selection */
 
     let updateExchangeSelect = function () {
       let useAverage = this._indicatorConfig.get('use_average');
@@ -261,8 +255,6 @@ const BitcoinAverageConfigView = new Lang.Class({
         this._makeExchangeOptions(currency)
       );
     }.bind(this);
-
-    /* currency selection */
 
     let currencySelect = this._addSelectCurrency(api.currencies);
     currencySelect.comboBoxView.connect('changed', updateExchangeSelect);
@@ -275,9 +267,10 @@ const BitcoinAverageConfigView = new Lang.Class({
       updateExchangeSelect();
     }.bind(this));
 
+    /* exchange selection */
+
+    let exchangeSelect = this._addSelectExchange();
     updateExchangeSelect();
-
-
   },
 
   _addAverageSwitch: function () {
@@ -297,6 +290,7 @@ const BitcoinAverageConfigView = new Lang.Class({
     let comboBoxExchange = new ComboBoxView();
 
     comboBoxExchange.connect("changed", function (view, value) {
+      log("comboBoxExchange value="+value);
       this._indicatorConfig.set('exchange', value);
     }.bind(this));
 
@@ -371,74 +365,61 @@ const IndicatorConfigView = new Lang.Class({
   Name: "BitcoinMarkets.IndicatorConfigView",
 
   _init: function (indicatorConfig) {
+    let padding = 8;
+
     this._indicatorConfig = indicatorConfig;
 
     this.widget = new Gtk.Box({
       orientation: Gtk.Orientation.VERTICAL,
     });
 
-    let options = [
-        {label: 'BitcoinAverage', value: 'bitcoinaverage'},
-        {label: 'BitStamp', value: 'bitstamp'},
-        {label: 'BitPay',   value: 'bitpay'},
-        {label: 'CoinBase', value: 'coinbase'},
-        {label: 'BXinTH', value: 'bxinth'}
-    ];
 
-    for each (let o in options) {
-      if (o.value === indicatorConfig.get('api')) {
-        o.active = true;
-      }
-    }
+    let frame;
 
-    this._selectApiView = new ComboBoxView(options);
+    frame = new Gtk.Frame({ label: _("Indicator Settings") });
+    this._layoutIndicatorSettings = new Gtk.Box({
+      orientation: Gtk.Orientation.VERTICAL,
+      border_width: padding
+    });
+    frame.add(this._layoutIndicatorSettings);
+    this.widget.add(frame);
 
-    this._selectApiView.connect("changed", function (view, api) {
-      this._selectApi(api);
-    }.bind(this));
 
-    this.widget.add(
-      makeConfigRow(_("Provider"), this._selectApiView.widget)
-    );
+    frame = new Gtk.Frame({ label: _("Provider Settings") });
+    this._layoutProviderSettings = new Gtk.Box({
+      orientation: Gtk.Orientation.VERTICAL,
+      border_width: padding
+    });
+    frame.add(this._layoutProviderSettings);
+    this.widget.add(frame);
 
-    this.widget.add(this._addSelectUnit());
-
-    this.widget.add(this._addShowChangeSwitch());
+    this._addIndicatorSettings();
 
     this._selectApi(indicatorConfig.get('api'));
 
     this.widget.show_all();
   },
 
+
+  _addIndicatorSettings: function () {
+    var layout = this._layoutIndicatorSettings;
+
+    layout.add(this._confSelectUnit());
+    layout.add(this._confShowChange());
+    layout.add(this._confDecimals());
+    layout.add(this._confProvider());
+  },
+
   _selectApi: function (api) {
+    let widget = this._layoutProviderSettings;
+    let config = this._indicatorConfig;
+
     let apiConfigViews = {
-      bitstamp: function () {
-        return new BitStampConfigView(this.widget, this._indicatorConfig);
-      }.bind(this),
-
-      bitcoinaverage: function () {
-        return new BitcoinAverageConfigView(
-          this.widget, this._indicatorConfig
-        );
-      }.bind(this),
-
-      bitpay: function () {
-        return new BitPayConfigView(
-          this.widget, this._indicatorConfig
-        );
-      }.bind(this),
-
-      coinbase: function () {
-        return new CoinbaseConfigView(
-          this.widget, this._indicatorConfig
-        );
-      }.bind(this),
-
-      bxinth: function () {
-        return new BXinTHConfigView(
-          this.widget, this._indicatorConfig
-        );
-      }.bind(this)
+      bitstamp:       function () new BitStampConfigView(widget, config),
+      bitcoinaverage: function () new BitcoinAverageConfigView(widget, config),
+      bitpay:         function () new BitPayConfigView(widget, config),
+      coinbase:       function () new CoinbaseConfigView(widget, config),
+      bxinth:         function () new BXinTHConfigView(widget, config),
     };
 
     if (this._apiConfigView) {
@@ -452,10 +433,36 @@ const IndicatorConfigView = new Lang.Class({
       throw new Error("no config view for " + api);
     }
 
-    this.widget.show_all();
+    widget.show_all();
   },
 
-  _addSelectUnit: function () {
+  _confProvider: function () {
+    let preset = this._indicatorConfig.get('api');
+
+    let options = [
+        {label: 'BitcoinAverage', value: 'bitcoinaverage'},
+        {label: 'BitStamp', value: 'bitstamp'},
+        {label: 'BitPay',   value: 'bitpay'},
+        {label: 'CoinBase', value: 'coinbase'},
+        {label: 'BXinTH',   value: 'bxinth'}
+    ];
+
+    for each (let o in options) {
+      if (o.value === preset) {
+        o.active = true;
+      }
+    }
+
+    let view = new ComboBoxView(options);
+
+    view.connect("changed", function (view, api) {
+      this._selectApi(api);
+    }.bind(this));
+
+    return makeConfigRow(_("Provider"), view.widget);
+  },
+
+  _confSelectUnit: function () {
     let preset = this._indicatorConfig.get('unit') || 'mBTC';
 
     let unitView = new ComboBoxView([
@@ -476,7 +483,7 @@ const IndicatorConfigView = new Lang.Class({
     return rowWidget;
   },
 
-  _addShowChangeSwitch: function () {
+  _confShowChange: function () {
     let preset = this._indicatorConfig.get('show_change') !== false;
 
     let switchView = new Gtk.Switch({active: preset});
@@ -486,6 +493,31 @@ const IndicatorConfigView = new Lang.Class({
     }.bind(this));
 
     return makeConfigRow(_("Show Change"), switchView);
+  },
+
+  _confDecimals: function () {
+    let preset = this._indicatorConfig.get('decimals');
+
+    let getLabel = function (v) {
+      if (v === undefined) {
+        return _("Default");
+      } else {
+        return String(v);
+      }
+    };
+
+    let options = [undefined, 0, 1, 2, 3, 4, 5].map(
+      function (v)
+        ({label: getLabel(v), value: v, active: (v === preset)})
+    );
+
+    let decimalsView = new ComboBoxView(options);
+
+    decimalsView.connect('changed', function (view, value) {
+      this._indicatorConfig.set('decimals', value);
+    }.bind(this));
+
+    return makeConfigRow(_("Decimals"), decimalsView.widget);
   },
 
   destroy: function () {
