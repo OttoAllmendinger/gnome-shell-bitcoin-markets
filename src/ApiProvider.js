@@ -370,7 +370,7 @@ const BaseApi = new Lang.Class({
     }
   },
 
-  getIndicatorModel: function (options) {
+  getModel: function (options) {
     return new IndicatorModel(
       options,
       this.getHandler(options),
@@ -630,13 +630,11 @@ const ApiProvider = new Lang.Class({
     };
   },
 
-  get: function (name, options) {
-    let api;
-
-    if ((api = this.apis[name]) === undefined) {
-      throw new Error('unknown api ' + name);
+  get: function (name) {
+    if (name in this.apis) {
+      return this.apis[name];
     } else {
-      return api.getIndicatorModel(options);
+      throw new Error('unknown api ' + name);
     }
   },
 

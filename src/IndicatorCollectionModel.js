@@ -83,12 +83,13 @@ const IndicatorCollectionModel = new GObject.Class({
     this.connect('row-deleted', mutex(Lang.bind(this, this._onRowDeleted)));
   },
 
-  size: function () {
-    return this._configs.length;
-  },
-
   getConfig: function (iter) {
     let json = this.get_value(iter, this.Columns.CONFIG);
+
+    if (!json) {
+      throw new Error('getConfig() failed for iter=' + iter);
+    }
+
     let config = new ConfigModel(JSON.parse(json));
 
     config.connect('update', function () {
@@ -103,7 +104,7 @@ const IndicatorCollectionModel = new GObject.Class({
   },
 
   _getLabel: function (config) {
-    return this._apiProvider.apis[config.api].getLabel(config);
+    return this._apiProvider.get(config.api).getLabel(config);
   },
 
   _getDefaults: function () {
@@ -117,35 +118,38 @@ const IndicatorCollectionModel = new GObject.Class({
   _reloadFromSettings: function () {
     this.clear();
 
-    this._configs = this._settings.get_strv(INDICATORS_KEY);
+    let configs = this._settings.get_strv(INDICATORS_KEY);
 
-    for each (let json in this._configs) {
-      this.set(
-        this.append(),
-        [this.Columns.LABEL, this.Columns.CONFIG],
-        [this._getLabel(JSON.parse(json)), json]
-      );
+    for each (let json in configs) {
+      try {
+        let label = this._getLabel(JSON.parse(json));
+        this.set(
+          this.append(),
+          [this.Columns.LABEL, this.Columns.CONFIG],
+          [label, json]
+        );
+      } catch (e) {
+        log("error loading indicator config: " + e);
+      }
     }
   },
 
   _writeSettings: function () {
     let [res, iter] = this.get_iter_first();
-
-    this._configs = [];
+    let configs = [];
 
     while (res) {
-      this._configs.push(this.get_value(iter, this.Columns.CONFIG));
+      configs.push(this.get_value(iter, this.Columns.CONFIG));
       res = this.iter_next(iter);
     }
 
-    this._settings.set_strv(INDICATORS_KEY, this._configs);
+    this._settings.set_strv(INDICATORS_KEY, configs);
   },
 
   _onRowChanged: function (self, path, iter) {
-    let configs = this._settings.get_strv(INDICATORS_KEY);
     let [i, _] = path.get_indices();
 
-    let config = configs[i] = this.get_value(iter, this.Columns.CONFIG);
+    let config = this.get_value(iter, this.Columns.CONFIG);
 
     this.set(
       iter,
@@ -158,7 +162,6 @@ const IndicatorCollectionModel = new GObject.Class({
 
   _onRowInserted: function (self, path, iter) {
     let [i, _] = path.get_indices();
-    let configs = this._settings.get_strv(INDICATORS_KEY);
     let defaults = this._getDefaults();
 
     this.set(

@@ -90,7 +90,7 @@ const MarketIndicatorView = new Lang.Class({
   _initBehavior: function () {
     let indicator = this;
 
-    this._model = _apiProvider.get(this._options.api, this._options);
+    this._model = _apiProvider.get(this._options.api).getModel(this._options);
 
     this._model.connect("update-start", function () {
       indicator._displayStatus(_Symbols.refresh);
@@ -176,7 +176,11 @@ let IndicatorCollection = new Lang.Class({
     this._removeAll();
 
     this._settings.get_strv(INDICATORS_KEY).forEach(function (i) {
-      this.add(new MarketIndicatorView(JSON.parse(i)));
+      try {
+        this.add(new MarketIndicatorView(JSON.parse(i)));
+      } catch (e) {
+        log("error creating indicator: " + e);
+      }
     }, this);
   },
 

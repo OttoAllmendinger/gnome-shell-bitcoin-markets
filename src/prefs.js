@@ -603,6 +603,8 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     } else {
       this._showIndicatorConfig(null);
     }
+
+    this._updateToolbar();
   },
 
   _showIndicatorConfig: function (indicatorConfig) {
@@ -621,7 +623,14 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
   },
 
   _updateToolbar: function () {
-    this._delButton.set_sensitive(this._store.size() > 0);
+    let sensitive = false;
+
+    if (this._selection) {
+      let [isSelected, _1, _2] = this._selection.get_selected();
+      sensitive = isSelected;
+    }
+
+    this._delButton.set_sensitive(sensitive);
   },
 
   _addClicked: function () {
