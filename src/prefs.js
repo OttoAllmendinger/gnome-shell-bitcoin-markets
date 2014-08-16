@@ -290,7 +290,6 @@ const BitcoinAverageConfigView = new Lang.Class({
     let comboBoxExchange = new ComboBoxView();
 
     comboBoxExchange.connect("changed", function (view, value) {
-      log("comboBoxExchange value="+value);
       this._indicatorConfig.set('exchange', value);
     }.bind(this));
 
@@ -405,8 +404,8 @@ const IndicatorConfigView = new Lang.Class({
     var layout = this._layoutIndicatorSettings;
 
     layout.add(this._confSelectUnit());
-    layout.add(this._confShowChange());
     layout.add(this._confDecimals());
+    layout.add(this._confShowChange());
     layout.add(this._confProvider());
   },
 
