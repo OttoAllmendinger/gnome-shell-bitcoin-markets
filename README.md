@@ -4,7 +4,6 @@ Displays Bitcoin market information in the gnome shell. Available APIs:
 
 * BitcoinAverage.com
 * BitStamp
-* MtGox
 * BitPay
 * Coinbase
 
