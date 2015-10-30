@@ -34,7 +34,8 @@ const ExchangeData = {
         "itbit",
         "rocktrading",
         "cryptonit",
-        "vircurex"
+        "vircurex",
+        "paymium"
     ],
     "GBP": [
         "localbitcoins",

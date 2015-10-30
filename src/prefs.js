@@ -226,7 +226,29 @@ const CoinbaseConfigView = new Lang.Class({
 
 Signals.addSignalMethods(CoinbaseConfigView.prototype);
 
+const PaymiumConfigView = new Lang.Class({
+  Name: "PaymiumConfigView",
+  Extends: ProviderConfigView,
 
+  _init: function (configWidget, indicatorConfig) {
+    this.parent(configWidget, indicatorConfig);
+    this._addSelectCurrency((new ApiProvider.PaymiumApi()).currencies);
+  },
+
+  _setApiDefaults: function (config) {
+    if (config.get('api') !== 'paymium') {
+      config.attributes = {
+        api: 'paymium',
+        currency: 'EUR',
+        attribute: 'last'
+      };
+
+      config.emit('update');
+    }
+  },
+});
+
+Signals.addSignalMethods(PaymiumConfigView.prototype);
 
 
 
@@ -305,7 +327,7 @@ const BitcoinAverageConfigView = new Lang.Class({
     let currentExchange = this._indicatorConfig.get('exchange');
     let exchanges = ApiProvider.getCurrencyToExchange()[currency];
 
-    let options = exchanges.map(function (e) 
+    let options = exchanges.map(function (e)
       ({label: e, value: e, active: e === currentExchange})
     );
 
@@ -419,6 +441,7 @@ const IndicatorConfigView = new Lang.Class({
       bitpay:         function () new BitPayConfigView(widget, config),
       coinbase:       function () new CoinbaseConfigView(widget, config),
       bxinth:         function () new BXinTHConfigView(widget, config),
+      paymium:         function () new PaymiumConfigView(widget, config)
     };
 
     if (this._apiConfigView) {
@@ -443,7 +466,8 @@ const IndicatorConfigView = new Lang.Class({
         {label: 'BitStamp', value: 'bitstamp'},
         {label: 'BitPay',   value: 'bitpay'},
         {label: 'CoinBase', value: 'coinbase'},
-        {label: 'BXinTH',   value: 'bxinth'}
+        {label: 'BXinTH',   value: 'bxinth'},
+        {label: 'Paymium',   value: 'paymium'}
     ];
 
     for each (let o in options) {
