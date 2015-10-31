@@ -6,6 +6,7 @@ Displays Bitcoin market information in the gnome shell. Available APIs:
 * BitStamp
 * BitPay
 * Coinbase
+* Paymium
 
 
 ## Installation

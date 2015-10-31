@@ -621,6 +621,42 @@ const BXinTHApi = new Lang.Class({
 });
 
 
+const PaymiumApi = new Lang.Class({
+  Name: 'PaymiumApi',
+  Extends: BaseApi,
+
+  apiName: "Paymium",
+
+  currencies: ['EUR'],
+
+  interval: 60, // unclear, should be safe
+
+  attributes: {
+    last: function (options) {
+      let renderCurrency = new CurrencyRenderer(options);
+      let renderChange = new ChangeRenderer();
+
+      let key = 'price';
+
+      return {
+        text: function (data)
+          renderCurrency(data["price"]),
+        change: function (data)
+          renderChange(data["price"])
+      };
+    }
+  },
+
+  getLabel: function (options) {
+    return "Paymium " + options.currency;
+  },
+
+  getUrl: function (options) {
+    return "https://paymium.com/api/v1/data/eur/ticker";
+  }
+});
+
+
 const ApiProvider = new Lang.Class({
   Name: "ApiProvider",
 
@@ -631,6 +667,7 @@ const ApiProvider = new Lang.Class({
       bitpay: new BitPayApi(),
       coinbase: new CoinbaseApi(),
       bxinth: new BXinTHApi(),
+      paymium: new PaymiumApi()
     };
   },
 
