@@ -81,10 +81,16 @@ const MarketIndicatorView = new Lang.Class({
 
     this.actor.add_actor(layout);
 
-    /*
-    this._tooltip = new PopupMenu.PopupMenuItem("tooltip");
-    this.menu.addMenuItem(this._tooltip);
-    */
+    this._popupMenu = new PopupMenu.PopupMenuItem(_('Settings'));
+    this.menu.addMenuItem(this._popupMenu);
+    this._popupMenu.connect('activate', function() {
+      let app_sys = Shell.AppSystem.get_default();
+      let prefs = app_sys.lookup_app('gnome-shell-extension-prefs.desktop');
+      if (prefs.get_state() == prefs.SHELL_APP_STATE_RUNNING)
+        prefs.activate();
+      else
+        prefs.get_app_info().launch_uris(['extension:///' + Extension.metadata.uuid], null);
+    });
   },
 
   _initBehavior: function () {
