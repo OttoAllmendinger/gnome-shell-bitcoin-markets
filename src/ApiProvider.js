@@ -657,6 +657,40 @@ const PaymiumApi = new Lang.Class({
 });
 
 
+const BtcChinaApi = new Lang.Class({
+  Name: 'BtcChinaApi',
+  Extends: BaseApi,
+
+  apiName: "BtcChina",
+
+  currencies: ['CNY'],
+
+  interval: 10,
+
+  attributes: {
+    last: function (options) {
+      let renderCurrency = new CurrencyRenderer(options);
+      let renderChange = new ChangeRenderer();
+
+      return {
+        text: function (data)
+          renderCurrency(data["ticker"]["last"]),
+        change: function (data)
+          renderChange(data["ticker"]["last"])
+      };
+    }
+  },
+
+  getLabel: function (options) {
+    return "BTCC " + options.currency;
+  },
+
+  getUrl: function (options) {
+    return "https://data.btcchina.com/data/ticker?market=btccny";
+  }
+});
+
+
 const ApiProvider = new Lang.Class({
   Name: "ApiProvider",
 
@@ -667,7 +701,8 @@ const ApiProvider = new Lang.Class({
       bitpay: new BitPayApi(),
       coinbase: new CoinbaseApi(),
       bxinth: new BXinTHApi(),
-      paymium: new PaymiumApi()
+      paymium: new PaymiumApi(),
+      btcchina: new BtcChinaApi()
     };
   },
 
