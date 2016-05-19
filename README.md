@@ -8,6 +8,7 @@ Displays Bitcoin market information in the gnome shell. Available APIs:
 * Coinbase
 * BX.in.th
 * Paymium
+* BTCChina
 
 
 ## Installation

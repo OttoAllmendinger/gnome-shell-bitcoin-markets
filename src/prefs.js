@@ -380,6 +380,30 @@ Signals.addSignalMethods(BXinTHConfigView.prototype);
 
 
 
+const BtcChinaConfigView = new Lang.Class({
+  Name: "BtcChinaConfigView",
+  Extends: ProviderConfigView,
+
+  _init: function (configWidget, indicatorConfig) {
+    this.parent(configWidget, indicatorConfig);
+    this._addSelectCurrency((new ApiProvider.BtcChinaApi()).currencies);
+  },
+
+  _setApiDefaults: function (config) {
+    if (config.get('api') !== 'btcchina') {
+      config.attributes = {
+        api: 'btcchina',
+        currency: 'CNY',
+        attribute: 'last'
+      };
+
+      config.emit('update');
+    }
+  },
+});
+
+Signals.addSignalMethods(BtcChinaConfigView.prototype);
+
 
 
 const IndicatorConfigView = new Lang.Class({
@@ -441,7 +465,8 @@ const IndicatorConfigView = new Lang.Class({
       bitpay:         function () new BitPayConfigView(widget, config),
       coinbase:       function () new CoinbaseConfigView(widget, config),
       bxinth:         function () new BXinTHConfigView(widget, config),
-      paymium:         function () new PaymiumConfigView(widget, config)
+      paymium:        function () new PaymiumConfigView(widget, config),
+      btcchina:       function () new BtcChinaConfigView(widget, config)
     };
 
     if (this._apiConfigView) {
@@ -467,7 +492,8 @@ const IndicatorConfigView = new Lang.Class({
         {label: 'BitPay',   value: 'bitpay'},
         {label: 'CoinBase', value: 'coinbase'},
         {label: 'BXinTH',   value: 'bxinth'},
-        {label: 'Paymium',   value: 'paymium'}
+        {label: 'Paymium',  value: 'paymium'},
+        {label: 'BtcChina', value: 'btcchina'}
     ];
 
     for each (let o in options) {
