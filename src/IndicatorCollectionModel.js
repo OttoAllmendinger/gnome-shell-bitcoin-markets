@@ -120,7 +120,8 @@ const IndicatorCollectionModel = new GObject.Class({
 
     let configs = this._settings.get_strv(INDICATORS_KEY);
 
-    for each (let json in configs) {
+    for (let key in configs) {
+      let json = configs[key];
       try {
         let label = this._getLabel(JSON.parse(json));
         this.set(
