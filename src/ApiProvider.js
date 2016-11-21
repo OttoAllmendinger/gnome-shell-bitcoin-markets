@@ -72,9 +72,9 @@ const DefaultCurrencies = [
 ];
 
 
-const getCurrencyToExchange = function () ExchangeData;
+const getCurrencyToExchange = () => ExchangeData;
 
-const getExchangeToCurrency = function ()
+const getExchangeToCurrency = () =>
   Object.keys(ExchangeData).reduce(function (o, currency) {
     ExchangeData[currency].forEach(function (exchange) {
       let a = o[exchange] || [];
@@ -198,7 +198,7 @@ const CurrencyRenderer = function ({unit, currency, decimals}) {
     precision = decimals;
   }
 
-  return function (number)
+  return (number) =>
     Accounting.formatMoney(changeUnit(number), {
       symbol: symbol,
       format: format,
@@ -389,8 +389,8 @@ const BaseApi = new Lang.Class({
   },
 
   destroy: function () {
-    for each (let handler in this._urlHandlers) {
-      handler.destroy();
+    for (let key in this._urlHandlers) {
+      this._urlHandlers[key].destroy();
     }
   }
 });
@@ -416,10 +416,8 @@ const BitstampApi = new Lang.Class({
       let renderChange = new ChangeRenderer();
 
       return {
-        text: function (data)
-          renderCurrency(data.last),
-        change: function (data)
-          renderChange(data.last)
+        text: (data) => renderCurrency(data.last),
+        change: (data) => renderChange(data.last)
       };
     }
   },
@@ -475,11 +473,8 @@ const BitcoinAverageApi = new Lang.Class({
       };
 
       return {
-        text: function (data)
-          renderCurrency(getNumber(data)),
-
-        change: function (data)
-          renderChange(getNumber(data))
+        text: (data) => renderCurrency(getNumber(data)),
+        change: (data) => renderChange(getNumber(data))
       };
     }
   },
@@ -532,10 +527,8 @@ const BitPayApi = new Lang.Class({
       };
 
       return {
-        text: function (data)
-          renderCurrency(find(options.currency, data)),
-        change: function (data)
-          renderChange(find(options.currency, data))
+        text: (data) => renderCurrency(find(options.currency, data)),
+        change: (data) => renderChange(find(options.currency, data))
       };
     }
   },
@@ -569,10 +562,8 @@ const CoinbaseApi = new Lang.Class({
       let key = 'btc_to_' + options.currency.toLowerCase();
 
       return {
-        text: function (data)
-          renderCurrency(data[key]),
-        change: function (data)
-          renderChange(data[key])
+        text: (data) => renderCurrency(data[key]),
+        change: (data) => renderChange(data[key])
       };
     }
   },
@@ -605,10 +596,8 @@ const BXinTHApi = new Lang.Class({
       let key = 'last_price';
 
       return {
-        text: function (data)
-          renderCurrency(data["1"]["last_price"]),
-        change: function (data)
-          renderChange(data["1"]["change"])
+        text: (data) => renderCurrency(data["1"]["last_price"]),
+        change: (data) => renderChange(data["1"]["change"])
       };
     }
   },
@@ -641,10 +630,8 @@ const PaymiumApi = new Lang.Class({
       let key = 'price';
 
       return {
-        text: function (data)
-          renderCurrency(data["price"]),
-        change: function (data)
-          renderChange(data["price"])
+        text: (data) => renderCurrency(data["price"]),
+        change: (data) => renderChange(data["price"])
       };
     }
   },
@@ -675,10 +662,8 @@ const BtcChinaApi = new Lang.Class({
       let renderChange = new ChangeRenderer();
 
       return {
-        text: function (data)
-          renderCurrency(data["ticker"]["last"]),
-        change: function (data)
-          renderChange(data["ticker"]["last"])
+        text: (data) => renderCurrency(data["ticker"]["last"]),
+        change: (data) => renderChange(data["ticker"]["last"])
       };
     }
   },
@@ -756,8 +741,8 @@ const ApiProvider = new Lang.Class({
   },
 
   destroy: function () {
-    for each (let api in this.apis) {
-      api.destroy();
+    for (let key in this.apis) {
+      this.apis[key].destroy();
     }
   }
 });
