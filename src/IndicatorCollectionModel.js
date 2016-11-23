@@ -92,13 +92,13 @@ const IndicatorCollectionModel = new GObject.Class({
 
     let config = new ConfigModel(JSON.parse(json));
 
-    config.connect('update', function () {
+    config.connect('update', () => {
       this.set(
         iter,
         [this.Columns.CONFIG],
         [config.toString()]
       );
-    }.bind(this));
+    });
 
     return config;
   },
@@ -148,8 +148,6 @@ const IndicatorCollectionModel = new GObject.Class({
   },
 
   _onRowChanged: function (self, path, iter) {
-    let [i, _] = path.get_indices();
-
     let config = this.get_value(iter, this.Columns.CONFIG);
 
     this.set(
@@ -162,7 +160,6 @@ const IndicatorCollectionModel = new GObject.Class({
   },
 
   _onRowInserted: function (self, path, iter) {
-    let [i, _] = path.get_indices();
     let defaults = this._getDefaults();
 
     this.set(
