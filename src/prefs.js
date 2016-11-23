@@ -16,6 +16,16 @@ const Convenience = Local.imports.convenience;
 const ApiProvider = Local.imports.ApiProvider;
 const ExchangeData = Local.imports.ExchangeData.ExchangeData;
 
+const {
+  ProviderBitcoinAverage,
+  ProviderBitstamp,
+  ProviderCoinbase,
+  ProviderBitPay,
+  ProviderBXinTH,
+  ProviderPaymium,
+  ProviderBtcChina
+} = Local.imports;
+
 const IndicatorCollectionModel =
   Local.imports.IndicatorCollectionModel.IndicatorCollectionModel;
 
@@ -72,7 +82,7 @@ const ComboBoxView = new Lang.Class({
     this.model.clear();
     this._options = options || [];
 
-    options.forEach((o) => {
+    this._options.forEach((o) => {
       let iter;
 
       this.model.set(
@@ -142,8 +152,8 @@ const ProviderConfigView = new Lang.Class({
 
   destroy: function () {
     this._widgets.forEach((widget) =>
-      this._configWidget.remove(widget);
-    });
+      this._configWidget.remove(widget)
+    );
 
     this._configWidget.show_all();
   }
@@ -157,7 +167,7 @@ const BitStampConfigView = new Lang.Class({
 
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ApiProvider.BitstampApi()).currencies);
+    this._addSelectCurrency((new ProviderBitstamp.Api()).currencies);
   },
 
   _setApiDefaults: function (config) {
@@ -181,7 +191,7 @@ const BitPayConfigView = new Lang.Class({
 
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ApiProvider.BitPayApi()).currencies);
+    this._addSelectCurrency((new ProviderBitPay.Api()).currencies);
   },
 
   _setApiDefaults: function (config) {
@@ -208,7 +218,7 @@ const CoinbaseConfigView = new Lang.Class({
 
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ApiProvider.CoinbaseApi()).currencies);
+    this._addSelectCurrency((new ProviderCoinbase.Api()).currencies);
   },
 
   _setApiDefaults: function (config) {
@@ -232,7 +242,7 @@ const PaymiumConfigView = new Lang.Class({
 
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ApiProvider.PaymiumApi()).currencies);
+    this._addSelectCurrency((new ProviderPaymium.Api()).currencies);
   },
 
   _setApiDefaults: function (config) {
@@ -265,7 +275,7 @@ const BitcoinAverageConfigView = new Lang.Class({
       indicatorConfig.get('use_average') !== false
     );
 
-    let api = new ApiProvider.BitcoinAverageApi();
+    let api = new ProviderBitcoinAverage.Api();
 
     /* currency selection */
 
@@ -325,7 +335,7 @@ const BitcoinAverageConfigView = new Lang.Class({
 
   _makeExchangeOptions: function (currency) {
     let currentExchange = this._indicatorConfig.get('exchange');
-    let exchanges = ApiProvider.getCurrencyToExchange()[currency];
+    let exchanges = ExchangeData[currency];
 
     let options = exchanges.map((e) =>
       ({label: e, value: e, active: e === currentExchange})
@@ -360,7 +370,7 @@ const BXinTHConfigView = new Lang.Class({
 
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ApiProvider.BXinTHApi()).currencies);
+    this._addSelectCurrency((new ProviderBXinTH.Api()).currencies);
   },
 
   _setApiDefaults: function (config) {
@@ -386,7 +396,7 @@ const BtcChinaConfigView = new Lang.Class({
 
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ApiProvider.BtcChinaApi()).currencies);
+    this._addSelectCurrency((new ProviderBtcChina.Api()).currencies);
   },
 
   _setApiDefaults: function (config) {
