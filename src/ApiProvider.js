@@ -593,8 +593,6 @@ const BXinTHApi = new Lang.Class({
       let renderCurrency = new CurrencyRenderer(options);
       let renderChange = new ChangeRenderer();
 
-      let key = 'last_price';
-
       return {
         text: (data) => renderCurrency(data["1"]["last_price"]),
         change: (data) => renderChange(data["1"]["change"])
@@ -626,8 +624,6 @@ const PaymiumApi = new Lang.Class({
     last: function (options) {
       let renderCurrency = new CurrencyRenderer(options);
       let renderChange = new ChangeRenderer();
-
-      let key = 'price';
 
       return {
         text: (data) => renderCurrency(data["price"]),
