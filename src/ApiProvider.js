@@ -45,7 +45,7 @@ const _userAgent =  "gnome-shell-bitcoin-markets" +
 // a NAT or if some clients really do many requests
 const getClientId = function () {
   // GUID code from http://stackoverflow.com/a/2117523/92493
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
       return v.toString(16);
   });
@@ -75,8 +75,8 @@ const DefaultCurrencies = [
 const getCurrencyToExchange = () => ExchangeData;
 
 const getExchangeToCurrency = () =>
-  Object.keys(ExchangeData).reduce(function (o, currency) {
-    ExchangeData[currency].forEach(function (exchange) {
+  Object.keys(ExchangeData).reduce((o, currency) => {
+    ExchangeData[currency].forEach((exchange) => {
       let a = o[exchange] || [];
       a.push(currency);
       o[exchange] = a;
@@ -91,7 +91,7 @@ const getJSON = function (url, callback) {
   headers.append('X-Client-Id', _clientId);
   _httpSession.queue_message(
     message,
-    function (session, message) {
+    (session, message) => {
       if (message.status_code == 200) {
         callback(null, JSON.parse(message.response_body.data));
       } else {
@@ -111,7 +111,7 @@ const Selector = function (path) {
    * path format: a.b.c.d
    */
   return function (obj) {
-    return path.split('.').reduce(function (obj, key) {
+    return path.split('.').reduce((obj, key) => {
       if (obj[key]) {
         return obj[key];
       } else {
@@ -241,12 +241,12 @@ const IndicatorModel = new Lang.Class({
         }));
 
     this._signalUpdate = handler.connect(
-        "update", function (obj, error, data) {
+        "update", (obj, error, data) => {
           onUpdate(error, data);
         });
 
     if (handler._lastError || handler._lastData) {
-      Mainloop.idle_add(function () {
+      Mainloop.idle_add(() => {
         onUpdate(handler._lastError, handler._lastData);
       });
     }
@@ -758,11 +758,11 @@ if (this.ARGV !== undefined) {
 
   let indicator = apiProvider.get('bitpay', options);
 
-  indicator.connect("update-start", function () {
+  indicator.connect("update-start", () => {
     log("signal update-start");
   });
 
-  indicator.connect("update", function (obj, error, data) {
+  indicator.connect("update", (obj, error, data) => {
     log("signal update");
     log("error: " + JSON.stringify(error));
     log("data: " + JSON.stringify(data));
