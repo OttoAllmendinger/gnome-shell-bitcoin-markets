@@ -9,7 +9,7 @@ const Signals = imports.signals;
 
 const Gettext = imports.gettext.domain('bitcoin-markets');
 const _ = Gettext.gettext;
-const N_ = function(e) { return e; };
+const N_ = (e) => e;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Convenience = Local.imports.convenience;
@@ -60,19 +60,19 @@ const ComboBoxView = new Lang.Class({
     this.model = model;
     this.setOptions(options);
 
-    comboBox.connect('changed', function (entry) {
+    comboBox.connect('changed', (entry) => {
       let i = comboBox.get_active();
       if (i in this._options) {
         this.emit('changed', this._options[i].value);
       }
-    }.bind(this));
+    });
   },
 
   setOptions: function (options) {
     this.model.clear();
     this._options = options || [];
 
-    for each (let o in options) {
+    options.forEach((o) => {
       let iter;
 
       this.model.set(
@@ -82,7 +82,7 @@ const ComboBoxView = new Lang.Class({
       if (o.active) {
         this.widget.set_active_iter(iter);
       }
-    }
+    });
   }
 });
 
@@ -93,7 +93,7 @@ Signals.addSignalMethods(ComboBoxView.prototype);
 
 const makeComboBoxCurrency = function (currencies, selected) {
   let options = currencies.map(
-    function (c) ({label: c, value: c, active: (c === selected)})
+    (c) => ({label: c, value: c, active: (c === selected)})
   );
 
   return new ComboBoxView(options);
@@ -124,9 +124,9 @@ const ProviderConfigView = new Lang.Class({
       currencies, this._indicatorConfig.get('currency')
     );
 
-    comboBoxCurrency.connect('changed', function(view, value) {
+    comboBoxCurrency.connect('changed', (view, value) => {
       this._indicatorConfig.set('currency', value);
-    }.bind(this));
+    });
 
     let rowWidget = this._addRow(_("Currency"), comboBoxCurrency.widget);
 
@@ -141,9 +141,9 @@ const ProviderConfigView = new Lang.Class({
   },
 
   destroy: function () {
-    for each (let widget in this._widgets) {
+    this._widgets.forEach((widget) =>
       this._configWidget.remove(widget);
-    }
+    });
 
     this._configWidget.show_all();
   }
@@ -284,10 +284,10 @@ const BitcoinAverageConfigView = new Lang.Class({
     /* use average switch */
     // TODO use proper view method: connect("changed")
     let averageSwitch = this._addAverageSwitch();
-    averageSwitch.switchView.connect('notify::active', function (obj) {
+    averageSwitch.switchView.connect('notify::active', (obj) => {
       this._indicatorConfig.set('use_average', obj.active);
       updateExchangeSelect();
-    }.bind(this));
+    });
 
     /* exchange selection */
 
@@ -311,9 +311,9 @@ const BitcoinAverageConfigView = new Lang.Class({
   _addSelectExchange: function () {
     let comboBoxExchange = new ComboBoxView();
 
-    comboBoxExchange.connect("changed", function (view, value) {
+    comboBoxExchange.connect("changed", (view, value) => {
       this._indicatorConfig.set('exchange', value);
-    }.bind(this));
+    });
 
     let rowWidget = this._addRow(_("Exchange"), comboBoxExchange.widget);
 
@@ -327,7 +327,7 @@ const BitcoinAverageConfigView = new Lang.Class({
     let currentExchange = this._indicatorConfig.get('exchange');
     let exchanges = ApiProvider.getCurrencyToExchange()[currency];
 
-    let options = exchanges.map(function (e)
+    let options = exchanges.map((e) =>
       ({label: e, value: e, active: e === currentExchange})
     );
 
@@ -484,14 +484,14 @@ const IndicatorConfigView = new Lang.Class({
     let config = this._indicatorConfig;
 
     let apiConfigViews = {
-      bitstamp:       function () new BitStampConfigView(widget, config),
-      bitcoinaverage: function () new BitcoinAverageConfigView(widget, config),
-      bitpay:         function () new BitPayConfigView(widget, config),
-      coinbase:       function () new CoinbaseConfigView(widget, config),
-      bxinth:         function () new BXinTHConfigView(widget, config),
-      paymium:        function () new PaymiumConfigView(widget, config),
-      btcchina:       function () new BtcChinaConfigView(widget, config),
-      bitso:          function () new BitsoConfigView(widget, config)
+      bitstamp:       () => new BitStampConfigView(widget, config),
+      bitcoinaverage: () => new BitcoinAverageConfigView(widget, config),
+      bitpay:         () => new BitPayConfigView(widget, config),
+      coinbase:       () => new CoinbaseConfigView(widget, config),
+      bxinth:         () => new BXinTHConfigView(widget, config),
+      paymium:        () => new PaymiumConfigView(widget, config),
+      btcchina:       () => new BtcChinaConfigView(widget, config)
+      bitso:          () => new BitsoConfigView(widget, config)
     };
 
     if (this._apiConfigView) {
@@ -522,17 +522,15 @@ const IndicatorConfigView = new Lang.Class({
         {label: 'Bitso',    value: 'bitso'}
     ];
 
-    for each (let o in options) {
+    options.forEach((o) => {
       if (o.value === preset) {
         o.active = true;
       }
-    }
+    });
 
     let view = new ComboBoxView(options);
 
-    view.connect("changed", function (view, api) {
-      this._selectApi(api);
-    }.bind(this));
+    view.connect("changed", (view, api) => this._selectApi(api));
 
     return makeConfigRow(_("Provider"), view.widget);
   },
@@ -549,9 +547,9 @@ const IndicatorConfigView = new Lang.Class({
       this._indicatorConfig.set('unit', 'mBTC');
     }
 
-    unitView.connect('changed', function (view, value) {
+    unitView.connect('changed', (view, value) => {
       this._indicatorConfig.set('unit', value);
-    }.bind(this));
+    });
 
     let rowWidget = makeConfigRow(_("Unit"), unitView.widget);
 
@@ -563,9 +561,9 @@ const IndicatorConfigView = new Lang.Class({
 
     let switchView = new Gtk.Switch({active: preset});
 
-    switchView.connect('notify::active', function (obj) {
+    switchView.connect('notify::active', (obj) => {
       this._indicatorConfig.set('show_change', obj.active);
-    }.bind(this));
+    });
 
     return makeConfigRow(_("Show Change"), switchView);
   },
@@ -582,15 +580,14 @@ const IndicatorConfigView = new Lang.Class({
     };
 
     let options = [undefined, 0, 1, 2, 3, 4, 5].map(
-      function (v)
-        ({label: getLabel(v), value: v, active: (v === preset)})
+      (v) => ({label: getLabel(v), value: v, active: (v === preset)})
     );
 
     let decimalsView = new ComboBoxView(options);
 
-    decimalsView.connect('changed', function (view, value) {
+    decimalsView.connect('changed', (view, value) => {
       this._indicatorConfig.set('decimals', value);
-    }.bind(this));
+    });
 
     return makeConfigRow(_("Decimals"), decimalsView.widget);
   },
@@ -678,13 +675,6 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
 
     toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR);
 
-    let getAddIndicatorAction = function ({label, value}) {
-      let action = new Gtk.Action({
-        name: label,
-        label: label
-      });
-    };
-
     /* new widget button with menu */
     let newButton = new Gtk.ToolButton({icon_name: "list-add-symbolic"});
     newButton.connect('clicked', Lang.bind(this, this._addClicked));
@@ -703,7 +693,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
   },
 
   _onSelectionChanged: function () {
-    let [isSelected, model, iter] = this._selection.get_selected();
+    let [isSelected, , iter] = this._selection.get_selected();
 
     if (isSelected) {
       this._showIndicatorConfig(this._store.getConfig(iter));
@@ -733,7 +723,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     let sensitive = false;
 
     if (this._selection) {
-      let [isSelected, _1, _2] = this._selection.get_selected();
+      let [isSelected] = this._selection.get_selected();
       sensitive = isSelected;
     }
 
@@ -746,7 +736,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
   },
 
   _delClicked: function () {
-    let [isSelected, model, iter] = this._selection.get_selected();
+    let [isSelected, , iter] = this._selection.get_selected();
 
     if (isSelected) {
       this._store.remove(iter);
