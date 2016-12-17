@@ -75,11 +75,11 @@ const IndicatorCollectionModel = new GObject.Class({
         }
       }
 
-    this.connect('row-changed', mutex(Lang.bind(this, this._onRowChanged)));
+    this.connect('row-changed', mutex(this._onRowChanged.bind(this)));
 
-    this.connect('row-inserted', mutex(Lang.bind(this, this._onRowInserted)));
+    this.connect('row-inserted', mutex(this._onRowInserted.bind(this)));
 
-    this.connect('row-deleted', mutex(Lang.bind(this, this._onRowDeleted)));
+    this.connect('row-deleted', mutex(this._onRowDeleted.bind(this)));
   },
 
   getConfig: function (iter) {

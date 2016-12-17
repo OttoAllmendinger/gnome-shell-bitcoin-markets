@@ -211,7 +211,7 @@ const Api = new Lang.Class({
     if (handler === undefined) {
       handler = this._urlHandlers[id] =
         new Handler(
-          id, options, Lang.bind(this, this.poll), this.interval
+          id, options, this.poll.bind(this), this.interval
         );
     }
 

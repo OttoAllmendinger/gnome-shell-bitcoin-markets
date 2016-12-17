@@ -170,7 +170,7 @@ let IndicatorCollection = new Lang.Class({
 
     this._settingsChangedId = this._settings.connect(
       'changed::' + INDICATORS_KEY,
-      Lang.bind(this, this._createIndicators)
+      this._createIndicators.bind(this)
     );
 
     this._createIndicators();

@@ -267,10 +267,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     /* behavior */
 
     this._selection = this._treeView.get_selection();
-    this._selection.connect(
-      'changed',
-      Lang.bind(this, this._onSelectionChanged)
-    );
+    this._selection.connect('changed', this._onSelectionChanged.bind(this));
   },
 
   _getTreeView: function () {
@@ -300,13 +297,13 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
 
     /* new widget button with menu */
     let newButton = new Gtk.ToolButton({icon_name: "list-add-symbolic"});
-    newButton.connect('clicked', Lang.bind(this, this._addClicked));
+    newButton.connect('clicked', this._addClicked.bind(this));
     toolbar.add(newButton);
 
     /* delete button */
     let delButton = this._delButton =
       new Gtk.ToolButton({icon_name: "list-remove-symbolic"});
-    delButton.connect('clicked', Lang.bind(this, this._delClicked));
+    delButton.connect('clicked', this._delClicked.bind(this));
 
     toolbar.add(delButton);
 

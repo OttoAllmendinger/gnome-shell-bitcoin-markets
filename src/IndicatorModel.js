@@ -14,7 +14,7 @@ const IndicatorModel = new Lang.Class({
     this._formatter = formatter;
     this._handler = handler;
 
-    let onUpdate = Lang.bind(this, function (error, data) {
+    let onUpdate = (error, data) => {
       if (error) {
         this.emit("update", error, null);
       } else {
@@ -28,17 +28,19 @@ const IndicatorModel = new Lang.Class({
           this.emit("update", formatError, null);
         }
       }
-    });
+    };
 
     this._signalUpdateStart = handler.connect(
-        "update-start", Lang.bind(this, function () {
-          this.emit("update-start");
-        }));
+        "update-start", () => {
+            this.emit("update-start")
+        }
+    );
 
     this._signalUpdate = handler.connect(
         "update", (obj, error, data) => {
           onUpdate(error, data);
-        });
+        }
+    );
 
     if (handler._lastError || handler._lastData) {
       Mainloop.idle_add(() => {
