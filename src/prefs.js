@@ -14,7 +14,6 @@ const N_ = (e) => e;
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Convenience = Local.imports.convenience;
 const ApiProvider = Local.imports.ApiProvider;
-const ExchangeData = Local.imports.ExchangeData.ExchangeData;
 
 const {
   ProviderBitcoinAverage,
@@ -26,418 +25,24 @@ const {
   ProviderBtcChina
 } = Local.imports;
 
+const {
+  ProviderBitcoinAveragePrefs,
+  ProviderBitstampPrefs,
+  ProviderCoinbasePrefs,
+  ProviderBitPayPrefs,
+  ProviderBXinTHPrefs,
+  ProviderPaymiumPrefs,
+  ProviderBtcChinaPrefs,
+  ProviderBitsoPrefs,
+} = Local.imports;
+
+const {
+  ComboBoxView,
+  makeConfigRow
+} = Local.imports.BaseProviderConfigView;
+
 const IndicatorCollectionModel =
   Local.imports.IndicatorCollectionModel.IndicatorCollectionModel;
-
-
-const makeConfigRow = function (description, widget) {
-  let box = new Gtk.Box({
-    orientation: Gtk.Orientation.HORIZONTAL,
-    margin_bottom: 8,
-    hexpand: true,
-    vexpand: false
-  });
-
-  let label = new Gtk.Label({
-    label: description,
-    xalign: 0,
-    expand: true
-  });
-
-  box.add(label);
-  box.add(widget);
-
-  return box;
-};
-
-
-const ComboBoxView = new Lang.Class({
-  Name: "ComboBoxView",
-
-  Columns: { LABEL: 0, VALUE: 1 },
-
-  _init: function (options) {
-    let model = new Gtk.ListStore();
-    model.set_column_types([GObject.TYPE_STRING]);
-
-    let comboBox = new Gtk.ComboBox({model: model});
-    let renderer = new Gtk.CellRendererText();
-
-    comboBox.pack_start(renderer, true);
-    comboBox.add_attribute(renderer, 'text', 0);
-
-    this.widget = comboBox;
-    this.model = model;
-    this.setOptions(options);
-
-    comboBox.connect('changed', (entry) => {
-      let i = comboBox.get_active();
-      if (i in this._options) {
-        this.emit('changed', this._options[i].value);
-      }
-    });
-  },
-
-  setOptions: function (options) {
-    this.model.clear();
-    this._options = options || [];
-
-    this._options.forEach((o) => {
-      let iter;
-
-      this.model.set(
-        iter = this.model.append(), [this.Columns.LABEL], [o.label]
-      );
-
-      if (o.active) {
-        this.widget.set_active_iter(iter);
-      }
-    });
-  }
-});
-
-
-Signals.addSignalMethods(ComboBoxView.prototype);
-
-
-
-const makeComboBoxCurrency = function (currencies, selected) {
-  let options = currencies.map(
-    (c) => ({label: c, value: c, active: (c === selected)})
-  );
-
-  return new ComboBoxView(options);
-};
-
-const ProviderConfigView = new Lang.Class({
-  Name: "ProviderConfigView",
-
-  _init: function (configWidget, indicatorConfig) {
-    this._configWidget = configWidget;
-    this._indicatorConfig = indicatorConfig;
-    this._widgets = [];
-    this._setDefaults(indicatorConfig);
-    this._setApiDefaults(indicatorConfig);
-  },
-
-  _addRow: function (label, widget) {
-    let rowWidget = makeConfigRow(label, widget);
-    this._configWidget.add(rowWidget);
-    this._widgets.push(rowWidget);
-
-    return rowWidget;
-  },
-
-
-  _addSelectCurrency: function (currencies) {
-    let comboBoxCurrency = makeComboBoxCurrency(
-      currencies, this._indicatorConfig.get('currency')
-    );
-
-    comboBoxCurrency.connect('changed', (view, value) => {
-      this._indicatorConfig.set('currency', value);
-    });
-
-    let rowWidget = this._addRow(_("Currency"), comboBoxCurrency.widget);
-
-    return {
-      rowWidget: rowWidget,
-      comboBoxView: comboBoxCurrency
-    };
-  },
-
-  _setDefaults: function (config) {
-    config.set('show_change', config.get('show_change') !== false);
-  },
-
-  destroy: function () {
-    this._widgets.forEach((widget) =>
-      this._configWidget.remove(widget)
-    );
-
-    this._configWidget.show_all();
-  }
-});
-
-
-
-const BitStampConfigView = new Lang.Class({
-  Name: "BitStampConfigView",
-  Extends: ProviderConfigView,
-
-  _init: function (configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ProviderBitstamp.Api()).currencies);
-  },
-
-  _setApiDefaults: function (config) {
-    if (config.get('api') !== 'bitstamp') {
-      config.attributes = {
-        api: 'bitstamp',
-        currency: 'USD',
-        attribute: 'last'
-      };
-
-      config.emit('update');
-    }
-  },
-});
-
-
-
-const BitPayConfigView = new Lang.Class({
-  Name: "BitPayConfigView",
-  Extends: ProviderConfigView,
-
-  _init: function (configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ProviderBitPay.Api()).currencies);
-  },
-
-  _setApiDefaults: function (config) {
-    if (config.get('api') !== 'bitpay') {
-      config.attributes = {
-        api: 'bitpay',
-        currency: 'USD',
-        attribute: 'last'
-      };
-
-      config.emit('update');
-    }
-  },
-});
-
-Signals.addSignalMethods(BitPayConfigView.prototype);
-
-
-
-
-const CoinbaseConfigView = new Lang.Class({
-  Name: "CoinbaseConfigView",
-  Extends: ProviderConfigView,
-
-  _init: function (configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ProviderCoinbase.Api()).currencies);
-  },
-
-  _setApiDefaults: function (config) {
-    if (config.get('api') !== 'coinbase') {
-      config.attributes = {
-        api: 'coinbase',
-        currency: 'USD',
-        attribute: 'last'
-      };
-
-      config.emit('update');
-    }
-  },
-});
-
-Signals.addSignalMethods(CoinbaseConfigView.prototype);
-
-const PaymiumConfigView = new Lang.Class({
-  Name: "PaymiumConfigView",
-  Extends: ProviderConfigView,
-
-  _init: function (configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ProviderPaymium.Api()).currencies);
-  },
-
-  _setApiDefaults: function (config) {
-    if (config.get('api') !== 'paymium') {
-      config.attributes = {
-        api: 'paymium',
-        currency: 'EUR',
-        attribute: 'last'
-      };
-
-      config.emit('update');
-    }
-  },
-});
-
-Signals.addSignalMethods(PaymiumConfigView.prototype);
-
-
-
-const BitcoinAverageConfigView = new Lang.Class({
-  Name: "BitcoinAverageConfigView",
-  Extends: ProviderConfigView,
-
-  _init: function (configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
-
-    // set defaults
-    indicatorConfig.set(
-      'use_average',
-      indicatorConfig.get('use_average') !== false
-    );
-
-    let api = new ProviderBitcoinAverage.Api();
-
-    /* currency selection */
-
-    let updateExchangeSelect = function () {
-      let useAverage = this._indicatorConfig.get('use_average');
-      let currency = this._indicatorConfig.get('currency');
-      exchangeSelect.rowWidget.sensitive = useAverage === false;
-      exchangeSelect.comboBoxView.setOptions(
-        this._makeExchangeOptions(currency)
-      );
-    }.bind(this);
-
-    let currencySelect = this._addSelectCurrency(api.currencies);
-    currencySelect.comboBoxView.connect('changed', updateExchangeSelect);
-
-    /* use average switch */
-    // TODO use proper view method: connect("changed")
-    let averageSwitch = this._addAverageSwitch();
-    averageSwitch.switchView.connect('notify::active', (obj) => {
-      this._indicatorConfig.set('use_average', obj.active);
-      updateExchangeSelect();
-    });
-
-    /* exchange selection */
-
-    let exchangeSelect = this._addSelectExchange();
-    updateExchangeSelect();
-  },
-
-  _addAverageSwitch: function () {
-    let switchView = new Gtk.Switch({
-      active: this._indicatorConfig.get('use_average') !== false
-    });
-
-    let rowWidget = this._addRow(_("Average"), switchView);
-
-    return {
-      rowWidget: rowWidget,
-      switchView: switchView
-    };
-  },
-
-  _addSelectExchange: function () {
-    let comboBoxExchange = new ComboBoxView();
-
-    comboBoxExchange.connect("changed", (view, value) => {
-      this._indicatorConfig.set('exchange', value);
-    });
-
-    let rowWidget = this._addRow(_("Exchange"), comboBoxExchange.widget);
-
-    return {
-      rowWidget: rowWidget,
-      comboBoxView: comboBoxExchange
-    };
-  },
-
-  _makeExchangeOptions: function (currency) {
-    let currentExchange = this._indicatorConfig.get('exchange');
-    let exchanges = ExchangeData[currency];
-
-    let options = exchanges.map((e) =>
-      ({label: e, value: e, active: e === currentExchange})
-    );
-
-    if (currentExchange === undefined) {
-      options[0].active = true;
-    }
-
-    return options;
-  },
-
-  _setApiDefaults: function (config) {
-    if (config.get('api') !== 'bitcoinaverage') {
-      config.attributes = {
-        api: 'bitcoinaverage',
-        exchange: 'average',
-        currency: 'USD',
-        attribute: 'last'
-      };
-
-      config.emit('update');
-    }
-  },
-});
-
-
-
-const BXinTHConfigView = new Lang.Class({
-  Name: "BXinTHConfigView",
-  Extends: ProviderConfigView,
-
-  _init: function (configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ProviderBXinTH.Api()).currencies);
-  },
-
-  _setApiDefaults: function (config) {
-    if (config.get('api') !== 'bxinth') {
-      config.attributes = {
-        api: 'bxinth',
-        currency: 'THB',
-        attribute: 'last'
-      };
-
-      config.emit('update');
-    }
-  },
-});
-
-Signals.addSignalMethods(BXinTHConfigView.prototype);
-
-
-
-const BtcChinaConfigView = new Lang.Class({
-  Name: "BtcChinaConfigView",
-  Extends: ProviderConfigView,
-
-  _init: function (configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ProviderBtcChina.Api()).currencies);
-  },
-
-  _setApiDefaults: function (config) {
-    if (config.get('api') !== 'btcchina') {
-      config.attributes = {
-        api: 'btcchina',
-        currency: 'CNY',
-        attribute: 'last'
-      };
-
-      config.emit('update');
-    }
-  },
-});
-
-Signals.addSignalMethods(BtcChinaConfigView.prototype);
-
-const BitsoConfigView = new Lang.Class({
-  Name: "BitsoConfigView",
-  Extends: ProviderConfigView,
-
-  _init: function (configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ApiProvider.BitsoApi()).currencies);
-  },
-
-  _setApiDefaults: function (config) {
-    if (config.get('api') !== 'bitso') {
-      config.attributes = {
-        api: 'bitso',
-        currency: 'MXN',
-        attribute: 'last'
-      };
-
-      config.emit('update');
-    }
-  },
-});
-
-Signals.addSignalMethods(BitsoConfigView.prototype);
-
 
 
 const IndicatorConfigView = new Lang.Class({
@@ -494,14 +99,22 @@ const IndicatorConfigView = new Lang.Class({
     let config = this._indicatorConfig;
 
     let apiConfigViews = {
-      bitstamp:       () => new BitStampConfigView(widget, config),
-      bitcoinaverage: () => new BitcoinAverageConfigView(widget, config),
-      bitpay:         () => new BitPayConfigView(widget, config),
-      coinbase:       () => new CoinbaseConfigView(widget, config),
-      bxinth:         () => new BXinTHConfigView(widget, config),
-      paymium:        () => new PaymiumConfigView(widget, config),
-      btcchina:       () => new BtcChinaConfigView(widget, config)
-      bitso:          () => new BitsoConfigView(widget, config)
+      bitstamp: () =>
+        new ProviderBitstampPrefs.ConfigView(widget, config),
+      bitcoinaverage: () =>
+        new ProviderBitcoinAveragePrefs.ConfigView(widget, config),
+      bitpay: () =>
+        new ProviderBitPayPrefs.ConfigView(widget, config),
+      coinbase: () =>
+        new ProviderCoinbasePrefs.ConfigView(widget, config),
+      bxinth: () =>
+        new ProviderBXinTHPrefs.ConfigView(widget, config),
+      paymium: () =>
+        new ProviderPaymiumPrefs.ConfigView(widget, config),
+      btcchina: () =>
+        new ProviderBtcChinaPrefs.ConfigView(widget, config),
+      bitso: () =>
+        new ProviderBitsoPrefs.ConfigView(widget, config)
     };
 
     if (this._apiConfigView) {
