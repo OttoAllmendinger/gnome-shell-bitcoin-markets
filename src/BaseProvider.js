@@ -234,8 +234,8 @@ const Api = new Lang.Class({
     );
   },
 
-  getLabel: function (options) {
-    return options.api + " " + options.currency;
+  getLabel: function ({api, currency}) {
+    return api + " " + currency;
   },
 
   destroy: function () {
