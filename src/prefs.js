@@ -194,7 +194,7 @@ const IndicatorConfigView = new Lang.Class({
   _confDecimals: function () {
     let preset = this._indicatorConfig.get('decimals');
 
-    let getLabel = function (v) {
+    let getLabel = (v) => {
       if (v === undefined) {
         return _("Default");
       } else {

@@ -42,7 +42,7 @@ const Api = new Lang.Class({
       let renderCurrency = BaseProvider.CurrencyRenderer(options);
       let renderChange = BaseProvider.ChangeRenderer();
 
-      let getNumber = function (data) {
+      let getNumber = (data) => {
         if (options.use_average !== false) {
           return data.last;
         } else if (options.exchange !== undefined) {

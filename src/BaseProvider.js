@@ -16,12 +16,12 @@ const DefaultCurrencies = [
       'MXN'
 ];
 
-const Selector = function (path) {
+const Selector = (path) => {
   /**
    * returns a function that returns a nested attribute
    * path format: a.b.c.d
    */
-  return function (obj) {
+  return (obj) => {
     return path.split('.').reduce((obj, key) => {
       if (obj[key]) {
         return obj[key];
@@ -40,14 +40,14 @@ const IndicatorChange = {
 };
 
 
-const ChangeRenderer = function (options) {
+const ChangeRenderer = (options) => {
   /**
    * Returns a function that returns the change
    * in value between consecutive calls.
    */
   let lastValue;
 
-  return function (newValue) {
+  return (newValue) => {
     let ret = IndicatorChange.unchanged;
 
     if (lastValue !== undefined) {
@@ -66,10 +66,10 @@ const ChangeRenderer = function (options) {
 
 
 
-const CurrencyRenderer = function ({unit, currency, decimals}) {
+const CurrencyRenderer = ({unit, currency, decimals}) => {
   unit = unit || 'mBTC';
 
-  const getFormat = function (currency) {
+  const getFormat = (currency) => {
     /* determined after mtgox api */
     const front = "%s%v";
     const back = "%v %s";
@@ -82,7 +82,7 @@ const CurrencyRenderer = function ({unit, currency, decimals}) {
     return frontFormats[currency] || back;
   };
 
-  const changeUnit = function (number) {
+  const changeUnit = (number) => {
     if (unit === 'mBTC') {
       return Number(number) / 1000.0;
     } else {
@@ -140,10 +140,10 @@ const Handler = new Lang.Class({
 
     this._id = id;
 
-    let loop = Lang.bind(this, function() {
+    let loop = () => {
       this.emit("update-start");
 
-      poll(options, Lang.bind(this, function (error, data) {
+      poll(options, (error, data) => {
         if (this.disabled) {
           return;
         }
@@ -156,14 +156,14 @@ const Handler = new Lang.Class({
           log("http error: too many requests: disable handler " + id);
           this.disabled = true;
         }
-      }));
+      });
 
       if (!this.disabled) {
         this._signalTimeout = Mainloop.timeout_add_seconds(
           interval, loop
         );
       }
-    });
+    };
 
     Mainloop.idle_add(loop);
   },

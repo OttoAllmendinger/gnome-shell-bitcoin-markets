@@ -19,7 +19,7 @@ const Api = new Lang.Class({
       let renderCurrency = BaseProvider.CurrencyRenderer(options);
       let renderChange = BaseProvider.ChangeRenderer();
 
-      let find = function (currency, arr) {
+      let find = (currency, arr) => {
         for (let {code, rate} of arr) {
           if (code === currency) {
             return rate;

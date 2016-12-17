@@ -9,7 +9,7 @@ const STATUS_TOO_MANY_REQUESTS = 429;
 const isErrTooManyRequests = (err) =>
     Number(err) === STATUS_TOO_MANY_REQUESTS
 
-const getExtensionVersion = function () {
+const getExtensionVersion = () => {
   if (Local.metadata['git-version']) {
     return 'git-' + Local.metadata['git-version'];
   } else if (Local.metadata.version) {
@@ -19,7 +19,7 @@ const getExtensionVersion = function () {
   }
 };
 
-const getGnomeVersion = function () {
+const getGnomeVersion = () => {
   return Config.PACKAGE_VERSION;
 };
 
@@ -35,7 +35,7 @@ const _userAgent =  "gnome-shell-bitcoin-markets" +
 // Some API providers have had issues with high traffic coming from single IPs
 // this code helps determine if these are actually different clients from behind
 // a NAT or if some clients really do many requests
-const getClientId = function () {
+const getClientId = () => {
   // GUID code from http://stackoverflow.com/a/2117523/92493
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
       var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
@@ -56,7 +56,7 @@ Soup.Session.prototype.add_feature.call(
 );
 
 
-const getJSON = function (url, callback) {
+const getJSON = (url, callback) => {
   // log((new Date()) + ' getJSON ' + url);
   let message = Soup.Message.new("GET", url);
   let headers = message.request_headers;

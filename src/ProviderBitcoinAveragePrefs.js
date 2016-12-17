@@ -31,14 +31,14 @@ const ConfigView = new Lang.Class({
 
     /* currency selection */
 
-    let updateExchangeSelect = function () {
+    let updateExchangeSelect = () => {
       let useAverage = this._indicatorConfig.get('use_average');
       let currency = this._indicatorConfig.get('currency');
       exchangeSelect.rowWidget.sensitive = useAverage === false;
       exchangeSelect.comboBoxView.setOptions(
         this._makeExchangeOptions(currency)
       );
-    }.bind(this);
+    };
 
     let currencySelect = this._addSelectCurrency(api.currencies);
     currencySelect.comboBoxView.connect('changed', updateExchangeSelect);

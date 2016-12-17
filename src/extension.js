@@ -18,7 +18,7 @@ const Panel = imports.ui.panel;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
-const N_ = function(e) e;
+const N_ = (e) => e;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 
@@ -82,7 +82,7 @@ const MarketIndicatorView = new Lang.Class({
 
     this._popupMenu = new PopupMenu.PopupMenuItem(_('Settings'));
     this.menu.addMenuItem(this._popupMenu);
-    this._popupMenu.connect('activate', function() {
+    this._popupMenu.connect('activate', () => {
       let app_sys = Shell.AppSystem.get_default();
       let prefs = app_sys.lookup_app('gnome-shell-extension-prefs.desktop');
       if (prefs.get_state() == prefs.SHELL_APP_STATE_RUNNING) {
@@ -100,11 +100,11 @@ const MarketIndicatorView = new Lang.Class({
 
     this._model = _apiProvider.get(this._options.api).getModel(this._options);
 
-    this._model.connect("update-start", function () {
+    this._model.connect("update-start", () => {
       indicator._displayStatus(_Symbols.refresh);
     });
 
-    this._model.connect("update", function (obj, err, data) {
+    this._model.connect("update", (obj, err, data) => {
       if (err) {
         indicator._showError(err);
       } else {
@@ -193,7 +193,7 @@ let IndicatorCollection = new Lang.Class({
   },
 
   _removeAll: function () {
-    this._indicators.forEach(function (i) i.destroy());
+    this._indicators.forEach((i) => i.destroy());
     this._indicators = [];
   },
 

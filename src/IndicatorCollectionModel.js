@@ -66,15 +66,14 @@ const IndicatorCollectionModel = new GObject.Class({
 
     var flag;
 
-    let mutex = function (func) {
-      return function () {
+    let mutex = (func) =>
+      () => {
         if (!flag) {
           flag = true;
           func.apply(null, arguments);
           flag = false;
         }
-      };
-    };
+      }
 
     this.connect('row-changed', mutex(Lang.bind(this, this._onRowChanged)));
 
