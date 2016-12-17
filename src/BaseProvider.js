@@ -204,7 +204,6 @@ const Api = new Lang.Class({
   },
 
   getHandler: function (options) {
-
     let id = this._getHandlerId(options);
     let handler = this._urlHandlers[id];
 
