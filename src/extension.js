@@ -86,10 +86,13 @@ const MarketIndicatorView = new Lang.Class({
     this._popupMenu.connect('activate', function() {
       let app_sys = Shell.AppSystem.get_default();
       let prefs = app_sys.lookup_app('gnome-shell-extension-prefs.desktop');
-      if (prefs.get_state() == prefs.SHELL_APP_STATE_RUNNING)
+      if (prefs.get_state() == prefs.SHELL_APP_STATE_RUNNING) {
         prefs.activate();
-      else
-        prefs.get_app_info().launch_uris(['extension:///' + Extension.metadata.uuid], null);
+      } else {
+        prefs
+          .get_app_info()
+          .launch_uris(['extension:///' + Extension.metadata.uuid], null);
+      }
     });
   },
 
