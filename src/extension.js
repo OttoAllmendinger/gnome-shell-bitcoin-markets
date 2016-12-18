@@ -20,12 +20,11 @@ const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
 const N_ = function(e) e;
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Extension = ExtensionUtils.getCurrentExtension();
+const Local = imports.misc.extensionUtils.getCurrentExtension();
 
-const ApiProvider = Extension.imports.ApiProvider;
+const ApiProvider = Local.imports.ApiProvider;
 
-const Convenience = Extension.imports.convenience;
+const Convenience = Local.imports.convenience;
 
 const INDICATORS_KEY = "indicators";
 const FIRST_RUN_KEY = "first-run";
@@ -91,7 +90,7 @@ const MarketIndicatorView = new Lang.Class({
       } else {
         prefs
           .get_app_info()
-          .launch_uris(['extension:///' + Extension.metadata.uuid], null);
+          .launch_uris(['extension:///' + Local.metadata.uuid], null);
       }
     });
   },
