@@ -82,9 +82,10 @@ const MarketIndicatorView = new Lang.Class({
     this.actor.add_actor(layout);
 
     this._popupItemStatus = new PopupMenu.PopupMenuItem(
-      "", {hover: false, can_focus: false}
+      "", {activate: false, hover: false, can_focus: false}
     );
-
+    this._popupItemStatus.label.set_style("max-width: 12em;");
+    this._popupItemStatus.label.clutter_text.set_line_wrap(true);
     this.menu.addMenuItem(this._popupItemStatus);
 
     this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
@@ -117,7 +118,10 @@ const MarketIndicatorView = new Lang.Class({
       } else {
         this._showData(data);
       }
+
+      this._updatePopupItemLabel(err, data);
     });
+
 
     this._displayStatus(_Symbols.refresh);
   },
@@ -153,6 +157,14 @@ const MarketIndicatorView = new Lang.Class({
 
   _displayText: function (text) {
     this._indicatorView.text = text;
+  },
+
+  _updatePopupItemLabel: function (err, data) {
+    let text = this._api.getLabel(this._options);
+    if (err) {
+      text += "\n\nError:\n" + String(err);
+    }
+    this._popupItemStatus.label.text = text;
   },
 
   destroy: function () {
