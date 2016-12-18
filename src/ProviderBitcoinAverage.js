@@ -17,6 +17,8 @@ const getExchangeToCurrency = () =>
   }, {});
 
 
+const _invalidExchangeError = () =>
+    new Error("use_average !== true and no exchange defined");
 
 const Api = new Lang.Class({
   Name: 'BitcoinAverage.Api',
@@ -35,12 +37,8 @@ const Api = new Lang.Class({
    */
   interval: 60,
 
-  _invalidExchangeError: function () {
-    return new Error("use_average !== true and no exchange defined");
-  },
-
   attributes: {
-    last: function (options) {
+    last: (options) => {
       let renderCurrency = BaseProvider.CurrencyRenderer(options);
       let renderChange = BaseProvider.ChangeRenderer();
 
@@ -50,7 +48,7 @@ const Api = new Lang.Class({
         } else if (options.exchange !== undefined) {
           return data[options.exchange].rates.last;
         } else {
-          throw this._invalidExchangeError();
+          throw _invalidExchangeError();
         }
       };
 
@@ -67,7 +65,7 @@ const Api = new Lang.Class({
     } else if (options.exchange !== undefined) {
       return "https://api.bitcoinaverage.com/exchanges/" + options.currency;
     } else {
-      throw this._invalidExchangeError();
+      throw _invalidExchangeError();
     }
   },
 
@@ -77,7 +75,7 @@ const Api = new Lang.Class({
     } else if (options.exchange !== undefined) {
       return "BitAvg " + options.currency + "@" + options.exchange;
     } else {
-      throw this._invalidExchangeError();
+      throw _invalidExchangeError();
     }
   }
 });
