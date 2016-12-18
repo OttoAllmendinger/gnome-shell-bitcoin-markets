@@ -181,13 +181,13 @@ let IndicatorCollection = new Lang.Class({
   _createIndicators: function () {
     this._removeAll();
 
-    this._settings.get_strv(INDICATORS_KEY).forEach(function (i) {
+    this._settings.get_strv(INDICATORS_KEY).forEach((i) => {
       try {
         this.add(new MarketIndicatorView(JSON.parse(i)));
       } catch (e) {
         log("error creating indicator: " + e);
       }
-    }, this);
+    });
   },
 
   _removeAll: function () {
