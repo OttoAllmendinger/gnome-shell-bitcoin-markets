@@ -96,19 +96,17 @@ const MarketIndicatorView = new Lang.Class({
   },
 
   _initBehavior: function () {
-    let indicator = this;
-
     this._model = _apiProvider.get(this._options.api).getModel(this._options);
 
     this._model.connect("update-start", () => {
-      indicator._displayStatus(_Symbols.refresh);
+      this._displayStatus(_Symbols.refresh);
     });
 
     this._model.connect("update", (obj, err, data) => {
       if (err) {
-        indicator._showError(err);
+        this._showError(err);
       } else {
-        indicator._showData(data);
+        this._showData(data);
       }
     });
 
