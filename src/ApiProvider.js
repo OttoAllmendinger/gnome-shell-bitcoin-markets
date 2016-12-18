@@ -744,7 +744,7 @@ const ApiProvider = new Lang.Class({
 });
 
 
-if (this.ARGV !== undefined) {
+if (window["ARGV"] && ARGV[0] === "test") {
   // run by gjs
   log("command line");
 
