@@ -1,13 +1,28 @@
+const Lang = imports.lang;
 const Soup = imports.gi.Soup;
+
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Config = imports.misc.config;
 
+function HTTPError(statusCode, reasonPhrase) {
+    this.name = "HTTPError";
+    this.statusCode = statusCode;
+    this.reasonPhrase = reasonPhrase;
+    this.stack = (new Error()).stack;
 
+    this.toString = () =>
+        "HTTP Status: " + this.statusCode +
+            ", Reason: " + this.reasonPhrase;
+}
+
+HTTPError.prototype = Object.create(Error.prototype);
+HTTPError.prototype.constructor = HTTPError;
 
 const STATUS_TOO_MANY_REQUESTS = 429;
 
 const isErrTooManyRequests = (err) =>
-    Number(err) === STATUS_TOO_MANY_REQUESTS
+    err && err.statusCode &&
+        Number(err.statusCode) === STATUS_TOO_MANY_REQUESTS
 
 const getExtensionVersion = () => {
   if (Local.metadata['git-version']) {
@@ -70,7 +85,13 @@ const getJSON = (url, callback) => {
         log('getJSON error url: ' + url);
         log('getJSON error status code: ' + message.status_code);
         log('getJSON error response: ' + message.response_body.data);
-        callback(message.status_code, null);
+        callback(
+            new HTTPError(
+              message.status_code,
+              message.reason_phrase
+            ),
+            null
+        );
       }
     }
   );

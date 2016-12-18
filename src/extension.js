@@ -81,9 +81,17 @@ const MarketIndicatorView = new Lang.Class({
 
     this.actor.add_actor(layout);
 
-    this._popupMenu = new PopupMenu.PopupMenuItem(_('Settings'));
-    this.menu.addMenuItem(this._popupMenu);
-    this._popupMenu.connect('activate', () => {
+    this._popupItemStatus = new PopupMenu.PopupMenuItem(
+      "", {hover: false, can_focus: false}
+    );
+
+    this.menu.addMenuItem(this._popupItemStatus);
+
+    this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+    this._popupItemSettings = new PopupMenu.PopupMenuItem(_('Settings'));
+    this.menu.addMenuItem(this._popupItemSettings);
+    this._popupItemSettings.connect('activate', () => {
       let app_sys = Shell.AppSystem.get_default();
       let prefs = app_sys.lookup_app('gnome-shell-extension-prefs.desktop');
       if (prefs.get_state() == prefs.SHELL_APP_STATE_RUNNING) {
@@ -118,6 +126,7 @@ const MarketIndicatorView = new Lang.Class({
     log("err " + JSON.stringify(error));
     this._displayText('error');
     this._displayStatus(_Symbols.error);
+    this._popupItemStatus.text = "error";
   },
 
   _showData: function (data) {
