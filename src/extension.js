@@ -58,6 +58,7 @@ const MarketIndicatorView = new Lang.Class({
   _init: function (options) {
     this.parent(0);
     this._options = options;
+    this._api = _apiProvider.get(options.api);
     this._initLayout();
     this._initBehavior();
   },
@@ -96,7 +97,7 @@ const MarketIndicatorView = new Lang.Class({
   },
 
   _initBehavior: function () {
-    this._model = _apiProvider.get(this._options.api).getModel(this._options);
+    this._model = this._api.getModel(this._options);
 
     this._model.connect("update-start", () => {
       this._displayStatus(_Symbols.refresh);
