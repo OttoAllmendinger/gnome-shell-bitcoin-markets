@@ -692,6 +692,44 @@ const BtcChinaApi = new Lang.Class({
   }
 });
 
+const BitsoApi = new Lang.Class({
+  Name: 'BitsoApi',
+  Extends: BaseApi,
+
+  apiName: "Bitso",
+
+  currencies: ['MXN'],
+
+  /* quote https://bitso.com/api_info#rate-limits
+   *
+   * > Rate limits are are based on one minute windows. If you do more than 30
+   * > requests in a minute, you get locked out for one minute.
+   */
+  interval: 30,
+
+  attributes: {
+    last: function (options) {
+      let renderCurrency = new CurrencyRenderer(options);
+      let renderChange = new ChangeRenderer();
+
+      return {
+        text: function (data)
+          renderCurrency(data.last),
+        change: function (data)
+          renderChange(data.last)
+      };
+    }
+  },
+
+  getLabel: function(options) {
+    return "Bitso " + options.currency;
+  },
+
+  getUrl: function(options) {
+    return "https://api.bitso.com/v2/ticker";
+  }
+});
+
 
 const ApiProvider = new Lang.Class({
   Name: "ApiProvider",
@@ -704,7 +742,8 @@ const ApiProvider = new Lang.Class({
       coinbase: new CoinbaseApi(),
       bxinth: new BXinTHApi(),
       paymium: new PaymiumApi(),
-      btcchina: new BtcChinaApi()
+      btcchina: new BtcChinaApi(),
+      bitso: new BitsoApi()
     };
   },
 

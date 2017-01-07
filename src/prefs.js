@@ -404,6 +404,30 @@ const BtcChinaConfigView = new Lang.Class({
 
 Signals.addSignalMethods(BtcChinaConfigView.prototype);
 
+const BitsoConfigView = new Lang.Class({
+  Name: "BitsoConfigView",
+  Extends: ProviderConfigView,
+
+  _init: function (configWidget, indicatorConfig) {
+    this.parent(configWidget, indicatorConfig);
+    this._addSelectCurrency((new ApiProvider.BitsoApi()).currencies);
+  },
+
+  _setApiDefaults: function (config) {
+    if (config.get('api') !== 'bitso') {
+      config.attributes = {
+        api: 'bitso',
+        currency: 'MXN',
+        attribute: 'last'
+      };
+
+      config.emit('update');
+    }
+  },
+});
+
+Signals.addSignalMethods(BitsoConfigView.prototype);
+
 
 
 const IndicatorConfigView = new Lang.Class({
@@ -466,7 +490,8 @@ const IndicatorConfigView = new Lang.Class({
       coinbase:       function () new CoinbaseConfigView(widget, config),
       bxinth:         function () new BXinTHConfigView(widget, config),
       paymium:        function () new PaymiumConfigView(widget, config),
-      btcchina:       function () new BtcChinaConfigView(widget, config)
+      btcchina:       function () new BtcChinaConfigView(widget, config),
+      bitso:          function () new BitsoConfigView(widget, config)
     };
 
     if (this._apiConfigView) {
@@ -493,7 +518,8 @@ const IndicatorConfigView = new Lang.Class({
         {label: 'CoinBase', value: 'coinbase'},
         {label: 'BXinTH',   value: 'bxinth'},
         {label: 'Paymium',  value: 'paymium'},
-        {label: 'BtcChina', value: 'btcchina'}
+        {label: 'BtcChina', value: 'btcchina'},
+        {label: 'Bitso',    value: 'bitso'}
     ];
 
     for each (let o in options) {
