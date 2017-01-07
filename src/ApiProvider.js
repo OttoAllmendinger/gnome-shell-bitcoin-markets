@@ -67,7 +67,8 @@ Soup.Session.prototype.add_feature.call(
 
 const DefaultCurrencies = [
       'USD', 'EUR', 'CNY', 'GBP', 'CAD', 'RUB', 'AUD',
-      'BRL', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN'
+      'BRL', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN',
+      'MXN'
 ];
 
 
@@ -163,7 +164,8 @@ const CurrencyRenderer = function ({unit, currency, decimals}) {
     const back = "%v %s";
     const frontFormats = {
       USD: front, CAD: front, AUD: front, GBP: front,
-      HKD: front, NZD: front, SGD: front, THB: front
+      HKD: front, NZD: front, SGD: front, THB: front,
+      MXN: front
     };
 
     return frontFormats[currency] || back;
