@@ -9,6 +9,7 @@ Displays Bitcoin market information in the gnome shell. Available APIs:
 * BX.in.th
 * Paymium
 * BTCChina
+* Bitso
 
 
 ## Installation
