@@ -13,7 +13,7 @@ const Api = new Lang.Class({
   //  IP address. ''
   apiName: "Bitstamp",
 
-  currencies: ['USD'],
+  currencies: ['USD', 'EUR'],
 
   interval: 10, // 60 requests per 10 minutes
 
@@ -34,6 +34,7 @@ const Api = new Lang.Class({
   },
 
   getUrl: function (options) {
-    return "https://www.bitstamp.net/api/ticker/";
+    return "https://www.bitstamp.net/api/v2/ticker/" +
+      'btc' + options.currency.toLowerCase() + '/';
   }
 });
