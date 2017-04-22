@@ -1,9 +1,9 @@
 {
-    "shell-version": ["3.22"],
+    "shell-version": ["3.22", "3.24"],
     "uuid": "bitcoin-markets@ottoallmendinger.github.com",
     "name": "Bitcoin Markets",
     "url": "https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/",
-    "description": "Display info on various Bitcoin exchanges. \n Tip address 1645A1qhW3FHxr2JLdqLuYGQ6QSmN5BbNS.",
+    "description": "Display info on various Bitcoin exchanges.",
     "settings-schema":  "org.gnome.shell.extensions.bitcoin-markets",
     "gettext-domain": "bitcoin-markets",
     "git-version": "_gitversion_"
