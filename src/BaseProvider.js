@@ -66,9 +66,7 @@ const ChangeRenderer = (options) => {
 
 
 
-const CurrencyRenderer = ({unit, currency, decimals}) => {
-  unit = unit || 'mBTC';
-
+const CurrencyRenderer = ({currency, decimals}) => {
   const getFormat = (currency) => {
     /* determined after mtgox api */
     const front = "%s%v";
@@ -80,14 +78,6 @@ const CurrencyRenderer = ({unit, currency, decimals}) => {
     };
 
     return frontFormats[currency] || back;
-  };
-
-  const changeUnit = (number) => {
-    if (unit === 'mBTC') {
-      return Number(number) / 1000.0;
-    } else {
-      return Number(number);
-    }
   };
 
   let format = getFormat(currency);
@@ -110,7 +100,7 @@ const CurrencyRenderer = ({unit, currency, decimals}) => {
   }
 
   return (number) =>
-    Accounting.formatMoney(changeUnit(number), {
+    Accounting.formatMoney(Number(number), {
       symbol: symbol,
       format: format,
       precision: precision

@@ -87,8 +87,6 @@ const IndicatorConfigView = new Lang.Class({
 
   _addIndicatorSettings: function () {
     var layout = this._layoutIndicatorSettings;
-
-    layout.add(this._confSelectUnit());
     layout.add(this._confDecimals());
     layout.add(this._confShowChange());
     layout.add(this._confProvider());
@@ -156,27 +154,6 @@ const IndicatorConfigView = new Lang.Class({
     view.connect("changed", (view, api) => this._selectApi(api));
 
     return makeConfigRow(_("Provider"), view.widget);
-  },
-
-  _confSelectUnit: function () {
-    let preset = this._indicatorConfig.get('unit') || 'mBTC';
-
-    let unitView = new ComboBoxView([
-      {label: 'mBTC', value: 'mBTC', active: (preset === 'mBTC')},
-      {label: 'BTC',  value: 'BTC',  active: (preset === 'BTC')}
-    ]);
-
-    if (this._indicatorConfig.get('unit') === undefined) {
-      this._indicatorConfig.set('unit', 'mBTC');
-    }
-
-    unitView.connect('changed', (view, value) => {
-      this._indicatorConfig.set('unit', value);
-    });
-
-    let rowWidget = makeConfigRow(_("Unit"), unitView.widget);
-
-    return rowWidget;
   },
 
   _confShowChange: function () {
