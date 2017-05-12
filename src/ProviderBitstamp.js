@@ -15,6 +15,8 @@ const Api = new Lang.Class({
 
   currencies: ['USD', 'EUR'],
 
+  coins: ['BTC','XRP'],
+
   interval: 10, // 60 requests per 10 minutes
 
   attributes: {
@@ -30,11 +32,11 @@ const Api = new Lang.Class({
   },
 
   getLabel: function (options) {
-    return "BitStamp " + options.currency;
+    return "BitStamp " + options.currency + "/" + options.coin;
   },
 
   getUrl: function (options) {
     return "https://www.bitstamp.net/api/v2/ticker/" +
-      'btc' + options.currency.toLowerCase() + '/';
+      options.coin.toLowerCase() + options.currency.toLowerCase() + '/';
   }
 });

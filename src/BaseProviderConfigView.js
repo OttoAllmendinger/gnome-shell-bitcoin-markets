@@ -84,6 +84,14 @@ const makeComboBoxCurrency = (currencies, selected) => {
   return new ComboBoxView(options);
 };
 
+const makeComboBoxCoin = (coins, selected) => {
+  let options = coins.map(
+    (c) => ({label: c, value: c, active: (c === selected)})
+  );
+
+  return new ComboBoxView(options);
+};
+
 
 const BaseProviderConfigView = new Lang.Class({
   Name: "BaseProviderConfigView",
@@ -104,7 +112,6 @@ const BaseProviderConfigView = new Lang.Class({
     return rowWidget;
   },
 
-
   _addSelectCurrency: function (currencies) {
     let comboBoxCurrency = makeComboBoxCurrency(
       currencies, this._indicatorConfig.get('currency')
@@ -115,6 +122,23 @@ const BaseProviderConfigView = new Lang.Class({
     });
 
     let rowWidget = this._addRow(_("Currency"), comboBoxCurrency.widget);
+
+    return {
+      rowWidget: rowWidget,
+      comboBoxView: comboBoxCurrency
+    };
+  },
+
+  _addSelectCoin: function (coins) {
+    let comboBoxCurrency = makeComboBoxCoin(
+      coins, this._indicatorConfig.get('coin')
+    );
+
+    comboBoxCurrency.connect('changed', (view, value) => {
+      this._indicatorConfig.set('coin', value);
+    });
+
+    let rowWidget = this._addRow(_("Coin"), comboBoxCurrency.widget);
 
     return {
       rowWidget: rowWidget,

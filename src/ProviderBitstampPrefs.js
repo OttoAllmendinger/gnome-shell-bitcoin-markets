@@ -13,13 +13,15 @@ const ConfigView = new Lang.Class({
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
     this._addSelectCurrency((new ProviderBitstamp.Api()).currencies);
+    this._addSelectCoin((new ProviderBitstamp.Api()).coins);
   },
 
   _setApiDefaults: function (config) {
     if (config.get('api') !== 'bitstamp') {
       config.attributes = {
         api: 'bitstamp',
-        currency: 'USD',
+        currency: 'EUR',
+        coin: 'BTC',
         attribute: 'last'
       };
 
