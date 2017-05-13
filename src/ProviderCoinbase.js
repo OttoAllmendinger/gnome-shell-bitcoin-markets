@@ -12,6 +12,8 @@ const Api = new Lang.Class({
 
   currencies: BaseProvider.DefaultCurrencies,
 
+  coins: ['BTC','LTC','ETH'],
+
   interval: 60, // unclear, should be safe
 
   attributes: {
@@ -19,7 +21,7 @@ const Api = new Lang.Class({
       let renderCurrency = BaseProvider.CurrencyRenderer(options);
       let renderChange = BaseProvider.ChangeRenderer();
 
-      let key = 'btc_to_' + options.currency.toLowerCase();
+      let key = options.coin.toLowerCase() + '_to_' + options.currency.toLowerCase();
 
       return {
         text: (data) => renderCurrency(data[key]),
@@ -29,7 +31,7 @@ const Api = new Lang.Class({
   },
 
   getLabel: function (options) {
-    return "Coinbase " + options.currency;
+    return "Coinbase " + options.currency + "/" + options.coin;
   },
 
   getUrl: function (options) {

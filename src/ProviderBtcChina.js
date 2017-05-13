@@ -12,6 +12,8 @@ const Api = new Lang.Class({
 
   currencies: ['CNY'],
 
+  coins: ['BTC','LTC'],
+
   interval: 10,
 
   attributes: {
@@ -27,10 +29,10 @@ const Api = new Lang.Class({
   },
 
   getLabel: function (options) {
-    return "BTCC " + options.currency;
+    return "BTCC " + options.currency + "/" + options.coin;
   },
 
   getUrl: function (options) {
-    return "https://data.btcchina.com/data/ticker?market=btccny";
+    return "https://data.btcchina.com/data/ticker?market=" + options.currency.toLowerCase() + options.coin.toLowerCase();
   }
 });

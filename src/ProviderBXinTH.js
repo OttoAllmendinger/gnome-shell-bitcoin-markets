@@ -12,6 +12,8 @@ const Api = new Lang.Class({
 
   currencies: ['THB'],
 
+  coins: ['BTC','ETH','DAS','REP','GNO'],
+
   interval: 60, // unclear, should be safe
 
   attributes: {
@@ -19,15 +21,29 @@ const Api = new Lang.Class({
       let renderCurrency = BaseProvider.CurrencyRenderer(options);
       let renderChange = BaseProvider.ChangeRenderer();
 
+      let find = (currency, coin, tickerObj) => {
+        let result = {
+          "last_price": 0,
+          "change": 0
+        }
+        Object.keys(tickerObj).forEach((k) => {
+          let current = tickerObj[k];
+          if (current['primary_currency'] === currency && current['secondary_currency'] === coin) {
+            result = current;
+          }
+        });
+        return result;
+      };
+
       return {
-        text: (data) => renderCurrency(data["1"]["last_price"]),
-        change: (data) => renderChange(data["1"]["change"])
+        text: (data) => renderCurrency(find(options.currency, options.coin, data)["last_price"]),
+        change: (data) => renderChange(find(options.currency, options.coin, data)["change"])
       };
     }
   },
 
   getLabel: function (options) {
-    return "BXinTH " + options.currency;
+    return "BXinTH " + options.currency + "/" + options.coin;
   },
 
   getUrl: function (options) {

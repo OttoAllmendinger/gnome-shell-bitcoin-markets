@@ -20,7 +20,7 @@ const ConfigView = new Lang.Class({
     if (config.get('api') !== 'bitstamp') {
       config.attributes = {
         api: 'bitstamp',
-        currency: 'EUR',
+        currency: 'USD',
         coin: 'BTC',
         attribute: 'last'
       };

@@ -13,6 +13,7 @@ const ConfigView = new Lang.Class({
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
     this._addSelectCurrency((new ProviderBXinTH.Api()).currencies);
+    this._addSelectCoin((new ProviderBXinTH.Api()).coins);
   },
 
   _setApiDefaults: function (config) {
@@ -20,6 +21,7 @@ const ConfigView = new Lang.Class({
       config.attributes = {
         api: 'bxinth',
         currency: 'THB',
+        coin: 'BTC',
         attribute: 'last'
       };
 

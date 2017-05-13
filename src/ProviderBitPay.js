@@ -12,6 +12,8 @@ const Api = new Lang.Class({
 
   currencies: BaseProvider.DefaultCurrencies,
 
+  coins: ['BTC'],
+
   interval: 60, // unclear, should be safe
 
   attributes: {
@@ -37,7 +39,7 @@ const Api = new Lang.Class({
   },
 
   getLabel: function (options) {
-    return "BitPay " + options.currency;
+    return "BitPay " + options.currency + "/" + options.coin;
   },
 
   getUrl: function (options) {

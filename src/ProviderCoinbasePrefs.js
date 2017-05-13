@@ -13,6 +13,7 @@ const ConfigView = new Lang.Class({
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
     this._addSelectCurrency((new ProviderCoinbase.Api()).currencies);
+    this._addSelectCoin((new ProviderCoinbase.Api()).coins);
   },
 
   _setApiDefaults: function (config) {
@@ -20,6 +21,7 @@ const ConfigView = new Lang.Class({
       config.attributes = {
         api: 'coinbase',
         currency: 'USD',
+        coin: 'BTC',
         attribute: 'last'
       };
 
