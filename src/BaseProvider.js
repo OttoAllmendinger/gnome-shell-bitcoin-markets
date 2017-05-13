@@ -66,21 +66,8 @@ const ChangeRenderer = (options) => {
 
 
 
-const CurrencyRenderer = ({currency, decimals}) => {
-  const getFormat = (currency) => {
-    /* determined after mtgox api */
-    const front = "%s%v";
-    const back = "%v %s";
-    const frontFormats = {
-      USD: front, CAD: front, AUD: front, GBP: front,
-      HKD: front, NZD: front, SGD: front, THB: front,
-      MXN: front
-    };
-
-    return frontFormats[currency] || back;
-  };
-
-  let format = getFormat(currency);
+const CurrencyRenderer = ({currency, coin, decimals}) => {
+  let format = "%v %s";
   let symbol = currency;
   let precision = 2;
 
@@ -104,7 +91,7 @@ const CurrencyRenderer = ({currency, decimals}) => {
       symbol: symbol,
       format: format,
       precision: precision
-    });
+    }) + "/" + coin;
 };
 
 

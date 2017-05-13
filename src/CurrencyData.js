@@ -681,14 +681,14 @@ const CurrencyData = {
     },
     "RUB": {
         "symbol": "RUB",
-        "symbol_native": "руб.",
+        "symbol_native": "₽",
         "decimal_digits": 2,
         "rounding": 0,
         "code": "RUB"
     },
     "RUR": {
         "symbol": "RUR",
-        "symbol_native": "руб.",
+        "symbol_native": "₽",
         "decimal_digits": 2,
         "rounding": 0,
         "code": "RUR"
