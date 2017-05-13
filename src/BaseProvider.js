@@ -13,7 +13,7 @@ const { IndicatorModel } = Local.imports.IndicatorModel;
 const DefaultCurrencies = [
       'USD', 'EUR', 'CNY', 'GBP', 'CAD', 'RUB', 'AUD',
       'BRL', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN',
-      'MXN'
+      'MXN', 'RUR'
 ];
 
 const Selector = (path) => {

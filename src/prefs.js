@@ -18,6 +18,8 @@ const ApiProvider = Local.imports.ApiProvider;
 const {
   ProviderBitcoinAverage,
   ProviderBitstamp,
+  ProviderBtce,
+  ProviderPoloniex,
   ProviderCoinbase,
   ProviderBitPay,
   ProviderBXinTH,
@@ -28,6 +30,8 @@ const {
 const {
   ProviderBitcoinAveragePrefs,
   ProviderBitstampPrefs,
+  ProviderBtcePrefs,
+  ProviderPoloniexPrefs,
   ProviderCoinbasePrefs,
   ProviderBitPayPrefs,
   ProviderBXinTHPrefs,
@@ -99,6 +103,10 @@ const IndicatorConfigView = new Lang.Class({
     let apiConfigViews = {
       bitstamp: () =>
         new ProviderBitstampPrefs.ConfigView(widget, config),
+      btce: () =>
+        new ProviderBtcePrefs.ConfigView(widget, config),
+      poloniex: () =>
+        new ProviderPoloniexPrefs.ConfigView(widget, config),
       bitcoinaverage: () =>
         new ProviderBitcoinAveragePrefs.ConfigView(widget, config),
       bitpay: () =>
@@ -135,6 +143,8 @@ const IndicatorConfigView = new Lang.Class({
     let options = [
         {label: 'BitcoinAverage', value: 'bitcoinaverage'},
         {label: 'BitStamp', value: 'bitstamp'},
+        {label: 'BTC-E', value: 'btce'},
+        {label: 'Poloniex', value: 'poloniex'},
         {label: 'BitPay',   value: 'bitpay'},
         {label: 'CoinBase', value: 'coinbase'},
         {label: 'BXinTH',   value: 'bxinth'},
