@@ -46,6 +46,7 @@ const _Defaults = [
   {
     api: 'bitcoinaverage',
     currency: 'USD',
+    coin: 'BTC',
     attribute: 'last'
   }
 ];

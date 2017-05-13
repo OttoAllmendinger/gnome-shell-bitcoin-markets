@@ -29,6 +29,9 @@ const Api = new Lang.Class({
   exchanges: Object.keys(getExchangeToCurrency()),
 
   currencies: BaseProvider.DefaultCurrencies,
+
+  coins: ['BTC'],
+
   /* quote https://bitcoinaverage.com/api.htm
    *
    * > API is updated along with the site, normally around every minute. There
@@ -71,9 +74,9 @@ const Api = new Lang.Class({
 
   getLabel: function (options) {
     if (options.use_average !== false) {
-      return "BitAvg " + options.currency;
+      return "BitAvg " + options.currency + "/" + options.coin;
     } else if (options.exchange !== undefined) {
-      return "BitAvg " + options.currency + "@" + options.exchange;
+      return "BitAvg " + options.currency + "/" + options.coin + "@" + options.exchange;
     } else {
       throw _invalidExchangeError();
     }

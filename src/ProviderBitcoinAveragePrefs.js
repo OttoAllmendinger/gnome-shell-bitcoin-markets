@@ -40,6 +40,8 @@ const ConfigView = new Lang.Class({
       );
     };
 
+    this._addSelectCoin(api.coins);
+
     let currencySelect = this._addSelectCurrency(api.currencies);
     currencySelect.comboBoxView.connect('changed', updateExchangeSelect);
 
@@ -52,7 +54,6 @@ const ConfigView = new Lang.Class({
     });
 
     /* exchange selection */
-
     let exchangeSelect = this._addSelectExchange();
     updateExchangeSelect();
   },
@@ -106,6 +107,7 @@ const ConfigView = new Lang.Class({
         api: 'bitcoinaverage',
         exchange: 'average',
         currency: 'USD',
+        coin: 'BTC',
         attribute: 'last'
       };
 

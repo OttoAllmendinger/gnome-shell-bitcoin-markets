@@ -25,8 +25,6 @@ const Api = new Lang.Class({
       let renderChange = BaseProvider.ChangeRenderer();
 
       let find = (currency, coin, tickerObj) => {
-        global.log(JSON.stringify(tickerObj), currency, coin)
-
         // The Poloniex ticker only offers BTC prices
         // Wen USD is selected, do a conversion using the USDt price
         let coinPrice;
@@ -34,7 +32,6 @@ const Api = new Lang.Class({
           if (currency === 'USD') {
             let btcUsdtPrice = tickerObj['USDT_BTC'].last;
             coinPrice = tickerObj['BTC_' + coin].last * btcUsdtPrice;
-            global.log(btcUsdtPrice)
           } else {
             coinPrice = tickerObj[currency + '_' + coin].last;
           }
