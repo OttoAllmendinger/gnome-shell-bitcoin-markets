@@ -134,8 +134,8 @@ const CurrencyData = {
         "code": "BRL"
     },
     "BTC": {
-      "symbol": "฿",
-      "symbol_native": "฿",
+      "symbol": "BTC",
+      "symbol_native": "BTC",
       "decimal_digits": 2,
       "rounding": 0,
       "code": "BTC"
