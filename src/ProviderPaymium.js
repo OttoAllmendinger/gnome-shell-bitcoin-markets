@@ -12,14 +12,14 @@ const Api = new Lang.Class({
 
   currencies: ['EUR'],
 
-  coins: ['BTC'],
+  coins: ['BTC','mBTC'],
 
   interval: 60, // unclear, should be safe
 
   attributes: {
     last: function (options) {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
 
       return {
         text: (data) => renderCurrency(data["price"]),

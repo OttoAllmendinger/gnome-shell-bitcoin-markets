@@ -15,14 +15,14 @@ const Api = new Lang.Class({
 
   currencies: ['USD', 'EUR'],
 
-  coins: ['BTC','XRP'],
+  coins: ['BTC','mBTC','XRP'],
 
   interval: 10, // 60 requests per 10 minutes
 
   attributes: {
     last: function (options) {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
 
       return {
         text: (data) => renderCurrency(data.last),
@@ -36,7 +36,8 @@ const Api = new Lang.Class({
   },
 
   getUrl: function (options) {
+    const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
     return "https://www.bitstamp.net/api/v2/ticker/" +
-      options.coin.toLowerCase() + options.currency.toLowerCase() + '/';
+      coin.toLowerCase() + options.currency.toLowerCase() + '/';
   }
 });

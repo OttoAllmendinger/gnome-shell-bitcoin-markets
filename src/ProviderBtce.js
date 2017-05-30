@@ -12,22 +12,22 @@ const Api = new Lang.Class({
 
   currencies: ['USD', 'EUR', 'RUR'],
 
-  coins: ['BTC','LTC','NMC','NVC','PPC','DSH','ETH'],
+  coins: ['BTC','mBTC','LTC','NMC','NVC','PPC','DSH','ETH'],
 
   interval: 10, // 60 requests per 10 minutes
 
   attributes: {
     last: function (options) {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
-
-      let find = (currency, coin, tickerObj) => {
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
+      const find = (currency, coin, tickerObj) => {
         return tickerObj[coin.toLowerCase() + '_' + currency.toLowerCase()] || { "last": 0 };
       };
+      const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
 
       return {
-        text: (data) => renderCurrency(find(options.currency, options.coin, data).last),
-        change: (data) => renderChange(find(options.currency, options.coin, data).last)
+        text: (data) => renderCurrency(find(options.currency, coin, data).last),
+        change: (data) => renderChange(find(options.currency, coin, data).last)
       };
     }
   },
@@ -37,6 +37,7 @@ const Api = new Lang.Class({
   },
 
   getUrl: function (options) {
-    return "https://btc-e.com/api/3/ticker/" + options.coin.toLowerCase() + "_" + options.currency.toLowerCase();
+    const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
+    return "https://btc-e.com/api/3/ticker/" + coin.toLowerCase() + "_" + options.currency.toLowerCase();
   }
 });

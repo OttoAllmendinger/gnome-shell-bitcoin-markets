@@ -20,7 +20,7 @@ const ConfigView = new Lang.Class({
     if (config.get('api') !== 'poloniex') {
       config.attributes = {
         api: 'poloniex',
-        currency: 'BTC',
+        currency: 'USD',
         coin: 'BTC',
         attribute: 'last'
       };

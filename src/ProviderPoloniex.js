@@ -10,9 +10,9 @@ const Api = new Lang.Class({
 
   apiName: "Poloniex",
 
-  currencies: ['BTC','USD'],
+  currencies: ['USD'],
 
-  coins: ['BCN', 'BELA','BLK','BTCD','BTM','BTS','BURST','CLAM','DASH','DGB','DOGE','EMC2','FLDC','FLO','GAME',
+  coins: ['BTC','mBTC','BCN', 'BELA','BLK','BTCD','BTM','BTS','BURST','CLAM','DASH','DGB','DOGE','EMC2','FLDC','FLO','GAME',
     'GRC','HUC','LTC','MAID','OMNI','NAUT','NAV','NEOS','NMC','NOTE','NXT','PINK','POT','PPC','RIC','SJCX','STR',
     'SYS','VIA','XVC','VRC','VTC','XBC','XCP','XEM','XMR','XPM','XRP','ETH','SC','BCY','EXP','FCT','RADS','AMP',
     'DCR','LSK','LBC','STEEM','SBD','ETC','REP','ARDR','ZEC','STRAT','NXC','PASC','GNT','GNO'],
@@ -21,17 +21,20 @@ const Api = new Lang.Class({
 
   attributes: {
     last: function (options) {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
-
-      let find = (currency, coin, tickerObj) => {
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
+      const find = (currency, coin, tickerObj) => {
         // The Poloniex ticker only offers BTC prices
         // Wen USD is selected, do a conversion using the USDt price
         let coinPrice;
         try {
           if (currency === 'USD') {
             let btcUsdtPrice = tickerObj['USDT_BTC'].last;
-            coinPrice = tickerObj['BTC_' + coin].last * btcUsdtPrice;
+            if (coin === 'BTC') {
+              coinPrice = btcUsdtPrice
+            } else {
+              coinPrice = tickerObj['BTC_' + coin].last * btcUsdtPrice;
+            }
           } else {
             coinPrice = tickerObj[currency + '_' + coin].last;
           }
@@ -40,10 +43,11 @@ const Api = new Lang.Class({
         }
         return coinPrice;
       };
+      const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
 
       return {
-        text: (data) => renderCurrency(find(options.currency, options.coin, data)),
-        change: (data) => renderChange(find(options.currency, options.coin, data))
+        text: (data) => renderCurrency(find(options.currency, coin, data)),
+        change: (data) => renderChange(find(options.currency, coin, data))
       };
     }
   },

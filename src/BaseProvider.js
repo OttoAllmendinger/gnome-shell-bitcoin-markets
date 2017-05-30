@@ -86,12 +86,17 @@ const CurrencyRenderer = ({currency, coin, decimals}) => {
     precision = decimals;
   }
 
-  return (number) =>
-    Accounting.formatMoney(Number(number), {
-      symbol: symbol,
-      format: format,
-      precision: precision
-    }) + "/" + coin;
+  return (number) => {
+    if (coin === 'mBTC') {
+      number = Number(number) / 1000.0;
+    }
+
+    return Accounting.formatMoney(Number(number), {
+        symbol: symbol,
+        format: format,
+        precision: precision
+      }) + "/" + coin;
+  }
 };
 
 

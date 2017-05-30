@@ -12,16 +12,15 @@ const Api = new Lang.Class({
 
   currencies: ['THB'],
 
-  coins: ['BTC','ETH','DAS','REP','GNO'],
+  coins: ['BTC','mBTC','ETH','DAS','REP','GNO'],//?
 
   interval: 60, // unclear, should be safe
 
   attributes: {
     last: function (options) {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
-
-      let find = (currency, coin, tickerObj) => {
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
+      const find = (currency, coin, tickerObj) => {
         let result = {
           "last_price": 0,
           "change": 0
@@ -34,10 +33,11 @@ const Api = new Lang.Class({
         });
         return result;
       };
+      const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
 
       return {
-        text: (data) => renderCurrency(find(options.currency, options.coin, data)["last_price"]),
-        change: (data) => renderChange(find(options.currency, options.coin, data)["change"])
+        text: (data) => renderCurrency(find(options.currency, coin, data)["last_price"]),
+        change: (data) => renderChange(find(options.currency, coin, data)["change"])
       };
     }
   },

@@ -30,7 +30,7 @@ const Api = new Lang.Class({
 
   currencies: BaseProvider.DefaultCurrencies,
 
-  coins: ['BTC'],
+  coins: ['BTC','mBTC'],
 
   /* quote https://bitcoinaverage.com/api.htm
    *
@@ -42,10 +42,9 @@ const Api = new Lang.Class({
 
   attributes: {
     last: (options) => {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
-
-      let getNumber = (data) => {
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
+      const getNumber = (data) => {
         if (options.use_average !== false) {
           return data.last;
         } else if (options.exchange !== undefined) {

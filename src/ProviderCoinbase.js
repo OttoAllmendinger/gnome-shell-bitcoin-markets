@@ -12,16 +12,16 @@ const Api = new Lang.Class({
 
   currencies: BaseProvider.DefaultCurrencies,
 
-  coins: ['BTC','LTC','ETH'],
+  coins: ['BTC','mBTC','LTC','ETH'],
 
   interval: 60, // unclear, should be safe
 
   attributes: {
     last: function (options) {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
-
-      let key = options.coin.toLowerCase() + '_to_' + options.currency.toLowerCase();
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
+      const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
+      const key = coin.toLowerCase() + '_to_' + options.currency.toLowerCase();
 
       return {
         text: (data) => renderCurrency(data[key]),
