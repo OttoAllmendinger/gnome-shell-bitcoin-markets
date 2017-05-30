@@ -77,7 +77,7 @@ Signals.addSignalMethods(ComboBoxView.prototype);
 
 
 const makeComboBoxCurrency = (currencies, selected) => {
-  let options = currencies.map(
+  let options = currencies.sort().map(
     (c) => ({label: c, value: c, active: (c === selected)})
   );
 
@@ -85,7 +85,7 @@ const makeComboBoxCurrency = (currencies, selected) => {
 };
 
 const makeComboBoxCoin = (coins, selected) => {
-  let options = coins.map(
+  let options = coins.sort().map(
     (c) => ({label: c, value: c, active: (c === selected)})
   );
 

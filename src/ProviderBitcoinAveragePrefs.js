@@ -40,10 +40,10 @@ const ConfigView = new Lang.Class({
       );
     };
 
-    this._addSelectCoin(api.coins);
-
     let currencySelect = this._addSelectCurrency(api.currencies);
     currencySelect.comboBoxView.connect('changed', updateExchangeSelect);
+
+    this._addSelectCoin(api.coins);
 
     /* use average switch */
     // TODO use proper view method: connect("changed")
