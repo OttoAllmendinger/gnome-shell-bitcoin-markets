@@ -223,13 +223,15 @@ let IndicatorCollection = new Lang.Class({
   _createIndicators: function () {
     this._removeAll();
 
-    this._settings.get_strv(INDICATORS_KEY).forEach((i) => {
-      try {
-        this.add(new MarketIndicatorView(JSON.parse(i)));
-      } catch (e) {
-        log("error creating indicator: " + e);
-      }
-    });
+    this._settings.get_strv(INDICATORS_KEY)
+      .map(JSON.parse)
+      .forEach((options) => {
+        try {
+          this.add(new MarketIndicatorView(options));
+        } catch (e) {
+          log("error creating indicator: " + e);
+        }
+      });
   },
 
   _removeAll: function () {
