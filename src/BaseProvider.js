@@ -23,6 +23,15 @@ const IndicatorChange = {
 };
 
 
+// Normalize pseudo-coins like "mBTC" to "BTC"
+const baseCoin = (coin) => {
+  if (coin === "mBTC") {
+    return "BTC";
+  }
+  return coin;
+}
+
+
 const ChangeRenderer = (options) => {
   /**
    * Returns a function that returns the change

@@ -33,7 +33,7 @@ const Api = new Lang.Class({
         });
         return result;
       };
-      const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
+      const coin = BaseProvider.baseCoin(options.coin);
 
       return {
         text: (data) => renderCurrency(find(options.currency, coin, data)["last_price"]),

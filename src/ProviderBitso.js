@@ -38,7 +38,7 @@ const Api = new Lang.Class({
   },
 
   getUrl: function(options) {
-    const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
+    const coin = BaseProvider.baseCoin(options.coin);
     return "https://api.bitso.com/v2/ticker?book=" + coin + "_" + options.currency;
   }
 });

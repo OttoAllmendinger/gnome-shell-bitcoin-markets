@@ -33,7 +33,7 @@ const Api = new Lang.Class({
   },
 
   getUrl: function (options) {
-    const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
+    const coin = BaseProvider.baseCoin(options.coin);
     return "https://data.btcchina.com/data/ticker?market=" + options.currency.toLowerCase() + coin.toLowerCase();
   }
 });

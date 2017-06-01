@@ -25,7 +25,7 @@ const Api = new Lang.Class({
       const renderChange = BaseProvider.ChangeRenderer();
       const find = (currency, coin, tickerObj) => {
         // The Poloniex ticker only offers BTC prices
-        // Wen USD is selected, do a conversion using the USDt price
+        // When USD is selected, do a conversion using the USDt price
         let coinPrice;
         try {
           if (currency === 'USD') {
@@ -43,7 +43,7 @@ const Api = new Lang.Class({
         }
         return coinPrice;
       };
-      const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
+      const coin = BaseProvider.baseCoin(options.coin);
 
       return {
         text: (data) => renderCurrency(find(options.currency, coin, data)),

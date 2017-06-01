@@ -20,7 +20,7 @@ const Api = new Lang.Class({
     last: function (options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
-      const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
+      const coin = BaseProvider.baseCoin(options.coin);
       const key = coin.toLowerCase() + '_to_' + options.currency.toLowerCase();
 
       return {

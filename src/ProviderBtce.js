@@ -23,7 +23,7 @@ const Api = new Lang.Class({
       const find = (currency, coin, tickerObj) => {
         return tickerObj[coin.toLowerCase() + '_' + currency.toLowerCase()] || { "last": 0 };
       };
-      const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
+      const coin = BaseProvider.baseCoin(options.coin);
 
       return {
         text: (data) => renderCurrency(find(options.currency, coin, data).last),
@@ -37,7 +37,8 @@ const Api = new Lang.Class({
   },
 
   getUrl: function (options) {
-    const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
-    return "https://btc-e.com/api/3/ticker/" + coin.toLowerCase() + "_" + options.currency.toLowerCase();
+    const coin = BaseProvider.baseCoin(options.coin);
+    return "https://btc-e.com/api/3/ticker/" +
+      coin.toLowerCase() + "_" + options.currency.toLowerCase();
   }
 });
