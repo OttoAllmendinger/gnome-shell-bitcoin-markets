@@ -16,23 +16,6 @@ const DefaultCurrencies = [
       'MXN', 'RUR'
 ];
 
-const Selector = (path) => {
-  /**
-   * returns a function that returns a nested attribute
-   * path format: a.b.c.d
-   */
-  return (obj) => {
-    return path.split('.').reduce((obj, key) => {
-      if (obj[key]) {
-        return obj[key];
-      } else {
-        throw new Error('invalid path: ' + path);
-      }
-    }, obj);
-  };
-};
-
-
 const IndicatorChange = {
   up: "up",
   down: "down",
