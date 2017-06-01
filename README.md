@@ -1,10 +1,15 @@
 ![Screenshot](https://raw.github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/master/data/screenshot.png)
 
-Displays Bitcoin market information in the gnome shell. Available APIs:
+Displays Bitcoin and Altcoin market information in the Gnome Shell.
+
+
+Available APIs:
 
 * BitcoinAverage.com
 * BitStamp
 * BitPay
+* BTC-E
+* Poloniex
 * Coinbase
 * BX.in.th
 * Paymium
@@ -30,9 +35,13 @@ The latest development version can be installed manually with these commands
 Then go to https://extensions.gnome.org/local/ to turn on the extension or use
 gnome-tweak-tool.
 
+
+## Contributors
+
+* https://github.com/filidorwiese - Altcoin support, BTC-E and Poloniex support
+
 ## TODO
 
-* Show tooltip info (last refresh, buy/sell prices)
 * Charts
 
 Tip address 1645A1qhW3FHxr2JLdqLuYGQ6QSmN5BbNS
