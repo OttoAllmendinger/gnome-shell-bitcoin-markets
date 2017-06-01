@@ -9,6 +9,8 @@ const Local = imports.misc.extensionUtils.getCurrentExtension();
 const {
   ProviderBitcoinAverage,
   ProviderBitstamp,
+  ProviderBtce,
+  ProviderPoloniex,
   ProviderCoinbase,
   ProviderBitPay,
   ProviderBXinTH,
@@ -25,6 +27,8 @@ const ApiProvider = new Lang.Class({
     this.apis = {
       bitcoinaverage: new ProviderBitcoinAverage.Api(),
       bitstamp: new ProviderBitstamp.Api(),
+      btce: new ProviderBtce.Api(),
+      poloniex: new ProviderPoloniex.Api(),
       bitpay: new ProviderBitPay.Api(),
       coinbase: new ProviderCoinbase.Api(),
       bxinth: new ProviderBXinTH.Api(),
@@ -56,7 +60,7 @@ if (window["ARGV"] && ARGV[0] === "test") {
 
   let apiProvider = new ApiProvider();
 
-  let options = {currency: "USD", attribute: "last"};
+  let options = {currency: "USD", attribute: "last", coin: "BTC"};
 
   let indicator = apiProvider.get('bitpay', options);
 

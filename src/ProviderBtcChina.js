@@ -12,12 +12,14 @@ const Api = new Lang.Class({
 
   currencies: ['CNY'],
 
+  coins: ['BTC','mBTC','LTC'],
+
   interval: 10,
 
   attributes: {
     last: function (options) {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
 
       return {
         text: (data) => renderCurrency(data["ticker"]["last"]),
@@ -27,10 +29,11 @@ const Api = new Lang.Class({
   },
 
   getLabel: function (options) {
-    return "BTCC " + options.currency;
+    return "BTCC " + options.currency + "/" + options.coin;
   },
 
   getUrl: function (options) {
-    return "https://data.btcchina.com/data/ticker?market=btccny";
+    const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
+    return "https://data.btcchina.com/data/ticker?market=" + options.currency.toLowerCase() + coin.toLowerCase();
   }
 });

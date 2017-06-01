@@ -2,24 +2,24 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
-const { ProviderBitstamp } = Local.imports;
+const { ProviderBtce } = Local.imports;
 const { BaseProviderConfigView } = Local.imports.BaseProviderConfigView;
 
 
 const ConfigView = new Lang.Class({
-  Name: "ProviderBitstamp.ConfigView",
+  Name: "ProviderBtce.ConfigView",
   Extends: BaseProviderConfigView,
 
   _init: function (configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
-    this._addSelectCurrency((new ProviderBitstamp.Api()).currencies);
-    this._addSelectCoin((new ProviderBitstamp.Api()).coins);
+    this._addSelectCurrency((new ProviderBtce.Api()).currencies);
+    this._addSelectCoin((new ProviderBtce.Api()).coins);
   },
 
   _setApiDefaults: function (config) {
-    if (config.get('api') !== 'bitstamp') {
+    if (config.get('api') !== 'btce') {
       config.attributes = {
-        api: 'bitstamp',
+        api: 'btce',
         currency: 'USD',
         coin: 'BTC',
         attribute: 'last'

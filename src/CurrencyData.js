@@ -133,6 +133,13 @@ const CurrencyData = {
         "rounding": 0,
         "code": "BRL"
     },
+    "BTC": {
+      "symbol": "BTC",
+      "symbol_native": "BTC",
+      "decimal_digits": 2,
+      "rounding": 0,
+      "code": "BTC"
+    },
     "BWP": {
         "symbol": "BWP",
         "symbol_native": "P",
@@ -674,10 +681,17 @@ const CurrencyData = {
     },
     "RUB": {
         "symbol": "RUB",
-        "symbol_native": "руб.",
+        "symbol_native": "₽",
         "decimal_digits": 2,
         "rounding": 0,
         "code": "RUB"
+    },
+    "RUR": {
+        "symbol": "RUR",
+        "symbol_native": "₽",
+        "decimal_digits": 2,
+        "rounding": 0,
+        "code": "RUR"
     },
     "RWF": {
         "symbol": "RWF",

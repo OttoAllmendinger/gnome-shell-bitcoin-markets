@@ -13,7 +13,7 @@ const { IndicatorModel } = Local.imports.IndicatorModel;
 const DefaultCurrencies = [
       'USD', 'EUR', 'CNY', 'GBP', 'CAD', 'RUB', 'AUD',
       'BRL', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN',
-      'MXN'
+      'MXN', 'RUR'
 ];
 
 const Selector = (path) => {
@@ -66,31 +66,8 @@ const ChangeRenderer = (options) => {
 
 
 
-const CurrencyRenderer = ({unit, currency, decimals}) => {
-  unit = unit || 'mBTC';
-
-  const getFormat = (currency) => {
-    /* determined after mtgox api */
-    const front = "%s%v";
-    const back = "%v %s";
-    const frontFormats = {
-      USD: front, CAD: front, AUD: front, GBP: front,
-      HKD: front, NZD: front, SGD: front, THB: front,
-      MXN: front
-    };
-
-    return frontFormats[currency] || back;
-  };
-
-  const changeUnit = (number) => {
-    if (unit === 'mBTC') {
-      return Number(number) / 1000.0;
-    } else {
-      return Number(number);
-    }
-  };
-
-  let format = getFormat(currency);
+const CurrencyRenderer = ({currency, coin, decimals}) => {
+  let format = "%v %s";
   let symbol = currency;
   let precision = 2;
 
@@ -109,12 +86,17 @@ const CurrencyRenderer = ({unit, currency, decimals}) => {
     precision = decimals;
   }
 
-  return (number) =>
-    Accounting.formatMoney(changeUnit(number), {
-      symbol: symbol,
-      format: format,
-      precision: precision
-    });
+  return (number) => {
+    if (coin === 'mBTC') {
+      number = Number(number) / 1000.0;
+    }
+
+    return Accounting.formatMoney(Number(number), {
+        symbol: symbol,
+        format: format,
+        precision: precision
+      }) + "/" + coin;
+  }
 };
 
 

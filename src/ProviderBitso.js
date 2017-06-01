@@ -12,6 +12,8 @@ const Api = new Lang.Class({
 
   currencies: ['MXN'],
 
+  coins: ['BTC','mBTC','ETH'],
+
   /* quote https://bitso.com/api_info#rate-limits
    *
    * > Rate limits are are based on one minute windows. If you do more than 30
@@ -21,8 +23,8 @@ const Api = new Lang.Class({
 
   attributes: {
     last: function (options) {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
 
       return {
         text: (data) => renderCurrency(data.last),
@@ -32,10 +34,11 @@ const Api = new Lang.Class({
   },
 
   getLabel: function(options) {
-    return "Bitso " + options.currency;
+    return "Bitso " + options.currency + "/" + options.coin;
   },
 
   getUrl: function(options) {
-    return "https://api.bitso.com/v2/ticker";
+    const coin = options.coin === 'mBTC' ? 'BTC' : options.coin;
+    return "https://api.bitso.com/v2/ticker?book=" + coin + "_" + options.currency;
   }
 });

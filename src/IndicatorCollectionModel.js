@@ -110,6 +110,7 @@ const IndicatorCollectionModel = new GObject.Class({
     return {
       api: 'bitcoinaverage',
       currency: 'USD',
+      coin: 'BTC',
       attribute: 'last'
     };
   },

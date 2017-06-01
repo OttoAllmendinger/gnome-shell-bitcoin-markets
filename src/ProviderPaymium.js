@@ -12,12 +12,14 @@ const Api = new Lang.Class({
 
   currencies: ['EUR'],
 
+  coins: ['BTC','mBTC'],
+
   interval: 60, // unclear, should be safe
 
   attributes: {
     last: function (options) {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
 
       return {
         text: (data) => renderCurrency(data["price"]),
@@ -27,10 +29,10 @@ const Api = new Lang.Class({
   },
 
   getLabel: function (options) {
-    return "Paymium " + options.currency;
+    return "Paymium " + options.currency + "/" + options.coin;
   },
 
   getUrl: function (options) {
-    return "https://paymium.com/api/v1/data/eur/ticker";
+    return "https://paymium.com/api/v1/data/" + options.currency.toLowerCase() + "/ticker";
   }
 });

@@ -12,14 +12,15 @@ const Api = new Lang.Class({
 
   currencies: BaseProvider.DefaultCurrencies,
 
+  coins: ['BTC','mBTC'],
+
   interval: 60, // unclear, should be safe
 
   attributes: {
     last: function (options) {
-      let renderCurrency = BaseProvider.CurrencyRenderer(options);
-      let renderChange = BaseProvider.ChangeRenderer();
-
-      let find = (currency, arr) => {
+      const renderCurrency = BaseProvider.CurrencyRenderer(options);
+      const renderChange = BaseProvider.ChangeRenderer();
+      const find = (currency, arr) => {
         for (let {code, rate} of arr) {
           if (code === currency) {
             return rate;
@@ -37,7 +38,7 @@ const Api = new Lang.Class({
   },
 
   getLabel: function (options) {
-    return "BitPay " + options.currency;
+    return "BitPay " + options.currency + "/" + options.coin;
   },
 
   getUrl: function (options) {
