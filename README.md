@@ -1,4 +1,4 @@
-![Screenshot](https://raw.github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/master/data/screenshot.png)
+![Screenshot](https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/blob/master/data/screenshot.png?raw=true)
 
 Displays Bitcoin and Altcoin market information in the Gnome Shell.
 
