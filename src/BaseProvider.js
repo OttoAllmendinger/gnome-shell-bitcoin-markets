@@ -87,7 +87,7 @@ const CurrencyRenderer = ({currency, coin, decimals}) => {
         symbol: symbol,
         format: format,
         precision: precision
-      }) + "/" + coin;
+    })
   }
 };
 

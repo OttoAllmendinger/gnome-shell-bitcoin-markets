@@ -93,6 +93,7 @@ const IndicatorConfigView = new Lang.Class({
     var layout = this._layoutIndicatorSettings;
     layout.add(this._confDecimals());
     layout.add(this._confShowChange());
+    layout.add(this._confShowBaseCurrency());
     layout.add(this._confProvider());
   },
 
@@ -177,6 +178,20 @@ const IndicatorConfigView = new Lang.Class({
 
     return makeConfigRow(_("Show Change"), switchView);
   },
+
+
+  _confShowBaseCurrency: function () {
+    let preset = this._indicatorConfig.get('show_base_currency') === true;
+
+    let switchView = new Gtk.Switch({active: preset});
+
+    switchView.connect('notify::active', (obj) => {
+      this._indicatorConfig.set('show_base_currency', obj.active);
+    });
+
+    return makeConfigRow(_("Show Base Currency"), switchView);
+  },
+
 
   _confDecimals: function () {
     let preset = this._indicatorConfig.get('decimals');

@@ -143,7 +143,11 @@ const MarketIndicatorView = new Lang.Class({
       unchanged: " "
     };
 
-    this._displayText(data.text);
+    let {text} = data;
+    if (this._options.show_base_currency) {
+      text += "/" + this._options.coin;
+    }
+    this._displayText(text);
 
     let symbol = " ";
 
