@@ -47,7 +47,9 @@ const _Defaults = [
     api: 'bitcoinaverage',
     currency: 'USD',
     coin: 'BTC',
-    attribute: 'last'
+    attribute: 'last',
+    show_change: true,
+    show_base_currency: false
   }
 ];
 
@@ -187,6 +189,8 @@ let IndicatorCollection = new Lang.Class({
     if (this._settings.get_boolean(FIRST_RUN_KEY)) {
       this._initDefaults();
       this._settings.set_boolean(FIRST_RUN_KEY, false);
+    } else {
+      this._upgradeSettings();
     }
 
     this._settingsChangedId = this._settings.connect(
@@ -199,6 +203,21 @@ let IndicatorCollection = new Lang.Class({
 
   _initDefaults: function () {
     this._settings.set_strv(INDICATORS_KEY, _Defaults.map(JSON.stringify));
+  },
+
+  _upgradeSettings: function () {
+    const applyDefaults = (options) => {
+      Object.keys(_Defaults).forEach((k) => {
+        if (!(k in options)) {
+          options[k] = _Defaults[k];
+        }
+      });
+      return options;
+    };
+    let updated = this._settings.get_strv(INDICATORS_KEY)
+      .map(JSON.parse)
+      .map(applyDefaults);
+    this._settings.set_strv(INDICATORS_KEY, updated.map(JSON.stringify));
   },
 
   _createIndicators: function () {
@@ -238,8 +257,12 @@ function init(metadata) {
 }
 
 function enable() {
-  _apiProvider = new ApiProvider.ApiProvider();
-  _indicatorCollection = new IndicatorCollection();
+  try {
+    _apiProvider = new ApiProvider.ApiProvider();
+    _indicatorCollection = new IndicatorCollection();
+  } catch (e) {
+    logError(e);
+  }
 }
 
 function disable() {
