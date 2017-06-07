@@ -4,15 +4,16 @@ const Soup = imports.gi.Soup;
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Config = imports.misc.config;
 
-function HTTPError(statusCode, reasonPhrase) {
+function HTTPError(soupMessage, error) {
     this.name = "HTTPError";
-    this.statusCode = statusCode;
-    this.reasonPhrase = reasonPhrase;
+    this.soupMessage = soupMessage;
     this.stack = (new Error()).stack;
 
     this.toString = () =>
-        "HTTP Status: " + this.statusCode +
-            ", Reason: " + this.reasonPhrase;
+        "method=" + this.soupMessage.method +
+        " uri=" + this.soupMessage.uri.to_string(false /* short */) +
+        " status_code=" + this.soupMessage.status_code +
+        " reason_phrase= " + this.soupMessage.reason_phrase;
 }
 
 HTTPError.prototype = Object.create(Error.prototype);
@@ -21,8 +22,10 @@ HTTPError.prototype.constructor = HTTPError;
 const STATUS_TOO_MANY_REQUESTS = 429;
 
 const isErrTooManyRequests = (err) =>
-    err && err.statusCode &&
-        Number(err.statusCode) === STATUS_TOO_MANY_REQUESTS
+    err &&
+        err.soupMessage &&
+        err.soupMessage.status_code &&
+        Number(err.soupMessage.status_code) === STATUS_TOO_MANY_REQUESTS
 
 const getExtensionVersion = () => {
   if (Local.metadata['git-version']) {
@@ -72,7 +75,6 @@ Soup.Session.prototype.add_feature.call(
 
 
 const getJSON = (url, callback) => {
-  // log((new Date()) + ' getJSON ' + url);
   let message = Soup.Message.new("GET", url);
   let headers = message.request_headers;
   headers.append('X-Client-Id', _clientId);
@@ -80,18 +82,19 @@ const getJSON = (url, callback) => {
     message,
     (session, message) => {
       if (message.status_code == 200) {
-        callback(null, JSON.parse(message.response_body.data));
+        let data;
+        try {
+          data = JSON.parse(message.response_body.data);
+        } catch (e) {
+          callback(
+            new Error("GET " + url + ": error parsing JSON: " + e), null
+          );
+        }
+        if (data) {
+          callback(null, data);
+        }
       } else {
-        log('getJSON error url: ' + url);
-        log('getJSON error status code: ' + message.status_code);
-        log('getJSON error response: ' + message.response_body.data);
-        callback(
-            new HTTPError(
-              message.status_code,
-              message.reason_phrase
-            ),
-            null
-        );
+        callback(new HTTPError(message), null);
       }
     }
   );

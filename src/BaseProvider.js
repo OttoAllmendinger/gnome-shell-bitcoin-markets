@@ -122,6 +122,10 @@ const Handler = new Lang.Class({
           return;
         }
 
+        if (error) {
+          logError(error);
+        }
+
         this._lastError = error;
         this._lastData = data;
         this.emit("update", error, data);
