@@ -4,7 +4,7 @@ GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always)
 
 SOURCE = src/*.js \
 		 src/CurrencyData.js \
-		 src/ExchangeData.js \
+		 src/ProviderBitcoinAverageExchangeData.js \
 		 src/stylesheet.css \
 		 src/metadata.json \
 		 src/schemas/gschemas.compiled \
@@ -34,8 +34,8 @@ metadata:
 src/CurrencyData.js:
 	gjs util/MakeCurrencyData.js > src/CurrencyData.js
 
-src/ExchangeData.js:
-	gjs util/MakeExchangeData.js > src/ExchangeData.js
+src/ProviderBitcoinAverageExchangeData.js:
+	gjs util/MakeExchangeData.js > $@
 
 src/locale/%/LC_MESSAGES/bitcoin-markets.mo: src/%.po
 	mkdir -p $(dir $@)

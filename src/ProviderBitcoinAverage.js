@@ -4,19 +4,6 @@ const Local = imports.misc.extensionUtils.getCurrentExtension();
 const BaseProvider = Local.imports.BaseProvider;
 
 
-const ExchangeData = Local.imports.ExchangeData.ExchangeData;
-
-const getExchangeToCurrency = () =>
-  Object.keys(ExchangeData).reduce((o, currency) => {
-    ExchangeData[currency].forEach((exchange) => {
-      let a = o[exchange] || [];
-      a.push(currency);
-      o[exchange] = a;
-    });
-    return o;
-  }, {});
-
-
 const _invalidExchangeError = () =>
     new Error("use_average !== true and no exchange defined");
 
@@ -26,29 +13,32 @@ const Api = new Lang.Class({
 
   apiName: "BitcoinAverage",
 
-  exchanges: Object.keys(getExchangeToCurrency()),
-
+  // FIXME: remote attribute, derive from ExchangeData instead
   currencies: BaseProvider.DefaultCurrencies,
 
   coins: ['BTC','mBTC'],
 
-  /* quote https://bitcoinaverage.com/api.htm
+  /* Quote 429 response:
    *
-   * > API is updated along with the site, normally around every minute. There
-   * > is no explicit restriction about how often you can call the API, yet
-   * > calling it more often than once a minute makes no sense. Please be good.
+   *  Rate limit exceeded for unauthenticated requests.
+   *  You are allowed to make 100 requests every 1440.0 minutes
+   *
+   * That means an interval of about 15 minutes
+   *
    */
-  interval: 60,
+  interval: 15 * 60,
 
   attributes: {
     last: (options) => {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
+      const symbol = "BTC" + options.currency.toUpperCase();
+
       const getNumber = (data) => {
         if (options.use_average !== false) {
-          return data.last;
+          return data[symbol].last;
         } else if (options.exchange !== undefined) {
-          return data[options.exchange].rates.last;
+          return data.symbols[symbol].last;
         } else {
           throw _invalidExchangeError();
         }
@@ -61,11 +51,14 @@ const Api = new Lang.Class({
     }
   },
 
-  getUrl: function (options) {
-    if (options.use_average !== false) {
-      return "https://api.bitcoinaverage.com/ticker/" + options.currency;
-    } else if (options.exchange !== undefined) {
-      return "https://api.bitcoinaverage.com/exchanges/" + options.currency;
+  getUrl: function ({use_average, exchange, coin, currency}) {
+    coin = BaseProvider.baseCoin(coin).toUpperCase();
+    currency = currency.toUpperCase();
+    if (use_average !== false) {
+      return "https://apiv2.bitcoinaverage.com/indices/global/ticker/short" +
+        "?crypto=" + coin + "&fiats=" + currency;
+    } else if (exchange !== undefined) {
+      return "https://apiv2.bitcoinaverage.com/exchanges/" + exchange;
     } else {
       throw _invalidExchangeError();
     }
