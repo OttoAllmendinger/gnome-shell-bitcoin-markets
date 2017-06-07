@@ -7,7 +7,7 @@ const _ = Gettext.gettext;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const { ProviderBitcoinAverage } = Local.imports;
-const { ExchangeData } = Local.imports.ExchangeData;
+const { ExchangeData } = Local.imports.ProviderBitcoinAverageExchangeData;
 const {
     ComboBoxView,
     BaseProviderConfigView
@@ -86,11 +86,22 @@ const ConfigView = new Lang.Class({
   },
 
   _makeExchangeOptions: function (currency) {
+    let coin = "BTC";
+    let symbol = coin + currency.toUpperCase();
     let currentExchange = this._indicatorConfig.get('exchange');
-    let exchanges = ExchangeData[currency];
+    let getVolume = (e) => {
+      if (symbol in e.symbols) {
+        return e.symbols[symbol].volume;
+      }
+      return 0;
+    }
+    let exchangeByVolume = ExchangeData.filter((e) => getVolume(e) > 0);
 
-    let options = exchanges.map((e) =>
-      ({label: e, value: e, active: e === currentExchange})
+    // swap order of (b, a) to sort in descending order
+    exchangeByVolume.sort((a, b) => getVolume(b) - getVolume(a));
+
+    let options = exchangeByVolume.map(({display_name, name}) =>
+      ({label: display_name, value: name, active: name === currentExchange})
     );
 
     if (currentExchange === undefined) {
