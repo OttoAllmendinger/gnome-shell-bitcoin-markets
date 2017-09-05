@@ -12,7 +12,7 @@ const Api = new Lang.Class({
 
   currencies: ['THB'],
 
-  coins: ['BTC','mBTC','ETH','DAS','REP','GNO'],//?
+  coins: ['BTC','mBTC','ETH','DAS','REP','GNO', 'OMG'],//?
 
   interval: 60, // unclear, should be safe
 
