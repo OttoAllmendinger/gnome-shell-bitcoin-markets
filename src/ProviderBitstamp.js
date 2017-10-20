@@ -15,7 +15,7 @@ const Api = new Lang.Class({
 
   currencies: ['USD', 'EUR'],
 
-  coins: ['BTC','mBTC','XRP'],
+  coins: ['BTC', 'mBTC', 'LTC', 'ETH', 'XRP'],
 
   interval: 10, // 60 requests per 10 minutes
 
