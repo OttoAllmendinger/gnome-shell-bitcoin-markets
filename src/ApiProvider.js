@@ -9,7 +9,6 @@ const Local = imports.misc.extensionUtils.getCurrentExtension();
 const {
   ProviderBitcoinAverage,
   ProviderBitstamp,
-  ProviderBtce,
   ProviderPoloniex,
   ProviderCoinbase,
   ProviderBitPay,
@@ -27,7 +26,6 @@ const ApiProvider = new Lang.Class({
     this.apis = {
       bitcoinaverage: new ProviderBitcoinAverage.Api(),
       bitstamp: new ProviderBitstamp.Api(),
-      btce: new ProviderBtce.Api(),
       poloniex: new ProviderPoloniex.Api(),
       bitpay: new ProviderBitPay.Api(),
       coinbase: new ProviderCoinbase.Api(),
