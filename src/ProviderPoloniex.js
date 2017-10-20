@@ -14,6 +14,7 @@ const Api = new Lang.Class({
 
   coins: [
     'BTC', 'mBTC',
+    'BCH',
     'BCN', 'BELA', 'BLK', 'BTCD', 'BTM', 'BTS', 'BURST', 'CLAM', 'DASH', 'DGB',
     'DOGE', 'EMC2', 'FLDC', 'FLO', 'GAME', 'GRC', 'HUC', 'LTC', 'MAID', 'OMNI',
     'NAUT', 'NAV', 'NEOS', 'NMC', 'NOTE', 'NXT', 'PINK', 'POT', 'PPC', 'RIC',
