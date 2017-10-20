@@ -26,6 +26,8 @@ const ApiProvider = Local.imports.ApiProvider;
 
 const Convenience = Local.imports.convenience;
 
+const { dump } = Local.imports.dump;
+
 const INDICATORS_KEY = "indicators";
 const FIRST_RUN_KEY = "first-run";
 
@@ -211,11 +213,9 @@ let IndicatorCollection = new Lang.Class({
 
   _upgradeSettings: function () {
     const applyDefaults = (options) => {
-      Object.keys(_Defaults).forEach((k) => {
-        if (!(k in options)) {
-          options[k] = _Defaults[k];
-        }
-      });
+      if (options.coin === undefined) {
+        options.coin = 'BTC';
+      }
       return options;
     };
     let updated = this._settings.get_strv(INDICATORS_KEY)
