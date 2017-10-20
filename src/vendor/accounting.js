@@ -410,3 +410,5 @@
 
 	// Root will be `window` in browser or `global` on the server:
 }(this));
+
+var accounting = this.accounting;
