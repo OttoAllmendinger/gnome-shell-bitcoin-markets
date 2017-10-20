@@ -26,8 +26,6 @@ const ApiProvider = Local.imports.ApiProvider;
 
 const Convenience = Local.imports.convenience;
 
-const { dump } = Local.imports.dump;
-
 const INDICATORS_KEY = "indicators";
 const FIRST_RUN_KEY = "first-run";
 
