@@ -140,7 +140,6 @@ const IndicatorConfigView = new Lang.Class({
     let options = [
         {label: 'BitcoinAverage', value: 'bitcoinaverage'},
         {label: 'BitStamp', value: 'bitstamp'},
-        {label: 'BTC-E', value: 'btce'},
         {label: 'Poloniex', value: 'poloniex'},
         {label: 'BitPay',   value: 'bitpay'},
         {label: 'CoinBase', value: 'coinbase'},

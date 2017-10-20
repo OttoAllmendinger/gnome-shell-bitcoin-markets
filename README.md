@@ -8,7 +8,6 @@ Available APIs:
 * BitcoinAverage.com
 * BitStamp
 * BitPay
-* BTC-E
 * Poloniex
 * Coinbase
 * BX.in.th
