@@ -12,10 +12,16 @@ const Api = new Lang.Class({
 
   currencies: ['USD'],
 
-  coins: ['BTC','mBTC','BCN', 'BELA','BLK','BTCD','BTM','BTS','BURST','CLAM','DASH','DGB','DOGE','EMC2','FLDC','FLO','GAME',
-    'GRC','HUC','LTC','MAID','OMNI','NAUT','NAV','NEOS','NMC','NOTE','NXT','PINK','POT','PPC','RIC','SJCX','STR',
-    'SYS','VIA','XVC','VRC','VTC','XBC','XCP','XEM','XMR','XPM','XRP','ETH','SC','BCY','EXP','FCT','RADS','AMP',
-    'DCR','LSK','LBC','STEEM','SBD','ETC','REP','ARDR','ZEC','STRAT','NXC','PASC','GNT','GNO'],
+  coins: [
+    'BTC', 'mBTC',
+    'BCN', 'BELA', 'BLK', 'BTCD', 'BTM', 'BTS', 'BURST', 'CLAM', 'DASH', 'DGB',
+    'DOGE', 'EMC2', 'FLDC', 'FLO', 'GAME', 'GRC', 'HUC', 'LTC', 'MAID', 'OMNI',
+    'NAUT', 'NAV', 'NEOS', 'NMC', 'NOTE', 'NXT', 'PINK', 'POT', 'PPC', 'RIC',
+    'SJCX', 'STR', 'SYS', 'VIA', 'XVC', 'VRC', 'VTC', 'XBC', 'XCP', 'XEM',
+    'XMR', 'XPM', 'XRP', 'ETH', 'SC', 'BCY', 'EXP', 'FCT', 'RADS', 'AMP', 'DCR',
+    'LSK', 'LBC', 'STEEM', 'SBD', 'ETC', 'REP', 'ARDR', 'ZEC', 'STRAT', 'NXC',
+    'PASC', 'GNT', 'GNO'
+  ],
 
   interval: 10, // 60 requests per 10 minutes
 
