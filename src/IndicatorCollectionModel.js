@@ -67,7 +67,7 @@ const IndicatorCollectionModel = new GObject.Class({
     var flag;
 
     let mutex = (func) =>
-      () => {
+      function () {
         if (!flag) {
           flag = true;
           func.apply(null, arguments);
