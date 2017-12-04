@@ -39,6 +39,9 @@ gnome-tweak-tool.
 ## Contributors
 
 * https://github.com/filidorwiese - Altcoin support, BTC-E and Poloniex support
+* https://github.com/fearenales - Popup settings implementation, BTCChina support
+* https://github.com/b00bl1k - WEX support
+* https://github.com/osiux - Bitso support
 
 ## TODO
 
