@@ -14,6 +14,7 @@ Available APIs:
 * Paymium
 * BTCChina
 * Bitso
+* WEX
 
 
 ## Installation
