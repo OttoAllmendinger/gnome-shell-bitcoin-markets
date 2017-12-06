@@ -41,7 +41,7 @@ const Api = new Lang.Class({
 
   getUrl: function (options) {
     const coin = BaseProvider.baseCoin(options.coin);
-    let coinParam
+    let coinParam = coin;
     switch (coin) {
       case 'DASH':
         coinParam = 'DSH'
@@ -58,11 +58,9 @@ const Api = new Lang.Class({
       case 'QASH':
         coinParam = 'QSH'
         break;
-    
       default:
         break;
     }
-    return "https://api.bitfinex.com/v2/ticker/t" +
-      coinParam + options.currency + '/';
+    return "https://api.bitfinex.com/v2/ticker/t" + coinParam + options.currency + '/';
   }
 });
