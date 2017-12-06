@@ -7,6 +7,7 @@ Available APIs:
 
 * BitcoinAverage.com
 * BitStamp
+* Bitfinex
 * BitPay
 * Poloniex
 * Coinbase
@@ -42,6 +43,7 @@ gnome-tweak-tool.
 * https://github.com/fearenales - Popup settings implementation, BTCChina support
 * https://github.com/b00bl1k - WEX support
 * https://github.com/osiux - Bitso support
+* https://github.com/brunobertoldi - Bitfinex support
 
 ## TODO
 
