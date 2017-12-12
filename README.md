@@ -12,6 +12,7 @@ Available APIs:
 * Poloniex
 * Coinbase
 * BX.in.th
+* Kraken
 * Paymium
 * BTCChina
 * Bitso
@@ -44,6 +45,7 @@ gnome-tweak-tool.
 * https://github.com/b00bl1k - WEX support
 * https://github.com/osiux - Bitso support
 * https://github.com/brunobertoldi - Bitfinex support
+* https://github.com/eloo - Kraken support
 
 ## TODO
 

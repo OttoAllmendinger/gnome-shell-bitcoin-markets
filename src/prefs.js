@@ -22,6 +22,7 @@ const {
   ProviderPoloniex,
   ProviderCoinbase,
   ProviderBitPay,
+  ProviderKraken,
   ProviderBXinTH,
   ProviderPaymium,
   ProviderBtcChina,
@@ -35,6 +36,7 @@ const {
   ProviderPoloniexPrefs,
   ProviderCoinbasePrefs,
   ProviderBitPayPrefs,
+  ProviderKrakenPrefs,
   ProviderBXinTHPrefs,
   ProviderPaymiumPrefs,
   ProviderBtcChinaPrefs,
@@ -114,6 +116,8 @@ const IndicatorConfigView = new Lang.Class({
         new ProviderBitcoinAveragePrefs.ConfigView(widget, config),
       bitpay: () =>
         new ProviderBitPayPrefs.ConfigView(widget, config),
+      kraken: () =>
+        new ProviderKrakenPrefs.ConfigView(widget, config),
       coinbase: () =>
         new ProviderCoinbasePrefs.ConfigView(widget, config),
       bxinth: () =>
@@ -151,6 +155,7 @@ const IndicatorConfigView = new Lang.Class({
         {label: 'Bitfinex', value: 'bitfinex'},
         {label: 'Poloniex', value: 'poloniex'},
         {label: 'BitPay',   value: 'bitpay'},
+        {label: 'Kraken',   value: 'kraken'},
         {label: 'CoinBase', value: 'coinbase'},
         {label: 'BXinTH',   value: 'bxinth'},
         {label: 'Paymium',  value: 'paymium'},
