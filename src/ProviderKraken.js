@@ -4,22 +4,6 @@ const Local = imports.misc.extensionUtils.getCurrentExtension();
 const BaseProvider = Local.imports.BaseProvider;
 
 
-// horrific api
-// curl https://api.kraken.com/0/public/AssetPairs | jq '.[] | keys'
-const getPairCode = (coin, currency) => {
-  coin = coin.toUpperCase()
-  currency = currency.toUpperCase()
-  if (coin.toUpperCase() === 'BTC') {
-    coin = 'XBT';
-  }
-  const unprefixed = ['BCH', 'DASH', 'EOS', 'GNO'];
-  if (unprefixed.includes(coin)) {
-    return `${coin}${currency}`;
-  } else {
-    return `X${coin}Z${currency}`;
-  }
-}
-
 const Api = new Lang.Class({
   Name: 'Kraken.Api',
   Extends: BaseProvider.Api,
@@ -28,40 +12,29 @@ const Api = new Lang.Class({
 
   currencies: ['USD', 'EUR'],
 
-  coins: [
-    'BTC',
-    'BCH',
-    'DASH',
-    'ETH',
-    'LTC',
-    'ZEC',
-    'XMR',
-    'REP',
-    'XRP',
-    'ETC'
-  ],
+  coins: ['XBT', 'BCH', 'DASH', 'ETH', 'LTC', 'ZEC', 'XMR', 'REP', 'XRP', 'ETC'],
 
-  interval: 10, // unknown, guessing
+  interval: 60, // 60 requests per 10 minutes
 
   attributes: {
     last: function(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
-      const { coin, currency } = options;
-      const id = getPairCode(coin, currency);
+
+      var id = "X" + options.coin.toUpperCase() + "Z" + options.currency.toUpperCase();
+
       return {
-        text: ({result}) => renderCurrency(result[id].a[0]),
-        change: ({result}) => renderChange(result[id].a[0])
+        text: (data) => renderCurrency(data["result"][id]["c"][0]),
+        change: (data) => renderChange(data["result"][id]["c"][0])
       };
     }
   },
 
-  getLabel: function({coin, currency}) {
-    return "Kraken " + currency + "/" + coin;
+  getLabel: function(options) {
+    return "Kraken " + options.currency + "/" + options.coin;
   },
 
-  getUrl: function({coin, currency}) {
-    return "https://api.kraken.com/0/public/Ticker?pair=" +
-      getPairCode(coin, currency);
+  getUrl: function(options) {
+    return "https://api.kraken.com/0/public/Ticker?pair=" + options.coin.toUpperCase() + options.currency.toUpperCase();
   }
 });

@@ -30,4 +30,3 @@ const ConfigView = new Lang.Class({
   },
 });
 Signals.addSignalMethods(ConfigView.prototype);
-
