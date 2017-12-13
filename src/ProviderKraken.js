@@ -12,20 +12,9 @@ const Api = new Lang.Class({
 
   currencies: ['USD', 'EUR'],
 
-  coins: [
-    'XBT',
-    'BCH',
-    'DASH',
-    'ETH',
-    'LTC',
-    'ZEC',
-    'XMR',
-    'REP',
-    'XRP',
-    'ETC'
-  ],
+  coins: ['XBT', 'BCH', 'DASH', 'ETH', 'LTC', 'ZEC', 'XMR', 'REP', 'XRP', 'ETC'],
 
-  interval: 10, // 60 requests per 10 minutes
+  interval: 60, // 60 requests per 10 minutes
 
   attributes: {
     last: function(options) {
@@ -33,11 +22,10 @@ const Api = new Lang.Class({
       const renderChange = BaseProvider.ChangeRenderer();
 
       var id = "X" + options.coin.toUpperCase() + "Z" + options.currency.toUpperCase();
-      console.log(id)
-      console.log(data)
+
       return {
-        text: (data) => renderCurrency(data[id][a][1]),
-        change: (data) => renderChange(data[id][a][1])
+        text: (data) => renderCurrency(data["result"][id]["c"][0]),
+        change: (data) => renderChange(data["result"][id]["c"][0])
       };
     }
   },
