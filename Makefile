@@ -26,7 +26,7 @@ EXTENSION_PATH = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
 all: schemas archive translations
 
 lint: src/*.js
-	jshint $?
+	eslint $?
 
 metadata:
 	sed 's/_gitversion_/$(GIT_VERSION)/' src/metadata.json.in > src/metadata.json
@@ -47,6 +47,10 @@ src/schemas/gschemas.compiled: src/schemas/$(SCHEMA)
 	glib-compile-schemas src/schemas/
 
 schemas: src/schemas/gschemas.compiled
+
+schema_reset:
+	gsettings --schemadir ./src/schemas/ reset-recursively \
+		org.gnome.shell.extensions.bitcoin-markets
 
 archive: schemas metadata translations $(SOURCE) $(VENDOR)
 	-rm $(ZIPFILE)
