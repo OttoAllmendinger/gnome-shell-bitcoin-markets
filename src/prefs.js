@@ -20,6 +20,7 @@ const {
   ProviderBitstamp,
   ProviderBitfinex,
   ProviderPoloniex,
+  ProviderCexio,
   ProviderCoinbase,
   ProviderBitPay,
   ProviderKraken,
@@ -34,6 +35,7 @@ const {
   ProviderBitstampPrefs,
   ProviderBitfinexPrefs,
   ProviderPoloniexPrefs,
+  ProviderCexioPrefs,
   ProviderCoinbasePrefs,
   ProviderBitPayPrefs,
   ProviderKrakenPrefs,
@@ -118,6 +120,8 @@ const IndicatorConfigView = new Lang.Class({
         new ProviderBitPayPrefs.ConfigView(widget, config),
       kraken: () =>
         new ProviderKrakenPrefs.ConfigView(widget, config),
+      cexio: () =>
+        new ProviderCexioPrefs.ConfigView(widget, config),
       coinbase: () =>
         new ProviderCoinbasePrefs.ConfigView(widget, config),
       bxinth: () =>
@@ -156,6 +160,7 @@ const IndicatorConfigView = new Lang.Class({
         {label: 'Poloniex', value: 'poloniex'},
         {label: 'BitPay',   value: 'bitpay'},
         {label: 'Kraken',   value: 'kraken'},
+        {label: 'CEX.IO',   value: 'cexio'},
         {label: 'CoinBase', value: 'coinbase'},
         {label: 'BXinTH',   value: 'bxinth'},
         {label: 'Paymium',  value: 'paymium'},
