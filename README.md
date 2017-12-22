@@ -10,6 +10,7 @@ Available APIs:
 * Bitfinex
 * BitPay
 * Poloniex
+* CEX.IO
 * Coinbase
 * BX.in.th
 * Kraken
