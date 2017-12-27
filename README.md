@@ -17,6 +17,7 @@ Available APIs:
 * BTCChina
 * Bitso
 * WEX
+* BTCMarkets.net
 
 
 ## Installation
