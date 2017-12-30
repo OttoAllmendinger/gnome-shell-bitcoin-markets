@@ -5,6 +5,7 @@ Displays Bitcoin and Altcoin market information in the Gnome Shell.
 
 Available APIs:
 
+* Binance
 * BitcoinAverage.com
 * BitStamp
 * Bitfinex
@@ -46,6 +47,7 @@ gnome-tweak-tool.
 * https://github.com/osiux - Bitso support
 * https://github.com/brunobertoldi - Bitfinex support
 * https://github.com/eloo - Kraken support
+* https://github.com/vecr25 - Binance support
 
 ## TODO
 

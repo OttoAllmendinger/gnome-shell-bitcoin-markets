@@ -7,6 +7,7 @@ const Mainloop = imports.mainloop;
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 
 const {
+  ProviderBinance,
   ProviderBitcoinAverage,
   ProviderBitstamp,
   ProviderBitfinex,
@@ -27,6 +28,7 @@ const ApiProvider = new Lang.Class({
 
   _init: function () {
     this.apis = {
+      binance: new ProviderBinance.Api(),
       bitcoinaverage: new ProviderBitcoinAverage.Api(),
       bitstamp: new ProviderBitstamp.Api(),
       bitfinex: new ProviderBitfinex.Api(),
