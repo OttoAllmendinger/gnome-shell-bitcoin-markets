@@ -16,6 +16,7 @@ const Convenience = Local.imports.convenience;
 const ApiProvider = Local.imports.ApiProvider;
 
 const {
+  ProviderBinance,
   ProviderBitcoinAverage,
   ProviderBitstamp,
   ProviderBitfinex,
@@ -32,6 +33,7 @@ const {
 } = Local.imports;
 
 const {
+  ProviderBinancePrefs,
   ProviderBitcoinAveragePrefs,
   ProviderBitstampPrefs,
   ProviderBitfinexPrefs,
@@ -110,6 +112,8 @@ const IndicatorConfigView = new Lang.Class({
     let config = this._indicatorConfig;
 
     let apiConfigViews = {
+      binance: () =>
+        new ProviderBinancePrefs.ConfigView(widget, config),
       bitstamp: () =>
         new ProviderBitstampPrefs.ConfigView(widget, config),
       bitfinex: () =>
@@ -158,6 +162,7 @@ const IndicatorConfigView = new Lang.Class({
     let preset = this._indicatorConfig.get('api');
 
     let options = [
+        {label: 'Binance', value: 'binance'},
         {label: 'BitcoinAverage', value: 'bitcoinaverage'},
         {label: 'BitStamp', value: 'bitstamp'},
         {label: 'Bitfinex', value: 'bitfinex'},
