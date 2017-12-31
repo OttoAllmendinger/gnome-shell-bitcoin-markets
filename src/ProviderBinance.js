@@ -5,7 +5,7 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'Bitfinex.Api',
+  Name: 'Binance.Api',
   Extends: BaseProvider.Api,
 
   apiName: "Binance",

@@ -2,7 +2,7 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
-const { ProviderBitfinex } = Local.imports;
+const { ProviderBinance } = Local.imports;
 const { BaseProviderConfigView } = Local.imports.BaseProviderConfigView;
 
 
