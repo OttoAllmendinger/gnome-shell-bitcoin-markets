@@ -47,6 +47,7 @@ gnome-tweak-tool.
 * https://github.com/osiux - Bitso support
 * https://github.com/brunobertoldi - Bitfinex support
 * https://github.com/eloo - Kraken support
+* https://github.com/plehatron -- CEX.io support
 
 ## TODO
 
