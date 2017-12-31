@@ -12,7 +12,7 @@ const Api = new Lang.Class({
 
   currencies: ['MXN'],
 
-  coins: ['BTC','mBTC','ETH', 'XRP'],
+  coins: ['BTC','mBTC','ETH', 'XRP', 'LTC'],
 
   /* quote https://bitso.com/api_info#rate-limits
    *
