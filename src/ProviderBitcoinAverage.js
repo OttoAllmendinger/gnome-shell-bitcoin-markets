@@ -16,7 +16,7 @@ const Api = new Lang.Class({
   // FIXME: remote attribute, derive from ExchangeData instead
   currencies: BaseProvider.DefaultCurrencies,
 
-  coins: ['BTC','mBTC'],
+  coins: ['BTC', 'mBTC'],
 
   /* Quote 429 response:
    *

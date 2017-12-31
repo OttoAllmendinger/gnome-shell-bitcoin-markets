@@ -12,7 +12,7 @@ const Api = new Lang.Class({
 
   currencies: ['CNY'],
 
-  coins: ['BTC','mBTC','LTC'],
+  coins: ['BTC', 'mBTC', 'LTC'],
 
   interval: 10,
 
@@ -34,6 +34,7 @@ const Api = new Lang.Class({
 
   getUrl: function (options) {
     const coin = BaseProvider.baseCoin(options.coin);
-    return "https://data.btcchina.com/data/ticker?market=" + options.currency.toLowerCase() + coin.toLowerCase();
+    return "https://data.btcchina.com/data/ticker?market=" +
+      options.currency.toLowerCase() + coin.toLowerCase();
   }
 });

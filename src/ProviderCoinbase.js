@@ -12,7 +12,7 @@ const Api = new Lang.Class({
 
   currencies: BaseProvider.DefaultCurrencies,
 
-  coins: ['BTC','mBTC','LTC','ETH'],
+  coins: ['BTC', 'mBTC', 'LTC', 'ETH'],
 
   interval: 60, // unclear, should be safe
 

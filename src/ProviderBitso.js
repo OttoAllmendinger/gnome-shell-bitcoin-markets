@@ -12,7 +12,7 @@ const Api = new Lang.Class({
 
   currencies: ['MXN'],
 
-  coins: ['BTC','mBTC','ETH', 'XRP', 'LTC'],
+  coins: ['BTC', 'mBTC', 'ETH', 'XRP', 'LTC'],
 
   /* quote https://bitso.com/api_info#rate-limits
    *
@@ -39,6 +39,8 @@ const Api = new Lang.Class({
 
   getUrl: function(options) {
     const coin = BaseProvider.baseCoin(options.coin);
-    return "https://api.bitso.com/v3/ticker?book=" + coin.toLowerCase() + "_" + options.currency.toLowerCase();
+    return "https://api.bitso.com/v3/ticker?book=" +
+          coin.toLowerCase() + "_" +
+          options.currency.toLowerCase();
   }
 });

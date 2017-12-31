@@ -7,7 +7,7 @@ const { BaseProviderConfigView } = Local.imports.BaseProviderConfigView;
 
 
 const ConfigView = new Lang.Class({
-  Name: "ProviderBitso.ConfigView(",
+  Name: "ProviderBitso.ConfigView",
   Extends: BaseProviderConfigView,
 
   _init: function (configWidget, indicatorConfig) {
