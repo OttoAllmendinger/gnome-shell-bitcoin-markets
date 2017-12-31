@@ -5,16 +5,16 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'ProviderPaymium.Api',
+  Name: 'Cexio.Api',
   Extends: BaseProvider.Api,
 
-  apiName: "Paymium",
+  apiName: "Cexio",
 
-  currencies: ['EUR'],
+  currencies: ['USD', 'EUR'],
 
-  coins: ['BTC', 'mBTC'],
+  coins: ['BTC', 'ETH', 'BCH', 'BTG', 'DASH', 'XRP', 'ZEC'],
 
-  interval: 60, // unclear, should be safe
+  interval: 10,
 
   attributes: {
     last: function (options) {
@@ -22,17 +22,17 @@ const Api = new Lang.Class({
       const renderChange = BaseProvider.ChangeRenderer();
 
       return {
-        text: (data) => renderCurrency(data["price"]),
-        change: (data) => renderChange(data["price"])
+        text: (data) => renderCurrency(data.last),
+        change: (data) => renderChange(data.last)
       };
     }
   },
 
   getLabel: function (options) {
-    return "Paymium " + options.currency + "/" + options.coin;
+    return 'CEX.IO ' + options.currency + '/' + options.coin;
   },
 
   getUrl: function (options) {
-    return "https://paymium.com/api/v1/data/" + options.currency.toLowerCase() + "/ticker";
+    return 'https://cex.io/api/ticker/' + options.coin + '/' + options.currency;
   }
 });
