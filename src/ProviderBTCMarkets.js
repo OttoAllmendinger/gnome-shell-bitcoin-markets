@@ -11,6 +11,7 @@ const Api = new Lang.Class({
   currencies: ['AUD', 'BTC'],
   coins: ['BTC', 'LTC', 'ETH', 'ETC', 'XRP', 'BCH'],
   interval: 10,
+
   attributes: {
     last: function (options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
@@ -21,9 +22,11 @@ const Api = new Lang.Class({
       };
     }
   },
+
   getLabel: function (options) {
     return 'BTCMarkets.net ' + options.currency + '/' + options.coin;
   },
+
   getUrl: function (options) {
     return 'https://api.btcmarkets.net/market/' + options.coin + '/' + options.currency + '/tick';
   }

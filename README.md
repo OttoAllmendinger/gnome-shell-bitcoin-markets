@@ -49,6 +49,7 @@ gnome-tweak-tool.
 * https://github.com/brunobertoldi - Bitfinex support
 * https://github.com/eloo - Kraken support
 * https://github.com/plehatron -- CEX.io support
+* https://github.com/h6w - BTCMarkets.net support
 
 ## TODO
 
