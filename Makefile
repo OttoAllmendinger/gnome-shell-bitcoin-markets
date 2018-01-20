@@ -5,6 +5,7 @@ GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always)
 SOURCE = src/*.js \
 		 src/CurrencyData.js \
 		 src/ProviderBitcoinAverageExchangeData.js \
+		 src/ProviderKrakenAssetPairs.js \
 		 src/stylesheet.css \
 		 src/metadata.json \
 		 src/schemas/gschemas.compiled \
@@ -36,6 +37,9 @@ src/CurrencyData.js:
 
 src/ProviderBitcoinAverageExchangeData.js:
 	gjs util/MakeExchangeData.js > $@
+
+src/ProviderKrakenAssetPairs.js:
+	gjs util/MakeProviderKrakenAssetPairs.js > src/ProviderKrakenAssetPairs.js
 
 src/locale/%/LC_MESSAGES/bitcoin-markets.mo: src/%.po
 	mkdir -p $(dir $@)
