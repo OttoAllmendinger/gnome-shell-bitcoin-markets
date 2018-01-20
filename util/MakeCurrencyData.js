@@ -9,7 +9,7 @@
       function (session, message) {
         let json = message.response_body.data;
         print("/*jshint -W100, moz:true */");
-        print("const CurrencyData = " + JSON.stringify(
+        print("var CurrencyData = " + JSON.stringify(
           JSON.parse(json), null, 4
         ) + ";");
         // this makes it a quine ;-)

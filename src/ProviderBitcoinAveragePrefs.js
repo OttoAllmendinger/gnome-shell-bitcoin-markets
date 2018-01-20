@@ -14,7 +14,7 @@ const {
 } = Local.imports.BaseProviderConfigView;
 
 
-const ConfigView = new Lang.Class({
+var ConfigView = new Lang.Class({
   Name: "ProviderBitcoinAveragePrefs.ConfigView",
   Extends: BaseProviderConfigView,
 

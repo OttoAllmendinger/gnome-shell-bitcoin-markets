@@ -7,7 +7,7 @@ const Mainloop = imports.mainloop;
  * data from api sources
  */
 
-const IndicatorModel = new Lang.Class({
+var IndicatorModel = new Lang.Class({
   Name: "IndicatorModel",
 
   _init: function (options, handler, formatter) {

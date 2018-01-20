@@ -10,7 +10,7 @@ const Accounting = Local.imports.accounting.accounting;
 const { CurrencyData } = Local.imports.CurrencyData;
 const { IndicatorModel } = Local.imports.IndicatorModel;
 
-const DefaultCurrencies = [
+var DefaultCurrencies = [
       'USD', 'EUR', 'CNY', 'GBP', 'CAD', 'RUB', 'AUD',
       'BRL', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN',
       'MXN', 'RUR'
@@ -160,7 +160,7 @@ Signals.addSignalMethods(Handler.prototype);
 /**
  * Api definitions
  */
-const Api = new Lang.Class({
+var Api = new Lang.Class({
   Name: "BaseApi",
 
   _init: function () {

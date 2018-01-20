@@ -7,7 +7,7 @@ const Signals = imports.signals;
 const Gettext = imports.gettext.domain('bitcoin-markets');
 const _ = Gettext.gettext;
 
-const makeConfigRow = (description, widget) => {
+var makeConfigRow = (description, widget) => {
   let box = new Gtk.Box({
     orientation: Gtk.Orientation.HORIZONTAL,
     margin_bottom: 8,
@@ -29,7 +29,7 @@ const makeConfigRow = (description, widget) => {
 
 
 
-const ComboBoxView = new Lang.Class({
+var ComboBoxView = new Lang.Class({
   Name: "ComboBoxView",
 
   Columns: { LABEL: 0, VALUE: 1 },
@@ -93,7 +93,7 @@ const makeComboBoxCoin = (coins, selected) => {
 };
 
 
-const BaseProviderConfigView = new Lang.Class({
+var BaseProviderConfigView = new Lang.Class({
   Name: "BaseProviderConfigView",
 
   _init: function (configWidget, indicatorConfig) {

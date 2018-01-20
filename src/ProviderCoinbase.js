@@ -4,7 +4,7 @@ const Local = imports.misc.extensionUtils.getCurrentExtension();
 const BaseProvider = Local.imports.BaseProvider;
 
 
-const Api = new Lang.Class({
+var Api = new Lang.Class({
   Name: 'Coinbase.Api',
   Extends: BaseProvider.Api,
 

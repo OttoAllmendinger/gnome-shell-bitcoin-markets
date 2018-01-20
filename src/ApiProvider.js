@@ -25,7 +25,7 @@ const {
 } = Local.imports;
 
 
-const ApiProvider = new Lang.Class({
+var ApiProvider = new Lang.Class({
   Name: "ApiProvider",
 
   _init: function () {

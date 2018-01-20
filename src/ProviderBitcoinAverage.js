@@ -7,7 +7,7 @@ const BaseProvider = Local.imports.BaseProvider;
 const _invalidExchangeError = () =>
     new Error("use_average !== true and no exchange defined");
 
-const Api = new Lang.Class({
+var Api = new Lang.Class({
   Name: 'BitcoinAverage.Api',
   Extends: BaseProvider.Api,
 

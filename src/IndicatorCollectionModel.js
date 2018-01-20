@@ -43,7 +43,7 @@ Signals.addSignalMethods(ConfigModel.prototype);
 
 
 
-const IndicatorCollectionModel = new GObject.Class({
+var IndicatorCollectionModel = new GObject.Class({
   Name: "BitcoinMarkets.IndicatorCollectionModel",
   GTypeName: "IndicatorCollectionModel",
   Extends: Gtk.ListStore,

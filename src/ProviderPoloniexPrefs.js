@@ -6,7 +6,7 @@ const { ProviderPoloniex } = Local.imports;
 const { BaseProviderConfigView } = Local.imports.BaseProviderConfigView;
 
 
-const ConfigView = new Lang.Class({
+var ConfigView = new Lang.Class({
   Name: "ProviderPoloniex.ConfigView",
   Extends: BaseProviderConfigView,
 

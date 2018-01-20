@@ -20,7 +20,7 @@ const getPairCode = (coin, currency) => {
   }
 }
 
-const Api = new Lang.Class({
+var Api = new Lang.Class({
   Name: 'Kraken.Api',
   Extends: BaseProvider.Api,
 
