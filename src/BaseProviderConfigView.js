@@ -32,17 +32,18 @@ var makeConfigRow = (description, widget) => {
 var ComboBoxView = new Lang.Class({
   Name: "ComboBoxView",
 
-  Columns: { LABEL: 0, VALUE: 1 },
+  Columns: { LABEL: 0, SENSITIVE: 1, VALUE: 2 },
 
   _init: function (options) {
     let model = new Gtk.ListStore();
-    model.set_column_types([GObject.TYPE_STRING]);
+    model.set_column_types([GObject.TYPE_STRING, GObject.TYPE_BOOLEAN]);
 
     let comboBox = new Gtk.ComboBox({model: model});
     let renderer = new Gtk.CellRendererText();
 
     comboBox.pack_start(renderer, true);
     comboBox.add_attribute(renderer, 'text', 0);
+    comboBox.add_attribute(renderer, 'sensitive', 1);
 
     this.widget = comboBox;
     this.model = model;
@@ -64,7 +65,7 @@ var ComboBoxView = new Lang.Class({
       let iter;
 
       this.model.set(
-        iter = this.model.append(), [this.Columns.LABEL], [o.label]
+        iter = this.model.append(), [this.Columns.LABEL, this.Columns.SENSITIVE], [o.label, true]
       );
 
       if (o.active) {
