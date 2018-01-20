@@ -27,7 +27,10 @@ const ConfigModel = new Lang.Class({
   },
 
   get: function (key) {
-    return this.attributes[key];
+    if (this.attributes[key] != undefined)
+      return this.attributes[key];
+    else
+      return undefined;
   },
 
   toString: function () {
