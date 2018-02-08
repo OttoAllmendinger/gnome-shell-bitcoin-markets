@@ -39,12 +39,13 @@ The latest development version can be installed manually with these commands
         make install
 
 Then go to https://extensions.gnome.org/local/ to turn on the extension or use
-gnome-tweak-tool.
+gnome-tweak-tool. With `make restart` the gnome-shell can be restarted during development iterations.
+On most systems you can use `journalctl /usr/bin/gnome-shell -f -o cat` to get log output from this (and other) extensions. 
 
 
 ## Contributors
 
-* https://github.com/filidorwiese - Altcoin support, BTC-E and Poloniex support
+* https://github.com/filidorwiese - Altcoin support, CoinMarketCap and Poloniex support
 * https://github.com/fearenales - Popup settings implementation, BTCChina support
 * https://github.com/b00bl1k - WEX support
 * https://github.com/osiux - Bitso support

@@ -23,6 +23,7 @@ const {
   ProviderPoloniex,
   ProviderCexio,
   ProviderCoinbase,
+  ProviderCoinMarketCap,
   ProviderBitPay,
   ProviderKraken,
   ProviderBXinTH,
@@ -40,6 +41,7 @@ const {
   ProviderPoloniexPrefs,
   ProviderCexioPrefs,
   ProviderCoinbasePrefs,
+  ProviderCoinMarketCapPrefs,
   ProviderBitPayPrefs,
   ProviderKrakenPrefs,
   ProviderBXinTHPrefs,
@@ -130,6 +132,8 @@ const IndicatorConfigView = new Lang.Class({
         new ProviderCexioPrefs.ConfigView(widget, config),
       coinbase: () =>
         new ProviderCoinbasePrefs.ConfigView(widget, config),
+      coinmarketcap: () =>
+        new ProviderCoinMarketCapPrefs.ConfigView(widget, config),
       bxinth: () =>
         new ProviderBXinTHPrefs.ConfigView(widget, config),
       paymium: () =>
@@ -171,6 +175,7 @@ const IndicatorConfigView = new Lang.Class({
         {label: 'Kraken',   value: 'kraken'},
         {label: 'CEX.IO',   value: 'cexio'},
         {label: 'CoinBase', value: 'coinbase'},
+        {label: 'CoinMarketCap', value: 'coinmarketcap'},
         {label: 'BXinTH',   value: 'bxinth'},
         {label: 'Paymium',  value: 'paymium'},
         {label: 'BtcChina', value: 'btcchina'},
@@ -216,7 +221,6 @@ const IndicatorConfigView = new Lang.Class({
 
     return makeConfigRow(_("Show Base Currency"), switchView);
   },
-
 
   _confDecimals: function () {
     let preset = this._indicatorConfig.get('decimals');
