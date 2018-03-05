@@ -58,4 +58,4 @@ gnome-tweak-tool.
 
 * Charts
 
-Tip address 1645A1qhW3FHxr2JLdqLuYGQ6QSmN5BbNS
+Bitcoin tip address 3AUe4yau24jk9q9n914yDQF89kaBsqBfkf
