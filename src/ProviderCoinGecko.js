@@ -2,6 +2,7 @@ const Lang = imports.lang;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const BaseProvider = Local.imports.BaseProvider;
+const { CurrencyData } = Local.imports.CurrencyData;
 
 
 const Api = new Lang.Class({
@@ -10,11 +11,11 @@ const Api = new Lang.Class({
 
   apiName: "CoinGecko",
 
-  currencies: ['USD', 'BRL'],
+  currencies: ['USD', 'BRL', 'BTC'],
 
-  coins: ['BTC', 'LTC', 'ETN'],
+  coins: ['BTC', 'ETN', 'DOGE', 'LTC'],
 
-  interval: 15,
+  interval: 300,
 
   attributes: {
     last: function (options) {
@@ -29,11 +30,12 @@ const Api = new Lang.Class({
   },
 
   getLabel: function (options) {
-    return "[CG] " + options.coin + " -> " + options.currency;
+    return "CoinGecko " + options.coin + "/" + options.currency;
   },
 
   getUrl: function (options) {
     const coin = BaseProvider.baseCoin(options.coin);
-    return 'https://api.coingecko.com/api/v3/coins/' + (coin == "BTC" ? "bitcoin" : (coin == "LTC" ? "litecoin" : "electroneum"));
+    let info = CurrencyData[coin];
+    return 'https://api.coingecko.com/api/v3/coins/' + (typeof info['name'] == "undefined" ? coin : info["name"].toLowerCase().replace(" ", ""));
   }
 });

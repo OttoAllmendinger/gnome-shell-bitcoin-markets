@@ -135,10 +135,11 @@ const CurrencyData = {
     },
     "BTC": {
       "symbol": "BTC",
-      "symbol_native": "BTC",
+      "symbol_native": "Ƀ",
       "decimal_digits": 2,
       "rounding": 0,
-      "code": "BTC"
+      "code": "BTC",
+      "name": "Bitcoin"
     },
     "BWP": {
         "symbol": "BWP",
@@ -245,6 +246,14 @@ const CurrencyData = {
         "rounding": 0,
         "code": "DOP"
     },
+    "DOGE": {
+        "symbol": "DOGE",
+        "symbol_native": "Ð",
+        "decimal_digits": 8,
+        "rounding": 0,
+        "code": "DOGE",
+        "name": "Doge Coin"
+    },
     "DZD": {
         "symbol": "DZD",
         "symbol_native": "د.ج.‏",
@@ -278,7 +287,8 @@ const CurrencyData = {
         "symbol_native": "ETN",
         "decimal_digits": 8,
         "rounding": 0,
-        "code": "ETN"
+        "code": "ETN",
+        "name": "Electroneum"
     },
     "EUR": {
         "symbol": "€",
@@ -489,6 +499,14 @@ const CurrencyData = {
         "decimal_digits": 2,
         "rounding": 0,
         "code": "LTL"
+    },
+    "LTC": {
+        "symbol": "LTC",
+        "symbol_native": "LTC",
+        "decimal_digits": 5,
+        "rounding": 0,
+        "code": "LTC",
+        "name": "Litecoin",
     },
     "LVL": {
         "symbol": "LVL",
