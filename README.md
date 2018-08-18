@@ -54,7 +54,7 @@ gnome-tweak-tool.
 * https://github.com/plehatron -- CEX.io support
 * https://github.com/h6w - BTCMarkets.net support
 * https://github.com/vecr25 - Binance support
-* https://github.com/joaoescribano - Crypto Enthusiast
+* https://github.com/joaoescribano - CoinGecko support
 
 ## TODO
 
