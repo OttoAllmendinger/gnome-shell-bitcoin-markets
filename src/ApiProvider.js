@@ -21,7 +21,8 @@ const {
   ProviderBtcChina,
   ProviderBitso,
   ProviderBTCMarkets,
-  ProviderWex
+  ProviderWex,
+  ProviderCoinGecko
 } = Local.imports;
 
 
@@ -44,7 +45,8 @@ const ApiProvider = new Lang.Class({
       btcchina: new ProviderBtcChina.Api(),
       bitso: new ProviderBitso.Api(),
       btcmarkets: new ProviderBTCMarkets.Api(),
-      wex: new ProviderWex.Api()
+      wex: new ProviderWex.Api(),
+      coingecko: new ProviderCoinGecko.Api()
     };
   },
 

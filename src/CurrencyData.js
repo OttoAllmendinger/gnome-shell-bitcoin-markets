@@ -273,6 +273,13 @@ const CurrencyData = {
         "rounding": 0,
         "code": "ETB"
     },
+    "ETN": {
+        "symbol": "ETN",
+        "symbol_native": "ETN",
+        "decimal_digits": 8,
+        "rounding": 0,
+        "code": "ETN"
+    },
     "EUR": {
         "symbol": "€",
         "symbol_native": "€",
