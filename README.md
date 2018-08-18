@@ -21,6 +21,7 @@ Available APIs:
 * WEX
 * BTCMarkets.net
 * Binance
+* CoinGecko
 
 
 ## Installation
