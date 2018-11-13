@@ -290,6 +290,14 @@ const CurrencyData = {
         "code": "ETN",
         "name": "Electroneum"
     },
+    "NBR": {
+        "symbol": "NBR",
+        "symbol_native": "NBR",
+        "decimal_digits": 8,
+        "rounding": 0,
+        "code": "NBR",
+        "name": "Niobio-Cash"
+    },
     "EUR": {
         "symbol": "€",
         "symbol_native": "€",

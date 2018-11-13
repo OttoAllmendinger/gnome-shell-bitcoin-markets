@@ -13,7 +13,7 @@ const Api = new Lang.Class({
 
   currencies: ['USD', 'BRL', 'BTC'],
 
-  coins: ['BTC', 'ETN', 'DOGE', 'LTC'],
+  coins: ['BTC', 'ETN', 'DOGE', 'LTC', 'NBR'],
 
   interval: 300,
 
