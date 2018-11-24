@@ -62,8 +62,8 @@ const IndicatorCollectionModel =
 const IndicatorConfigView = new Lang.Class({
   Name: "BitcoinMarkets.IndicatorConfigView",
 
-  _init: function (indicatorConfig) {
-    let padding = 8;
+  _init(indicatorConfig) {
+    const padding = 8;
 
     this._indicatorConfig = indicatorConfig;
 
@@ -99,7 +99,7 @@ const IndicatorConfigView = new Lang.Class({
   },
 
 
-  _addIndicatorSettings: function () {
+  _addIndicatorSettings() {
     var layout = this._layoutIndicatorSettings;
     layout.add(this._confDecimals());
     layout.add(this._confShowChange());
@@ -107,11 +107,11 @@ const IndicatorConfigView = new Lang.Class({
     layout.add(this._confProvider());
   },
 
-  _selectApi: function (api) {
-    let widget = this._layoutProviderSettings;
-    let config = this._indicatorConfig;
+  _selectApi(api) {
+    const widget = this._layoutProviderSettings;
+    const config = this._indicatorConfig;
 
-    let apiConfigViews = {
+    const apiConfigViews = {
       binance: () =>
         new ProviderBinancePrefs.ConfigView(widget, config),
       bitstamp: () =>
@@ -158,10 +158,10 @@ const IndicatorConfigView = new Lang.Class({
     widget.show_all();
   },
 
-  _confProvider: function () {
-    let preset = this._indicatorConfig.get('api');
+  _confProvider() {
+    const preset = this._indicatorConfig.get('api');
 
-    let options = [
+    const options = [
         {label: 'Binance', value: 'binance'},
         {label: 'BitcoinAverage', value: 'bitcoinaverage'},
         {label: 'BitStamp', value: 'bitstamp'},
@@ -185,17 +185,17 @@ const IndicatorConfigView = new Lang.Class({
       }
     });
 
-    let view = new ComboBoxView(options);
+    const view = new ComboBoxView(options);
 
     view.connect("changed", (view, api) => this._selectApi(api));
 
     return makeConfigRow(_("Provider"), view.widget);
   },
 
-  _confShowChange: function () {
-    let preset = this._indicatorConfig.get('show_change') !== false;
+  _confShowChange() {
+    const preset = this._indicatorConfig.get('show_change') !== false;
 
-    let switchView = new Gtk.Switch({active: preset});
+    const switchView = new Gtk.Switch({active: preset});
 
     switchView.connect('notify::active', (obj) => {
       this._indicatorConfig.set('show_change', obj.active);
@@ -205,10 +205,10 @@ const IndicatorConfigView = new Lang.Class({
   },
 
 
-  _confShowBaseCurrency: function () {
-    let preset = this._indicatorConfig.get('show_base_currency') === true;
+  _confShowBaseCurrency() {
+    const preset = this._indicatorConfig.get('show_base_currency') === true;
 
-    let switchView = new Gtk.Switch({active: preset});
+    const switchView = new Gtk.Switch({active: preset});
 
     switchView.connect('notify::active', (obj) => {
       this._indicatorConfig.set('show_base_currency', obj.active);
@@ -218,10 +218,10 @@ const IndicatorConfigView = new Lang.Class({
   },
 
 
-  _confDecimals: function () {
-    let preset = this._indicatorConfig.get('decimals');
+  _confDecimals() {
+    const preset = this._indicatorConfig.get('decimals');
 
-    let getLabel = (v) => {
+    const getLabel = (v) => {
       if (v === undefined) {
         return _("Default");
       } else {
@@ -229,11 +229,11 @@ const IndicatorConfigView = new Lang.Class({
       }
     };
 
-    let options = [undefined, 0, 1, 2, 3, 4, 5].map(
+    const options = [undefined, 0, 1, 2, 3, 4, 5].map(
       (v) => ({label: getLabel(v), value: v, active: (v === preset)})
     );
 
-    let decimalsView = new ComboBoxView(options);
+    const decimalsView = new ComboBoxView(options);
 
     decimalsView.connect('changed', (view, value) => {
       this._indicatorConfig.set('decimals', value);
@@ -242,7 +242,7 @@ const IndicatorConfigView = new Lang.Class({
     return makeConfigRow(_("Decimals"), decimalsView.widget);
   },
 
-  destroy: function () {
+  destroy() {
     this.disconnectAll();
     this.widget.destroy();
   }
@@ -260,7 +260,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
   GTypeName: "BitcoinMarketsSettingsWidget",
   Extends: Gtk.Box,
 
-  _init: function () {
+  _init() {
     this.parent({
       orientation: Gtk.Orientation.HORIZONTAL
     });
@@ -270,7 +270,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
 
     /* sidebar (left) */
 
-    let sidebar = new Gtk.Box({
+    const sidebar = new Gtk.Box({
       margin: 10,
       orientation: Gtk.Orientation.VERTICAL,
       width_request: 240
@@ -297,7 +297,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     this._selection.connect('changed', this._onSelectionChanged.bind(this));
   },
 
-  _getTreeView: function () {
+  _getTreeView() {
     this._treeView = new Gtk.TreeView({
       model: this._store,
       headers_visible: false,
@@ -306,8 +306,8 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
       vexpand: true
     });
 
-    let label = new Gtk.TreeViewColumn({title: "Label"});
-    let renderer = new Gtk.CellRendererText();
+    const label = new Gtk.TreeViewColumn({title: "Label"});
+    const renderer = new Gtk.CellRendererText();
     label.pack_start(renderer, true);
     label.add_attribute(renderer, "text", 0);
     this._treeView.insert_column(label, 0);
@@ -315,20 +315,20 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     return this._treeView;
   },
 
-  _getToolbar: function () {
-    let toolbar = this._toolbar = new Gtk.Toolbar({
+  _getToolbar() {
+    const toolbar = this._toolbar = new Gtk.Toolbar({
       icon_size: 1
     });
 
     toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR);
 
     /* new widget button with menu */
-    let newButton = new Gtk.ToolButton({icon_name: "list-add-symbolic"});
+    const newButton = new Gtk.ToolButton({icon_name: "list-add-symbolic"});
     newButton.connect('clicked', this._addClicked.bind(this));
     toolbar.add(newButton);
 
     /* delete button */
-    let delButton = this._delButton =
+    const delButton = this._delButton =
       new Gtk.ToolButton({icon_name: "list-remove-symbolic"});
     delButton.connect('clicked', this._delClicked.bind(this));
 
@@ -339,8 +339,8 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     return toolbar;
   },
 
-  _onSelectionChanged: function () {
-    let [isSelected, , iter] = this._selection.get_selected();
+  _onSelectionChanged() {
+    const [isSelected, , iter] = this._selection.get_selected();
 
     if (isSelected) {
       this._showIndicatorConfig(this._store.getConfig(iter));
@@ -351,7 +351,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     this._updateToolbar();
   },
 
-  _showIndicatorConfig: function (indicatorConfig) {
+  _showIndicatorConfig(indicatorConfig) {
     if (this._indicatorConfigView) {
       this._configLayout.remove(this._indicatorConfigView.widget);
       this._indicatorConfigView.destroy();
@@ -366,24 +366,24 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     this._configLayout.add(this._indicatorConfigView.widget);
   },
 
-  _updateToolbar: function () {
+  _updateToolbar() {
     let sensitive = false;
 
     if (this._selection) {
-      let [isSelected] = this._selection.get_selected();
+      const [isSelected] = this._selection.get_selected();
       sensitive = isSelected;
     }
 
     this._delButton.set_sensitive(sensitive);
   },
 
-  _addClicked: function () {
+  _addClicked() {
     this._store.append();
     this._updateToolbar();
   },
 
-  _delClicked: function () {
-    let [isSelected, , iter] = this._selection.get_selected();
+  _delClicked() {
+    const [isSelected, , iter] = this._selection.get_selected();
 
     if (isSelected) {
       this._store.remove(iter);
@@ -399,7 +399,7 @@ function init() {
 
 
 function buildPrefsWidget() {
-  let widget = new BitcoinMarketsSettingsWidget();
+  const widget = new BitcoinMarketsSettingsWidget();
 
   widget.show_all();
 

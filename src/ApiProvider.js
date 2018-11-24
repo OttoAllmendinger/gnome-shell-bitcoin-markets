@@ -28,7 +28,7 @@ const {
 const ApiProvider = new Lang.Class({
   Name: "ApiProvider",
 
-  _init: function () {
+  _init() {
     this.apis = {
       binance: new ProviderBinance.Api(),
       bitcoinaverage: new ProviderBitcoinAverage.Api(),
@@ -48,7 +48,7 @@ const ApiProvider = new Lang.Class({
     };
   },
 
-  get: function (name) {
+  get(name) {
     if (name in this.apis) {
       return this.apis[name];
     } else {
@@ -56,7 +56,8 @@ const ApiProvider = new Lang.Class({
     }
   },
 
-  destroy: function () {
+  destroy() {
+    // eslint-disable-next-line
     for (let key in this.apis) {
       this.apis[key].destroy();
     }
@@ -68,11 +69,11 @@ if (window["ARGV"] && ARGV[0] === "test") {
   // run by gjs
   log("command line");
 
-  let apiProvider = new ApiProvider();
+  const apiProvider = new ApiProvider();
 
-  let options = {currency: "USD", attribute: "last", coin: "BTC"};
+  const options = {currency: "USD", attribute: "last", coin: "BTC"};
 
-  let indicator = apiProvider.get('bitpay', options);
+  const indicator = apiProvider.get('bitpay', options);
 
   indicator.connect("update-start", () => {
     log("signal update-start");

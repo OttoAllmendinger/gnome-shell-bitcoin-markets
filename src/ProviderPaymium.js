@@ -17,7 +17,7 @@ const Api = new Lang.Class({
   interval: 60, // unclear, should be safe
 
   attributes: {
-    last: function (options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
 
@@ -28,11 +28,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function (options) {
+  getLabel(options) {
     return "Paymium " + options.currency + "/" + options.coin;
   },
 
-  getUrl: function (options) {
+  getUrl(options) {
     return "https://paymium.com/api/v1/data/" + options.currency.toLowerCase() + "/ticker";
   }
 });

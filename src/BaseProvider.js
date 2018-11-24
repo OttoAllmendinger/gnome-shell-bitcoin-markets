@@ -59,11 +59,11 @@ const ChangeRenderer = (options) => {
 
 
 const CurrencyRenderer = ({currency, coin, decimals}) => {
-  let format = "%v %s";
+  const format = "%v %s";
   let symbol = currency;
   let precision = 2;
 
-  let info = CurrencyData[currency];
+  const info = CurrencyData[currency];
 
   if (info) {
     symbol = info.symbol_native;
@@ -84,9 +84,9 @@ const CurrencyRenderer = ({currency, coin, decimals}) => {
     }
 
     return Accounting.formatMoney(Number(number), {
-        symbol: symbol,
-        format: format,
-        precision: precision
+        symbol,
+        format,
+        precision
     })
   }
 };
@@ -105,7 +105,7 @@ const CurrencyRenderer = ({currency, coin, decimals}) => {
 const Handler = new Lang.Class({
   Name: "Handler",
 
-  _init: function (id, options, poll, interval) {
+  _init(id, options, poll, interval) {
     this.disabled = false;
 
     if ((!interval) || (interval < 1)) {
@@ -114,7 +114,7 @@ const Handler = new Lang.Class({
 
     this._id = id;
 
-    let loop = () => {
+    const loop = () => {
       this.emit("update-start");
 
       poll(options, (error, data) => {
@@ -146,7 +146,7 @@ const Handler = new Lang.Class({
     Mainloop.idle_add(loop);
   },
 
-  destroy: function () {
+  destroy() {
     if (this._signalTimeout) {
       Mainloop.source_remove(this._signalTimeout);
     }
@@ -163,17 +163,17 @@ Signals.addSignalMethods(Handler.prototype);
 const Api = new Lang.Class({
   Name: "BaseApi",
 
-  _init: function () {
+  _init() {
     this._urlHandlers = {};
     this._update = undefined;
   },
 
-  poll: function (options, callback) {
-    let url = this.getUrl(options);
+  poll(options, callback) {
+    const url = this.getUrl(options);
     HTTP.getJSON(url, callback);
   },
 
-  _getHandlerId: function (options) {
+  _getHandlerId(options) {
     /**
      * default case: each poll URL gets a separate handler. This doesn't
      * work so well if the url needs to be dynamic (MtGox nonce)
@@ -181,8 +181,8 @@ const Api = new Lang.Class({
     return this.getUrl(options);
   },
 
-  getHandler: function (options) {
-    let id = this._getHandlerId(options);
+  getHandler(options) {
+    const id = this._getHandlerId(options);
     let handler = this._urlHandlers[id];
 
     if (handler === undefined) {
@@ -195,7 +195,7 @@ const Api = new Lang.Class({
     return handler;
   },
 
-  getFormatter: function (options) {
+  getFormatter(options) {
     if (this.attributes[options.attribute]) {
       return this.attributes[options.attribute](options);
     } else {
@@ -203,7 +203,7 @@ const Api = new Lang.Class({
     }
   },
 
-  getModel: function (options) {
+  getModel(options) {
     return new IndicatorModel(
       options,
       this.getHandler(options),
@@ -211,11 +211,12 @@ const Api = new Lang.Class({
     );
   },
 
-  getLabel: function ({api, currency}) {
+  getLabel({api, currency}) {
     return api + " " + currency;
   },
 
-  destroy: function () {
+  destroy() {
+    // eslint-disable-next-line
     for (let key in this._urlHandlers) {
       this._urlHandlers[key].destroy();
     }

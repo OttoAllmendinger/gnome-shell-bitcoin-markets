@@ -20,7 +20,7 @@ const Api = new Lang.Class({
   interval: 10, // 60 requests per 10 minutes
 
   attributes: {
-    last: function (options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
 
@@ -31,11 +31,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function (options) {
+  getLabel(options) {
     return "BitStamp " + options.currency + "/" + options.coin;
   },
 
-  getUrl: function (options) {
+  getUrl(options) {
     const coin = BaseProvider.baseCoin(options.coin);
     return "https://www.bitstamp.net/api/v2/ticker/" +
       coin.toLowerCase() + options.currency.toLowerCase() + '/';

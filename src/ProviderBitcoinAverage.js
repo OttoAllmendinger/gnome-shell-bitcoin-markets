@@ -51,7 +51,7 @@ const Api = new Lang.Class({
     }
   },
 
-  getUrl: function ({use_average, exchange, coin, currency}) {
+  getUrl({use_average, exchange, coin, currency}) {
     coin = BaseProvider.baseCoin(coin).toUpperCase();
     currency = currency.toUpperCase();
     if (use_average !== false) {
@@ -64,7 +64,7 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function (options) {
+  getLabel(options) {
     if (options.use_average !== false) {
       return "BitAvg " + options.currency + "/" + options.coin;
     } else if (options.exchange !== undefined) {

@@ -18,7 +18,7 @@ const ConfigView = new Lang.Class({
   Name: "ProviderBitcoinAveragePrefs.ConfigView",
   Extends: BaseProviderConfigView,
 
-  _init: function (configWidget, indicatorConfig) {
+  _init(configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
 
     // set defaults
@@ -27,81 +27,81 @@ const ConfigView = new Lang.Class({
       indicatorConfig.get('use_average') !== false
     );
 
-    let api = new ProviderBitcoinAverage.Api();
+    const api = new ProviderBitcoinAverage.Api();
 
     /* currency selection */
 
-    let updateExchangeSelect = () => {
-      let useAverage = this._indicatorConfig.get('use_average');
-      let currency = this._indicatorConfig.get('currency');
+    const updateExchangeSelect = () => {
+      const useAverage = this._indicatorConfig.get('use_average');
+      const currency = this._indicatorConfig.get('currency');
       exchangeSelect.rowWidget.sensitive = useAverage === false;
       exchangeSelect.comboBoxView.setOptions(
         this._makeExchangeOptions(currency)
       );
     };
 
-    let currencySelect = this._addSelectCurrency(api.currencies);
+    const currencySelect = this._addSelectCurrency(api.currencies);
     currencySelect.comboBoxView.connect('changed', updateExchangeSelect);
 
     this._addSelectCoin(api.coins);
 
     /* use average switch */
     // TODO use proper view method: connect("changed")
-    let averageSwitch = this._addAverageSwitch();
+    const averageSwitch = this._addAverageSwitch();
     averageSwitch.switchView.connect('notify::active', (obj) => {
       this._indicatorConfig.set('use_average', obj.active);
       updateExchangeSelect();
     });
 
     /* exchange selection */
-    let exchangeSelect = this._addSelectExchange();
+    const exchangeSelect = this._addSelectExchange();
     updateExchangeSelect();
   },
 
-  _addAverageSwitch: function () {
-    let switchView = new Gtk.Switch({
+  _addAverageSwitch() {
+    const switchView = new Gtk.Switch({
       active: this._indicatorConfig.get('use_average') !== false
     });
 
-    let rowWidget = this._addRow(_("Average"), switchView);
+    const rowWidget = this._addRow(_("Average"), switchView);
 
     return {
-      rowWidget: rowWidget,
-      switchView: switchView
+      rowWidget,
+      switchView
     };
   },
 
-  _addSelectExchange: function () {
-    let comboBoxExchange = new ComboBoxView();
+  _addSelectExchange() {
+    const comboBoxExchange = new ComboBoxView();
 
     comboBoxExchange.connect("changed", (view, value) => {
       this._indicatorConfig.set('exchange', value);
     });
 
-    let rowWidget = this._addRow(_("Exchange"), comboBoxExchange.widget);
+    const rowWidget = this._addRow(_("Exchange"), comboBoxExchange.widget);
 
     return {
-      rowWidget: rowWidget,
+      rowWidget,
       comboBoxView: comboBoxExchange
     };
   },
 
-  _makeExchangeOptions: function (currency) {
-    let coin = "BTC";
-    let symbol = coin + currency.toUpperCase();
-    let currentExchange = this._indicatorConfig.get('exchange');
-    let getVolume = (e) => {
+  _makeExchangeOptions(currency) {
+    const coin = "BTC";
+    const symbol = coin + currency.toUpperCase();
+    const currentExchange = this._indicatorConfig.get('exchange');
+    const getVolume = (e) => {
       if (symbol in e.symbols) {
         return e.symbols[symbol].volume;
       }
       return 0;
     }
-    let exchangeByVolume = ExchangeData.filter((e) => getVolume(e) > 0);
+    const exchangeByVolume = ExchangeData.filter((e) => getVolume(e) > 0);
 
     // swap order of (b, a) to sort in descending order
     exchangeByVolume.sort((a, b) => getVolume(b) - getVolume(a));
 
-    let options = exchangeByVolume.map(({display_name, name}) =>
+    const options = exchangeByVolume.map(({display_name, name}) =>
       ({label: display_name, value: name, active: name === currentExchange})
     );
 
@@ -112,7 +112,7 @@ const ConfigView = new Lang.Class({
     return options;
   },
 
-  _setApiDefaults: function (config) {
+  _setApiDefaults(config) {
     if (config.get('api') !== 'bitcoinaverage') {
       config.attributes = {
         api: 'bitcoinaverage',

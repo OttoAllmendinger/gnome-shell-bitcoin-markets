@@ -44,7 +44,7 @@ const Api = new Lang.Class({
   interval: 10, // unknown, guessing
 
   attributes: {
-    last: function(options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
       const { coin, currency } = options;
@@ -56,11 +56,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function({coin, currency}) {
+  getLabel({coin, currency}) {
     return "Kraken " + currency + "/" + coin;
   },
 
-  getUrl: function({coin, currency}) {
+  getUrl({coin, currency}) {
     return "https://api.kraken.com/0/public/Ticker?pair=" +
       getPairCode(coin, currency);
   }

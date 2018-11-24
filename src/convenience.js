@@ -40,7 +40,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
  * If @domain is not provided, it will be taken from metadata['gettext-domain']
  */
 function initTranslations(domain) {
-    let extension = ExtensionUtils.getCurrentExtension();
+    const extension = ExtensionUtils.getCurrentExtension();
 
     domain = domain || extension.metadata['gettext-domain'];
 
@@ -48,7 +48,7 @@ function initTranslations(domain) {
     // has the locale files in a subfolder
     // otherwise assume that extension has been installed in the
     // same prefix as gnome-shell
-    let localeDir = extension.dir.get_child('locale');
+    const localeDir = extension.dir.get_child('locale');
     if (localeDir.query_exists(null))
         Gettext.bindtextdomain(domain, localeDir.get_path());
     else
@@ -64,7 +64,7 @@ function initTranslations(domain) {
  * metadata['settings-schema'].
  */
 function getSettings(schema) {
-    let extension = ExtensionUtils.getCurrentExtension();
+    const extension = ExtensionUtils.getCurrentExtension();
 
     schema = schema || extension.metadata['settings-schema'];
 
@@ -75,7 +75,7 @@ function getSettings(schema) {
     // otherwise assume that extension has been installed in the
     // same prefix as gnome-shell (and therefore schemas are available
     // in the standard folders)
-    let schemaDir = extension.dir.get_child('schemas');
+    const schemaDir = extension.dir.get_child('schemas');
     let schemaSource;
     if (schemaDir.query_exists(null))
         schemaSource = GioSSS.new_from_directory(schemaDir.get_path(),
@@ -84,7 +84,7 @@ function getSettings(schema) {
     else
         schemaSource = GioSSS.get_default();
 
-    let schemaObj = schemaSource.lookup(schema, true);
+    const schemaObj = schemaSource.lookup(schema, true);
     if (!schemaObj)
         throw new Error(
                 'Schema ' + schema + ' could not be found for extension ' +

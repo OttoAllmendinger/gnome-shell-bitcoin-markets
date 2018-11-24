@@ -17,10 +17,11 @@ const Api = new Lang.Class({
   interval: 60, // unclear, should be safe
 
   attributes: {
-    last: function (options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
       const find = (currency, arr) => {
+        // eslint-disable-next-line
         for (let {code, rate} of arr) {
           if (code === currency) {
             return rate;
@@ -37,11 +38,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function (options) {
+  getLabel(options) {
     return "BitPay " + options.currency + "/" + options.coin;
   },
 
-  getUrl: function (options) {
+  getUrl(options) {
     return "https://bitpay.com/api/rates";
   }
 });

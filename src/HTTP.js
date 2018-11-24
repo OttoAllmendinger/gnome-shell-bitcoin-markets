@@ -75,8 +75,8 @@ Soup.Session.prototype.add_feature.call(
 
 
 const getJSON = (url, callback) => {
-  let message = Soup.Message.new("GET", url);
-  let headers = message.request_headers;
+  const message = Soup.Message.new("GET", url);
+  const headers = message.request_headers;
   headers.append('X-Client-Id', _clientId);
   _httpSession.queue_message(
     message,

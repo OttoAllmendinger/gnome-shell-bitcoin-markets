@@ -8,14 +8,14 @@ const Gettext = imports.gettext.domain('bitcoin-markets');
 const _ = Gettext.gettext;
 
 const makeConfigRow = (description, widget) => {
-  let box = new Gtk.Box({
+  const box = new Gtk.Box({
     orientation: Gtk.Orientation.HORIZONTAL,
     margin_bottom: 8,
     hexpand: true,
     vexpand: false
   });
 
-  let label = new Gtk.Label({
+  const label = new Gtk.Label({
     label: description,
     xalign: 0,
     expand: true
@@ -34,12 +34,12 @@ const ComboBoxView = new Lang.Class({
 
   Columns: { LABEL: 0, VALUE: 1 },
 
-  _init: function (options) {
-    let model = new Gtk.ListStore();
+  _init(options) {
+    const model = new Gtk.ListStore();
     model.set_column_types([GObject.TYPE_STRING]);
 
-    let comboBox = new Gtk.ComboBox({model: model});
-    let renderer = new Gtk.CellRendererText();
+    const comboBox = new Gtk.ComboBox({model});
+    const renderer = new Gtk.CellRendererText();
 
     comboBox.pack_start(renderer, true);
     comboBox.add_attribute(renderer, 'text', 0);
@@ -49,14 +49,14 @@ const ComboBoxView = new Lang.Class({
     this.setOptions(options);
 
     comboBox.connect('changed', (entry) => {
-      let i = comboBox.get_active();
+      const i = comboBox.get_active();
       if (i in this._options) {
         this.emit('changed', this._options[i].value);
       }
     });
   },
 
-  setOptions: function (options) {
+  setOptions(options) {
     this.model.clear();
     this._options = options || [];
 
@@ -77,7 +77,7 @@ Signals.addSignalMethods(ComboBoxView.prototype);
 
 
 const makeComboBoxCurrency = (currencies, selected) => {
-  let options = currencies.map(
+  const options = currencies.map(
     (c) => ({label: c, value: c, active: (c === selected)})
   );
 
@@ -85,7 +85,7 @@ const makeComboBoxCurrency = (currencies, selected) => {
 };
 
 const makeComboBoxCoin = (coins, selected) => {
-  let options = coins.map(
+  const options = coins.map(
     (c) => ({label: c, value: c, active: (c === selected)})
   );
 
@@ -96,7 +96,7 @@ const makeComboBoxCoin = (coins, selected) => {
 const BaseProviderConfigView = new Lang.Class({
   Name: "BaseProviderConfigView",
 
-  _init: function (configWidget, indicatorConfig) {
+  _init(configWidget, indicatorConfig) {
     this._configWidget = configWidget;
     this._indicatorConfig = indicatorConfig;
     this._widgets = [];
@@ -104,16 +104,16 @@ const BaseProviderConfigView = new Lang.Class({
     this._setApiDefaults(indicatorConfig);
   },
 
-  _addRow: function (label, widget) {
-    let rowWidget = makeConfigRow(label, widget);
+  _addRow(label, widget) {
+    const rowWidget = makeConfigRow(label, widget);
     this._configWidget.add(rowWidget);
     this._widgets.push(rowWidget);
 
     return rowWidget;
   },
 
-  _addSelectCurrency: function (currencies) {
-    let comboBoxCurrency = makeComboBoxCurrency(
+  _addSelectCurrency(currencies) {
+    const comboBoxCurrency = makeComboBoxCurrency(
       currencies, this._indicatorConfig.get('currency')
     );
 
@@ -121,16 +121,16 @@ const BaseProviderConfigView = new Lang.Class({
       this._indicatorConfig.set('currency', value);
     });
 
-    let rowWidget = this._addRow(_("Currency"), comboBoxCurrency.widget);
+    const rowWidget = this._addRow(_("Currency"), comboBoxCurrency.widget);
 
     return {
-      rowWidget: rowWidget,
+      rowWidget,
       comboBoxView: comboBoxCurrency
     };
   },
 
-  _addSelectCoin: function (coins) {
-    let comboBoxCurrency = makeComboBoxCoin(
+  _addSelectCoin(coins) {
+    const comboBoxCurrency = makeComboBoxCoin(
       coins, this._indicatorConfig.get('coin')
     );
 
@@ -138,19 +138,19 @@ const BaseProviderConfigView = new Lang.Class({
       this._indicatorConfig.set('coin', value);
     });
 
-    let rowWidget = this._addRow(_("Coin"), comboBoxCurrency.widget);
+    const rowWidget = this._addRow(_("Coin"), comboBoxCurrency.widget);
 
     return {
-      rowWidget: rowWidget,
+      rowWidget,
       comboBoxView: comboBoxCurrency
     };
   },
 
-  _setDefaults: function (config) {
+  _setDefaults(config) {
     config.set('show_change', config.get('show_change') !== false);
   },
 
-  destroy: function () {
+  destroy() {
     this._widgets.forEach((widget) =>
       this._configWidget.remove(widget)
     );

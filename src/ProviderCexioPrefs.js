@@ -10,13 +10,13 @@ const ConfigView = new Lang.Class({
   Name: "ProviderCexio.ConfigView",
   Extends: BaseProviderConfigView,
 
-  _init: function (configWidget, indicatorConfig) {
+  _init(configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
     this._addSelectCurrency((new ProviderCexio.Api()).currencies);
     this._addSelectCoin((new ProviderCexio.Api()).coins);
   },
 
-  _setApiDefaults: function (config) {
+  _setApiDefaults(config) {
     if (config.get('api') !== 'cexio') {
       config.attributes = {
         api: 'cexio',

@@ -28,7 +28,7 @@ const Api = new Lang.Class({
   interval: 10, // 60 requests per 10 minutes
 
   attributes: {
-    last: function (options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
       const find = (currency, coin, tickerObj) => {
@@ -37,7 +37,7 @@ const Api = new Lang.Class({
         let coinPrice;
         try {
           if (currency === 'USD') {
-            let btcUsdtPrice = tickerObj['USDT_BTC'].last;
+            const btcUsdtPrice = tickerObj['USDT_BTC'].last;
             if (coin === 'BTC') {
               coinPrice = btcUsdtPrice
             } else {
@@ -60,11 +60,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function (options) {
+  getLabel(options) {
     return "Poloniex " + options.currency + "/" + options.coin;
   },
 
-  getUrl: function (options) {
+  getUrl(options) {
     return "https://poloniex.com/public?command=returnTicker";
   }
 });

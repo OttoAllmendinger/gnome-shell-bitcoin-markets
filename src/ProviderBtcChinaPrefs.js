@@ -10,13 +10,13 @@ const ConfigView = new Lang.Class({
   Name: "ProviderBtcChina.ConfigView",
   Extends: BaseProviderConfigView,
 
-  _init: function (configWidget, indicatorConfig) {
+  _init(configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
     this._addSelectCurrency((new ProviderBtcChina.Api()).currencies);
     this._addSelectCoin((new ProviderBtcChina.Api()).coins);
   },
 
-  _setApiDefaults: function (config) {
+  _setApiDefaults(config) {
     if (config.get('api') !== 'btcchina') {
       config.attributes = {
         api: 'btcchina',

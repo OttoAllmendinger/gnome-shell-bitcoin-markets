@@ -17,7 +17,7 @@ const Api = new Lang.Class({
   interval: 10,
 
   attributes: {
-    last: function (options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
 
@@ -28,11 +28,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function (options) {
+  getLabel(options) {
     return "BTCC " + options.currency + "/" + options.coin;
   },
 
-  getUrl: function (options) {
+  getUrl(options) {
     const coin = BaseProvider.baseCoin(options.coin);
     return "https://data.btcchina.com/data/ticker?market=" +
       options.currency.toLowerCase() + coin.toLowerCase();

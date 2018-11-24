@@ -13,7 +13,7 @@ const Api = new Lang.Class({
   interval: 10,
 
   attributes: {
-    last: function (options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
       return {
@@ -23,11 +23,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function (options) {
+  getLabel(options) {
     return 'BTCMarkets.net ' + options.currency + '/' + options.coin;
   },
 
-  getUrl: function (options) {
+  getUrl(options) {
     return 'https://api.btcmarkets.net/market/' + options.coin + '/' + options.currency + '/tick';
   }
 });

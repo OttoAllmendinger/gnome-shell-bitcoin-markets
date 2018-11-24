@@ -17,7 +17,7 @@ const Api = new Lang.Class({
   interval: 60, // unclear, should be safe
 
   attributes: {
-    last: function (options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
       const coin = BaseProvider.baseCoin(options.coin);
@@ -30,11 +30,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function (options) {
+  getLabel(options) {
     return "Coinbase " + options.currency + "/" + options.coin;
   },
 
-  getUrl: function (options) {
+  getUrl(options) {
     return "https://coinbase.com/api/v1/currencies/exchange_rates";
   }
 });

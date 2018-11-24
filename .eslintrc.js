@@ -16,9 +16,11 @@ module.exports = {
   },
 
   "rules": {
+    "object-shorthand": "error",
+    "space-before-function-paren": ["error", "never"],
+    "prefer-const": "error",
     "no-underscore-dangle": "off",
     "brace-style": ["error"],
-    "prefer-arrow-callback": ["error", { "allowNamedFunctions": true }],
     "no-unused-vars": ["error", {
         "vars": "local",
         "args": "none",

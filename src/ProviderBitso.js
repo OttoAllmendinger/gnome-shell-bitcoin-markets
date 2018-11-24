@@ -22,7 +22,7 @@ const Api = new Lang.Class({
   interval: 30,
 
   attributes: {
-    last: function (options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
 
@@ -33,11 +33,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function(options) {
+  getLabel(options) {
     return "Bitso " + options.currency + "/" + options.coin;
   },
 
-  getUrl: function(options) {
+  getUrl(options) {
     const coin = BaseProvider.baseCoin(options.coin);
     return "https://api.bitso.com/v3/ticker?book=" +
           coin.toLowerCase() + "_" +

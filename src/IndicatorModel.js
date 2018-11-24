@@ -10,11 +10,11 @@ const Mainloop = imports.mainloop;
 const IndicatorModel = new Lang.Class({
   Name: "IndicatorModel",
 
-  _init: function (options, handler, formatter) {
+  _init(options, handler, formatter) {
     this._formatter = formatter;
     this._handler = handler;
 
-    let onUpdate = (error, data) => {
+    const onUpdate = (error, data) => {
       if (error) {
         this.emit("update", error, null);
       } else {
@@ -49,7 +49,7 @@ const IndicatorModel = new Lang.Class({
     }
   },
 
-  destroy: function () {
+  destroy() {
     this.disconnectAll();
     this._handler.disconnect(this._signalUpdateStart);
     this._handler.disconnect(this._signalUpdate);

@@ -58,7 +58,7 @@ const MarketIndicatorView = new Lang.Class({
   Name: 'MarketIndicatorView',
   Extends: PanelMenu.Button,
 
-  _init: function (options) {
+  _init(options) {
     this.parent(0);
     this._options = options;
     this._api = _apiProvider.get(options.api);
@@ -66,8 +66,8 @@ const MarketIndicatorView = new Lang.Class({
     this._initBehavior();
   },
 
-  _initLayout: function () {
-    let layout = new St.BoxLayout();
+  _initLayout() {
+    const layout = new St.BoxLayout();
 
     this._indicatorView = new St.Label({
       y_align: Clutter.ActorAlign.CENTER,
@@ -96,8 +96,8 @@ const MarketIndicatorView = new Lang.Class({
     this._popupItemSettings = new PopupMenu.PopupMenuItem(_('Settings'));
     this.menu.addMenuItem(this._popupItemSettings);
     this._popupItemSettings.connect('activate', () => {
-      let app_sys = Shell.AppSystem.get_default();
-      let prefs = app_sys.lookup_app('gnome-shell-extension-prefs.desktop');
+      const app_sys = Shell.AppSystem.get_default();
+      const prefs = app_sys.lookup_app('gnome-shell-extension-prefs.desktop');
       if (prefs.get_state() == prefs.SHELL_APP_STATE_RUNNING) {
         prefs.activate();
       } else {
@@ -108,7 +108,7 @@ const MarketIndicatorView = new Lang.Class({
     });
   },
 
-  _initBehavior: function () {
+  _initBehavior() {
     this._model = this._api.getModel(this._options);
 
     this._model.connect("update-start", () => {
@@ -129,15 +129,15 @@ const MarketIndicatorView = new Lang.Class({
     this._displayStatus(_Symbols.refresh);
   },
 
-  _showError: function (error) {
+  _showError(error) {
     log("err " + JSON.stringify(error));
     this._displayText('error');
     this._displayStatus(_Symbols.error);
     this._popupItemStatus.text = "error";
   },
 
-  _showData: function (data) {
-    let _StatusToSymbol = {
+  _showData(data) {
+    const _StatusToSymbol = {
       up: _Symbols.up,
       down: _Symbols.down,
       unchanged: " "
@@ -159,15 +159,15 @@ const MarketIndicatorView = new Lang.Class({
     }
   },
 
-  _displayStatus: function (text) {
+  _displayStatus(text) {
     this._statusView.text = text;
   },
 
-  _displayText: function (text) {
+  _displayText(text) {
     this._indicatorView.text = text;
   },
 
-  _updatePopupItemLabel: function (err, data) {
+  _updatePopupItemLabel(err, data) {
     let text = this._api.getLabel(this._options);
     if (err) {
       text += "\n\nError:\n" + String(err);
@@ -175,7 +175,7 @@ const MarketIndicatorView = new Lang.Class({
     this._popupItemStatus.label.text = text;
   },
 
-  destroy: function () {
+  destroy() {
     this._model.destroy();
     this._indicatorView.destroy();
     this._statusView.destroy();
@@ -184,10 +184,10 @@ const MarketIndicatorView = new Lang.Class({
   }
 });
 
-let IndicatorCollection = new Lang.Class({
+const IndicatorCollection = new Lang.Class({
   Name: "IndicatorCollection",
 
-  _init: function () {
+  _init() {
     this._indicators = [];
     this._settings = Convenience.getSettings();
 
@@ -206,24 +206,24 @@ let IndicatorCollection = new Lang.Class({
     this._createIndicators();
   },
 
-  _initDefaults: function () {
+  _initDefaults() {
     this._settings.set_strv(INDICATORS_KEY, _Defaults.map(JSON.stringify));
   },
 
-  _upgradeSettings: function () {
+  _upgradeSettings() {
     const applyDefaults = (options) => {
       if (options.coin === undefined) {
         options.coin = 'BTC';
       }
       return options;
     };
-    let updated = this._settings.get_strv(INDICATORS_KEY)
+    const updated = this._settings.get_strv(INDICATORS_KEY)
       .map(JSON.parse)
       .map(applyDefaults);
     this._settings.set_strv(INDICATORS_KEY, updated.map(JSON.stringify));
   },
 
-  _createIndicators: function () {
+  _createIndicators() {
     this._removeAll();
 
     this._settings.get_strv(INDICATORS_KEY)
@@ -237,18 +237,18 @@ let IndicatorCollection = new Lang.Class({
       });
   },
 
-  _removeAll: function () {
+  _removeAll() {
     this._indicators.forEach((i) => i.destroy());
     this._indicators = [];
   },
 
-  add: function (indicator) {
+  add(indicator) {
     this._indicators.push(indicator);
-    let name = 'bitcoin-market-indicator-' + this._indicators.length;
+    const name = 'bitcoin-market-indicator-' + this._indicators.length;
     Main.panel.addToStatusArea(name, indicator);
   },
 
-  destroy: function () {
+  destroy() {
     this._removeAll();
     this._settings.disconnect(this._settingsChangedId);
   }

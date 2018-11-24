@@ -10,13 +10,13 @@ const ConfigView = new Lang.Class({
   Name: "ProviderBinance.ConfigView",
   Extends: BaseProviderConfigView,
 
-  _init: function (configWidget, indicatorConfig) {
+  _init(configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
     this._addSelectCurrency((new ProviderBinance.Api()).currencies);
     this._addSelectCoin((new ProviderBinance.Api()).coins);
   },
 
-  _setApiDefaults: function (config) {
+  _setApiDefaults(config) {
     if (config.get('api') !== 'binance') {
       config.attributes = {
         api: 'binance',

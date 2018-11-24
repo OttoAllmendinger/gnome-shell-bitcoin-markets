@@ -17,24 +17,24 @@ const INDICATORS_KEY = "indicators";
 const ConfigModel = new Lang.Class({
   Name: "ConfigModel",
 
-  _init: function (attributes) {
+  _init(attributes) {
     this.attributes = attributes;
   },
 
-  set: function (key, value) {
+  set(key, value) {
     this.attributes[key] = value;
     this.emit('update', key, value);
   },
 
-  get: function (key) {
+  get(key) {
     return this.attributes[key];
   },
 
-  toString: function () {
+  toString() {
     return JSON.stringify(this.attributes);
   },
 
-  destroy: function () {
+  destroy() {
     this.disconnectAll();
   }
 });
@@ -53,7 +53,7 @@ const IndicatorCollectionModel = new GObject.Class({
     CONFIG: 1
   },
 
-  _init: function (params, apiProvider) {
+  _init(params, apiProvider) {
     this.parent(params);
 
     this._apiProvider = apiProvider;
@@ -66,8 +66,8 @@ const IndicatorCollectionModel = new GObject.Class({
 
     var flag;
 
-    let mutex = (func) =>
-      function () {
+    const mutex = (func) =>
+      function() {
         if (!flag) {
           flag = true;
           func.apply(null, arguments);
@@ -82,14 +82,14 @@ const IndicatorCollectionModel = new GObject.Class({
     this.connect('row-deleted', mutex(this._onRowDeleted.bind(this)));
   },
 
-  getConfig: function (iter) {
-    let json = this.get_value(iter, this.Columns.CONFIG);
+  getConfig(iter) {
+    const json = this.get_value(iter, this.Columns.CONFIG);
 
     if (!json) {
       throw new Error('getConfig() failed for iter=' + iter);
     }
 
-    let config = new ConfigModel(JSON.parse(json));
+    const config = new ConfigModel(JSON.parse(json));
 
     config.connect('update', () => {
       this.set(
@@ -102,11 +102,11 @@ const IndicatorCollectionModel = new GObject.Class({
     return config;
   },
 
-  _getLabel: function (config) {
+  _getLabel(config) {
     return this._apiProvider.get(config.api).getLabel(config);
   },
 
-  _getDefaults: function () {
+  _getDefaults() {
     return {
       api: 'bitcoinaverage',
       currency: 'USD',
@@ -115,15 +115,16 @@ const IndicatorCollectionModel = new GObject.Class({
     };
   },
 
-  _reloadFromSettings: function () {
+  _reloadFromSettings() {
     this.clear();
 
-    let configs = this._settings.get_strv(INDICATORS_KEY);
+    const configs = this._settings.get_strv(INDICATORS_KEY);
 
+    // eslint-disable-next-line
     for (let key in configs) {
-      let json = configs[key];
+      const json = configs[key];
       try {
-        let label = this._getLabel(JSON.parse(json));
+        const label = this._getLabel(JSON.parse(json));
         this.set(
           this.append(),
           [this.Columns.LABEL, this.Columns.CONFIG],
@@ -135,9 +136,10 @@ const IndicatorCollectionModel = new GObject.Class({
     }
   },
 
-  _writeSettings: function () {
+  _writeSettings() {
+    // eslint-disable-next-line
     let [res, iter] = this.get_iter_first();
-    let configs = [];
+    const configs = [];
 
     while (res) {
       configs.push(this.get_value(iter, this.Columns.CONFIG));
@@ -147,8 +149,8 @@ const IndicatorCollectionModel = new GObject.Class({
     this._settings.set_strv(INDICATORS_KEY, configs);
   },
 
-  _onRowChanged: function (self, path, iter) {
-    let config = this.get_value(iter, this.Columns.CONFIG);
+  _onRowChanged(self, path, iter) {
+    const config = this.get_value(iter, this.Columns.CONFIG);
 
     this.set(
       iter,
@@ -159,8 +161,8 @@ const IndicatorCollectionModel = new GObject.Class({
     this._writeSettings();
   },
 
-  _onRowInserted: function (self, path, iter) {
-    let defaults = this._getDefaults();
+  _onRowInserted(self, path, iter) {
+    const defaults = this._getDefaults();
 
     this.set(
       iter,
@@ -171,7 +173,7 @@ const IndicatorCollectionModel = new GObject.Class({
     this._writeSettings();
   },
 
-  _onRowDeleted: function (self, path, iter) {
+  _onRowDeleted(self, path, iter) {
     this._writeSettings();
   }
 });

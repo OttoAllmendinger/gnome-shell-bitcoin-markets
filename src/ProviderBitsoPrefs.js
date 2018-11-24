@@ -10,13 +10,13 @@ const ConfigView = new Lang.Class({
   Name: "ProviderBitso.ConfigView",
   Extends: BaseProviderConfigView,
 
-  _init: function (configWidget, indicatorConfig) {
+  _init(configWidget, indicatorConfig) {
     this.parent(configWidget, indicatorConfig);
     this._addSelectCurrency((new ProviderBitso.Api()).currencies);
     this._addSelectCoin((new ProviderBitso.Api()).coins);
   },
 
-  _setApiDefaults: function (config) {
+  _setApiDefaults(config) {
     if (config.get('api') !== 'bitso') {
       config.attributes = {
         api: 'bitso',

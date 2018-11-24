@@ -17,7 +17,7 @@ const Api = new Lang.Class({
   interval: 60,
 
   attributes: {
-    last: function (options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
 
@@ -30,11 +30,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function (options) {
+  getLabel(options) {
     return "WEX " + options.currency + "/" + options.coin;
   },
 
-  getUrl: function (options) {
+  getUrl(options) {
     return "https://wex.nz/api/3/ticker/" + options.coin.toLowerCase() + "_"
       + options.currency.toLowerCase()
   }

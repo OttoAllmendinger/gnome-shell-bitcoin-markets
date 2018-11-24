@@ -17,7 +17,7 @@ const Api = new Lang.Class({
   interval: 60, // unclear, should be safe
 
   attributes: {
-    last: function (options) {
+    last(options) {
       const renderCurrency = BaseProvider.CurrencyRenderer(options);
       const renderChange = BaseProvider.ChangeRenderer();
       const find = (currency, coin, tickerObj) => {
@@ -26,7 +26,7 @@ const Api = new Lang.Class({
           "change": 0
         }
         Object.keys(tickerObj).forEach((k) => {
-          let current = tickerObj[k];
+          const current = tickerObj[k];
           if (current['primary_currency'] === currency && current['secondary_currency'] === coin) {
             result = current;
           }
@@ -42,11 +42,11 @@ const Api = new Lang.Class({
     }
   },
 
-  getLabel: function (options) {
+  getLabel(options) {
     return "BXinTH " + options.currency + "/" + options.coin;
   },
 
-  getUrl: function (options) {
+  getUrl(options) {
     return "https://bx.in.th/api/";
   }
 });
