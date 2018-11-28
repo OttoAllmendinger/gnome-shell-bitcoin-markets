@@ -10,6 +10,7 @@ const { Format } = Local.imports;
 const { CurrencyData } = Local.imports.CurrencyData;
 const { IndicatorModel } = Local.imports.IndicatorModel;
 
+
 const DefaultCurrencies = [
       "USD", "EUR", "CNY", "GBP", "CAD", "RUB", "AUD",
       "BRL", "CZK", "JPY", "NZD", "SEK", "SGD", "PLN",

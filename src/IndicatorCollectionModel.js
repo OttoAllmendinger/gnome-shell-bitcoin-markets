@@ -8,6 +8,7 @@ const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
+const { ApiService } = Local.imports;
 const Convenience = Local.imports.convenience;
 
 const INDICATORS_KEY = "indicators";
@@ -53,10 +54,8 @@ const IndicatorCollectionModel = new GObject.Class({
     CONFIG: 1
   },
 
-  _init(params, apiProvider) {
+  _init(params) {
     this.parent(params);
-
-    this._apiProvider = apiProvider;
 
     this.set_column_types([GObject.TYPE_STRING, GObject.TYPE_STRING]);
 
@@ -103,7 +102,12 @@ const IndicatorCollectionModel = new GObject.Class({
   },
 
   _getLabel(config) {
-    return this._apiProvider.get(config.api).getLabel(config);
+    try {
+      return ApiService.getProvider(config.api).getLabel(config);
+    } catch (e) {
+      logError(e);
+      return `[error: ${config.api}]`
+    }
   },
 
   _getDefaults() {

@@ -7,6 +7,10 @@ const Signals = imports.signals;
 const Gettext = imports.gettext.domain("bitcoin-markets");
 const _ = Gettext.gettext;
 
+const Local = imports.misc.extensionUtils.getCurrentExtension();
+const { ApiService } = Local.imports;
+
+
 const makeConfigRow = (description, widget) => {
   const box = new Gtk.Box({
     orientation: Gtk.Orientation.HORIZONTAL,
@@ -96,20 +100,37 @@ const makeComboBoxCoin = (coins, selected) => {
 const BaseProviderConfigView = new Lang.Class({
   Name: "BaseProviderConfigView",
 
-  _init(configWidget, indicatorConfig) {
+  _init(api, configWidget, indicatorConfig) {
+    this._api = api;
+    this._provider = ApiService.getProvider(api);
     this._configWidget = configWidget;
     this._indicatorConfig = indicatorConfig;
     this._widgets = [];
     this._setDefaults(indicatorConfig);
     this._setApiDefaults(indicatorConfig);
+    this._initWidgets();
   },
 
   _addRow(label, widget) {
     const rowWidget = makeConfigRow(label, widget);
     this._configWidget.add(rowWidget);
     this._widgets.push(rowWidget);
-
     return rowWidget;
+  },
+
+  _initWidgets() {
+    this._addSelectCurrency(this._provider.currencies);
+    this._addSelectCoin(this._provider.coins);
+  },
+
+  _setDefaults(config) {
+    config.set("show_change", config.get("show_change") !== false);
+  },
+
+  _setApiDefaults(config) {
+    if (config.get("api") !== this._api) {
+      config.set("api", this._api);
+    }
   },
 
   _addSelectCurrency(currencies) {
@@ -144,10 +165,6 @@ const BaseProviderConfigView = new Lang.Class({
       rowWidget,
       comboBoxView: comboBoxCurrency
     };
-  },
-
-  _setDefaults(config) {
-    config.set("show_change", config.get("show_change") !== false);
   },
 
   destroy() {

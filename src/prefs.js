@@ -13,41 +13,12 @@ const N_ = (e) => e;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Convenience = Local.imports.convenience;
-const ApiProvider = Local.imports.ApiProvider;
 
 const {
-  ProviderBinance,
-  ProviderBitcoinAverage,
-  ProviderBitstamp,
-  ProviderBitfinex,
-  ProviderPoloniex,
-  ProviderCexio,
-  ProviderCoinbase,
-  ProviderBitPay,
-  ProviderKraken,
-  ProviderBXinTH,
-  ProviderPaymium,
-  ProviderBtcChina,
-  ProviderBTCMarkets,
-  ProviderWex
-} = Local.imports;
-
-const {
-  ProviderBinancePrefs,
+  Format,
+  ApiService,
+  BaseProviderConfigView,
   ProviderBitcoinAveragePrefs,
-  ProviderBitstampPrefs,
-  ProviderBitfinexPrefs,
-  ProviderPoloniexPrefs,
-  ProviderCexioPrefs,
-  ProviderCoinbasePrefs,
-  ProviderBitPayPrefs,
-  ProviderKrakenPrefs,
-  ProviderBXinTHPrefs,
-  ProviderPaymiumPrefs,
-  ProviderBtcChinaPrefs,
-  ProviderBitsoPrefs,
-  ProviderBTCMarketsPrefs,
-  ProviderWexPrefs
 } = Local.imports;
 
 const {
@@ -111,48 +82,22 @@ const IndicatorConfigView = new Lang.Class({
     const widget = this._layoutProviderSettings;
     const config = this._indicatorConfig;
 
-    const apiConfigViews = {
-      binance: () =>
-        new ProviderBinancePrefs.ConfigView(widget, config),
-      bitstamp: () =>
-        new ProviderBitstampPrefs.ConfigView(widget, config),
-      bitfinex: () =>
-        new ProviderBitfinexPrefs.ConfigView(widget, config),
-      poloniex: () =>
-        new ProviderPoloniexPrefs.ConfigView(widget, config),
-      bitcoinaverage: () =>
-        new ProviderBitcoinAveragePrefs.ConfigView(widget, config),
-      bitpay: () =>
-        new ProviderBitPayPrefs.ConfigView(widget, config),
-      kraken: () =>
-        new ProviderKrakenPrefs.ConfigView(widget, config),
-      cexio: () =>
-        new ProviderCexioPrefs.ConfigView(widget, config),
-      coinbase: () =>
-        new ProviderCoinbasePrefs.ConfigView(widget, config),
-      bxinth: () =>
-        new ProviderBXinTHPrefs.ConfigView(widget, config),
-      paymium: () =>
-        new ProviderPaymiumPrefs.ConfigView(widget, config),
-      btcchina: () =>
-        new ProviderBtcChinaPrefs.ConfigView(widget, config),
-      bitso: () =>
-        new ProviderBitsoPrefs.ConfigView(widget, config),
-      btcmarkets: () =>
-        new ProviderBTCMarketsPrefs.ConfigView(widget, config),
-      wex: () =>
-        new ProviderWexPrefs.ConfigView(widget, config)
-    };
-
     if (this._apiConfigView) {
       this._apiConfigView.destroy();
       this._apiConfigView = null;
     }
 
-    if (api in apiConfigViews) {
-      this._apiConfigView = apiConfigViews[api]();
-    } else {
-      throw new Error("no config view for " + api);
+    try {
+      if (api === "bitcoinaverage") {
+        this._apiConfigView =
+          new ProviderBitcoinAveragePrefs.ConfigView(widget, config);
+      } else {
+        this._apiConfigView =
+          new BaseProviderConfigView.BaseProviderConfigView(api, widget, config);
+      }
+    } catch (e) {
+      e.message = `Error creating configView for api ${api}: ${e.message}`;
+      logError(e);
     }
 
     widget.show_all();
@@ -161,23 +106,10 @@ const IndicatorConfigView = new Lang.Class({
   _confProvider() {
     const preset = this._indicatorConfig.get("api");
 
-    const options = [
-        {label: "Binance", value: "binance"},
-        {label: "BitcoinAverage", value: "bitcoinaverage"},
-        {label: "BitStamp", value: "bitstamp"},
-        {label: "Bitfinex", value: "bitfinex"},
-        {label: "Poloniex", value: "poloniex"},
-        {label: "BitPay",   value: "bitpay"},
-        {label: "Kraken",   value: "kraken"},
-        {label: "CEX.IO",   value: "cexio"},
-        {label: "CoinBase", value: "coinbase"},
-        {label: "BXinTH",   value: "bxinth"},
-        {label: "Paymium",  value: "paymium"},
-        {label: "BtcChina", value: "btcchina"},
-        {label: "Bitso",    value: "bitso"},
-        {label: "BTCMarkets",    value: "btcmarkets"},
-        {label: "WEX",      value: "wex"}
-    ];
+    const options = Object.keys(ApiService.Providers).map((name) => ({
+      value: name,
+      label: ApiService.getProvider(name).apiName
+    }));
 
     options.forEach((o) => {
       if (o.value === preset) {
@@ -191,6 +123,7 @@ const IndicatorConfigView = new Lang.Class({
 
     return makeConfigRow(_("Provider"), view.widget);
   },
+
 
   _confShowChange() {
     const preset = this._indicatorConfig.get("show_change") !== false;
@@ -265,8 +198,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
       orientation: Gtk.Orientation.HORIZONTAL
     });
 
-    this._apiProvider = new ApiProvider.ApiProvider();
-    this._store = new IndicatorCollectionModel(undefined, this._apiProvider);
+    this._store = new IndicatorCollectionModel();
 
     /* sidebar (left) */
 

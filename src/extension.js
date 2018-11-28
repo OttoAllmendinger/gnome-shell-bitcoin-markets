@@ -22,7 +22,7 @@ const N_ = (e) => e;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 
-const ApiProvider = Local.imports.ApiProvider;
+const { ApiService } = Local.imports;
 
 const Convenience = Local.imports.convenience;
 
@@ -61,7 +61,7 @@ const MarketIndicatorView = new Lang.Class({
   _init(options) {
     this.parent(0);
     this._options = options;
-    this._api = _apiProvider.get(options.api);
+    this._api = ApiService.getProvider(options.api);
     this._initLayout();
     this._initBehavior();
   },
@@ -255,7 +255,6 @@ const IndicatorCollection = new Lang.Class({
 });
 
 let _indicatorCollection;
-let _apiProvider;
 
 function init(metadata) {
   Convenience.initTranslations();
@@ -263,7 +262,6 @@ function init(metadata) {
 
 function enable() {
   try {
-    _apiProvider = new ApiProvider.ApiProvider();
     _indicatorCollection = new IndicatorCollection();
   } catch (e) {
     logError(e);
@@ -272,5 +270,5 @@ function enable() {
 
 function disable() {
   _indicatorCollection.destroy();
-  _apiProvider.destroy();
+  ApiService.stop();
 }

@@ -19,14 +19,10 @@ const ConfigView = new Lang.Class({
   Extends: BaseProviderConfigView,
 
   _init(configWidget, indicatorConfig) {
-    this.parent(configWidget, indicatorConfig);
+    this.parent("bitcoinaverage", configWidget, indicatorConfig);
+  },
 
-    // set defaults
-    indicatorConfig.set(
-      "use_average",
-      indicatorConfig.get("use_average") !== false
-    );
-
+  _initWidgets() {
     const api = new ProviderBitcoinAverage.Api();
 
     /* currency selection */
