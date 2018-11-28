@@ -3,6 +3,7 @@ SCHEMA = org.gnome.shell.extensions.bitcoin-markets.gschema.xml
 GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always)
 
 SOURCE = src/*.js \
+		 src/vendor/*.js \
 		 src/CurrencyData.js \
 		 src/ProviderBitcoinAverageExchangeData.js \
 		 src/stylesheet.css \
@@ -10,8 +11,6 @@ SOURCE = src/*.js \
 		 src/schemas/gschemas.compiled \
 		 src/schemas/$(SCHEMA) \
 		 src/locale/*
-
-VENDOR = src/vendor/*.js
 
 
 TRANSLATION_SOURCE=$(wildcard src/*.po)
@@ -32,10 +31,10 @@ metadata:
 	sed 's/_gitversion_/$(GIT_VERSION)/' src/metadata.json.in > src/metadata.json
 
 src/CurrencyData.js:
-	gjs util/MakeCurrencyData.js > src/CurrencyData.js
+	gjs tools/MakeCurrencyData.js > src/CurrencyData.js
 
 src/ProviderBitcoinAverageExchangeData.js:
-	gjs util/MakeExchangeData.js > $@
+	gjs tools/MakeExchangeData.js > $@
 
 src/locale/%/LC_MESSAGES/bitcoin-markets.mo: src/%.po
 	mkdir -p $(dir $@)
@@ -56,8 +55,6 @@ archive: schemas metadata translations $(SOURCE) $(VENDOR)
 	-rm $(ZIPFILE)
 	cd src/ && \
 		zip -r ../$(ZIPFILE) $(patsubst src/%,%,$(SOURCE))
-	cd src/vendor/ && \
-		zip -r ../../$(ZIPFILE) $(patsubst src/vendor/%,%,$(VENDOR))
 
 install: archive
 	-rm -r $(EXTENSION_PATH)
@@ -68,4 +65,4 @@ testprefs: install
 	gnome-shell-extension-prefs $(UUID)
 
 restart: install
-	gjs util/restartShell.js
+	gjs tools/restartShell.js

@@ -6,7 +6,7 @@ const Mainloop = imports.mainloop;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const HTTP = Local.imports.HTTP;
-const Accounting = Local.imports.accounting.accounting;
+const { Format } = Local.imports;
 const { CurrencyData } = Local.imports.CurrencyData;
 const { IndicatorModel } = Local.imports.IndicatorModel;
 
@@ -59,36 +59,12 @@ const ChangeRenderer = (options) => {
 
 
 const CurrencyRenderer = ({currency, coin, decimals}) => {
-  const format = "%v %s";
-  let symbol = currency;
-  let precision = 2;
+  const base = coin;
+  const quote = currency;
+  const decimalSpecifier = (decimals === undefined) ? "" : String(decimals);
+  const format = `{v${decimalSpecifier}} {qs}`;
 
-  const info = CurrencyData[currency];
-
-  if (info) {
-    symbol = info.symbol_native;
-
-    /* disambiguate dollar currencies */
-    if (symbol === "$") symbol = info.symbol;
-
-    precision = info.decimal_digits;
-  }
-
-  if (decimals !== null) {
-    precision = decimals;
-  }
-
-  return (number) => {
-    if (coin === "mBTC") {
-      number = Number(number) / 1000.0;
-    }
-
-    return Accounting.formatMoney(Number(number), {
-        symbol,
-        format,
-        precision
-    })
-  }
+  return (number) => Format.format(Number(number), { format, base, quote })
 };
 
 
