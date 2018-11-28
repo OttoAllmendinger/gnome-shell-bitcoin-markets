@@ -5,14 +5,14 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'BtcChina.Api',
+  Name: "BtcChina.Api",
   Extends: BaseProvider.Api,
 
   apiName: "BtcChina",
 
-  currencies: ['CNY'],
+  currencies: ["CNY"],
 
-  coins: ['BTC', 'mBTC', 'LTC'],
+  coins: ["BTC", "mBTC", "LTC"],
 
   interval: 10,
 

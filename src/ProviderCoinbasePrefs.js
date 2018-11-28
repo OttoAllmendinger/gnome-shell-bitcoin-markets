@@ -17,15 +17,15 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'coinbase') {
+    if (config.get("api") !== "coinbase") {
       config.attributes = {
-        api: 'coinbase',
-        currency: 'USD',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "coinbase",
+        currency: "USD",
+        coin: "BTC",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });

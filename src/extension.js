@@ -16,7 +16,7 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Panel = imports.ui.panel;
 
-const Gettext = imports.gettext.domain('gnome-shell-extensions');
+const Gettext = imports.gettext.domain("gnome-shell-extensions");
 const _ = Gettext.gettext;
 const N_ = (e) => e;
 
@@ -39,15 +39,15 @@ const _Symbols = {
 };
 
 const _Colors = {
-  error: '#ff0000',
+  error: "#ff0000",
 };
 
 const _Defaults = [
   {
-    api: 'bitcoinaverage',
-    currency: 'USD',
-    coin: 'BTC',
-    attribute: 'last',
+    api: "bitcoinaverage",
+    currency: "USD",
+    coin: "BTC",
+    attribute: "last",
     show_change: true,
     show_base_currency: false
   }
@@ -55,7 +55,7 @@ const _Defaults = [
 
 
 const MarketIndicatorView = new Lang.Class({
-  Name: 'MarketIndicatorView',
+  Name: "MarketIndicatorView",
   Extends: PanelMenu.Button,
 
   _init(options) {
@@ -93,17 +93,17 @@ const MarketIndicatorView = new Lang.Class({
 
     this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-    this._popupItemSettings = new PopupMenu.PopupMenuItem(_('Settings'));
+    this._popupItemSettings = new PopupMenu.PopupMenuItem(_("Settings"));
     this.menu.addMenuItem(this._popupItemSettings);
-    this._popupItemSettings.connect('activate', () => {
+    this._popupItemSettings.connect("activate", () => {
       const app_sys = Shell.AppSystem.get_default();
-      const prefs = app_sys.lookup_app('gnome-shell-extension-prefs.desktop');
+      const prefs = app_sys.lookup_app("gnome-shell-extension-prefs.desktop");
       if (prefs.get_state() == prefs.SHELL_APP_STATE_RUNNING) {
         prefs.activate();
       } else {
         prefs
           .get_app_info()
-          .launch_uris(['extension:///' + Local.metadata.uuid], null);
+          .launch_uris(["extension:///" + Local.metadata.uuid], null);
       }
     });
   },
@@ -131,7 +131,7 @@ const MarketIndicatorView = new Lang.Class({
 
   _showError(error) {
     log("err " + JSON.stringify(error));
-    this._displayText('error');
+    this._displayText("error");
     this._displayStatus(_Symbols.error);
     this._popupItemStatus.text = "error";
   },
@@ -199,7 +199,7 @@ const IndicatorCollection = new Lang.Class({
     }
 
     this._settingsChangedId = this._settings.connect(
-      'changed::' + INDICATORS_KEY,
+      "changed::" + INDICATORS_KEY,
       this._createIndicators.bind(this)
     );
 
@@ -213,7 +213,7 @@ const IndicatorCollection = new Lang.Class({
   _upgradeSettings() {
     const applyDefaults = (options) => {
       if (options.coin === undefined) {
-        options.coin = 'BTC';
+        options.coin = "BTC";
       }
       return options;
     };
@@ -244,7 +244,7 @@ const IndicatorCollection = new Lang.Class({
 
   add(indicator) {
     this._indicators.push(indicator);
-    const name = 'bitcoin-market-indicator-' + this._indicators.length;
+    const name = "bitcoin-market-indicator-" + this._indicators.length;
     Main.panel.addToStatusArea(name, indicator);
   },
 

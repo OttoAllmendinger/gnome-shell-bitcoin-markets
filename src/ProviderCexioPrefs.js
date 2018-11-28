@@ -17,15 +17,15 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'cexio') {
+    if (config.get("api") !== "cexio") {
       config.attributes = {
-        api: 'cexio',
-        currency: 'USD',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "cexio",
+        currency: "USD",
+        coin: "BTC",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });

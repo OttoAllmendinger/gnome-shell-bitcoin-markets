@@ -17,15 +17,15 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'wex') {
+    if (config.get("api") !== "wex") {
       config.attributes = {
-        api: 'wex',
-        currency: 'EUR',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "wex",
+        currency: "EUR",
+        coin: "BTC",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });

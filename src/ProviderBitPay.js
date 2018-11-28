@@ -5,14 +5,14 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'BitPay.Api',
+  Name: "BitPay.Api",
   Extends: BaseProvider.Api,
 
   apiName: "BitPay",
 
   currencies: BaseProvider.DefaultCurrencies,
 
-  coins: ['BTC', 'mBTC'],
+  coins: ["BTC", "mBTC"],
 
   interval: 60, // unclear, should be safe
 

@@ -5,14 +5,14 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'ProviderPaymium.Api',
+  Name: "ProviderPaymium.Api",
   Extends: BaseProvider.Api,
 
   apiName: "Paymium",
 
-  currencies: ['EUR'],
+  currencies: ["EUR"],
 
-  coins: ['BTC', 'mBTC'],
+  coins: ["BTC", "mBTC"],
 
   interval: 60, // unclear, should be safe
 

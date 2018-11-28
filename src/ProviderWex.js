@@ -5,14 +5,14 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'ProviderWex.Api',
+  Name: "ProviderWex.Api",
   Extends: BaseProvider.Api,
 
   apiName: "WEX",
 
-  currencies: ['USD', 'RUR', 'EUR'],
+  currencies: ["USD", "RUR", "EUR"],
 
-  coins: ['BTC', 'LTC', 'NMC', 'NVC', 'PPC', 'DSH', 'ETH', 'BCH', 'ZEC'],
+  coins: ["BTC", "LTC", "NMC", "NVC", "PPC", "DSH", "ETH", "BCH", "ZEC"],
 
   interval: 60,
 

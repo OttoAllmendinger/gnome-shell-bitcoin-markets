@@ -17,15 +17,15 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'btcchina') {
+    if (config.get("api") !== "btcchina") {
       config.attributes = {
-        api: 'btcchina',
-        currency: 'CNY',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "btcchina",
+        currency: "CNY",
+        coin: "BTC",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });

@@ -5,14 +5,14 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'Bitso.Api',
+  Name: "Bitso.Api",
   Extends: BaseProvider.Api,
 
   apiName: "Bitso",
 
-  currencies: ['MXN'],
+  currencies: ["MXN"],
 
-  coins: ['BTC', 'mBTC', 'ETH', 'XRP', 'LTC'],
+  coins: ["BTC", "mBTC", "ETH", "XRP", "LTC"],
 
   /* quote https://bitso.com/api_info#rate-limits
    *

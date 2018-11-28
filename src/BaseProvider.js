@@ -11,9 +11,9 @@ const { CurrencyData } = Local.imports.CurrencyData;
 const { IndicatorModel } = Local.imports.IndicatorModel;
 
 const DefaultCurrencies = [
-      'USD', 'EUR', 'CNY', 'GBP', 'CAD', 'RUB', 'AUD',
-      'BRL', 'CZK', 'JPY', 'NZD', 'SEK', 'SGD', 'PLN',
-      'MXN', 'RUR'
+      "USD", "EUR", "CNY", "GBP", "CAD", "RUB", "AUD",
+      "BRL", "CZK", "JPY", "NZD", "SEK", "SGD", "PLN",
+      "MXN", "RUR"
 ];
 
 const IndicatorChange = {
@@ -69,7 +69,7 @@ const CurrencyRenderer = ({currency, coin, decimals}) => {
     symbol = info.symbol_native;
 
     /* disambiguate dollar currencies */
-    if (symbol === '$') symbol = info.symbol;
+    if (symbol === "$") symbol = info.symbol;
 
     precision = info.decimal_digits;
   }
@@ -79,7 +79,7 @@ const CurrencyRenderer = ({currency, coin, decimals}) => {
   }
 
   return (number) => {
-    if (coin === 'mBTC') {
+    if (coin === "mBTC") {
       number = Number(number) / 1000.0;
     }
 
@@ -109,7 +109,7 @@ const Handler = new Lang.Class({
     this.disabled = false;
 
     if ((!interval) || (interval < 1)) {
-      throw new Error('invalid interval ' + interval);
+      throw new Error("invalid interval " + interval);
     }
 
     this._id = id;

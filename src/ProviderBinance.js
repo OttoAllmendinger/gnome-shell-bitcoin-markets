@@ -5,14 +5,14 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'Binance.Api',
+  Name: "Binance.Api",
   Extends: BaseProvider.Api,
 
   apiName: "Binance",
 
-  currencies: ['USDT'],
+  currencies: ["USDT"],
 
-  coins: ['BTC', 'LTC', 'ETH', 'BNB', 'BCC', 'NEO'],
+  coins: ["BTC", "LTC", "ETH", "BNB", "BCC", "NEO"],
 
   /* I couldn't find any limitations
    *
@@ -39,7 +39,7 @@ const Api = new Lang.Class({
 
   getUrl(options) {
     const coin = BaseProvider.baseCoin(options.coin);
-    return 'https://api.binance.com/api/v3/ticker/price?symbol=' +
+    return "https://api.binance.com/api/v3/ticker/price?symbol=" +
       coin.toUpperCase() + options.currency.toUpperCase();
   }
 });

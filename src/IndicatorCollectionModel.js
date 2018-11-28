@@ -23,7 +23,7 @@ const ConfigModel = new Lang.Class({
 
   set(key, value) {
     this.attributes[key] = value;
-    this.emit('update', key, value);
+    this.emit("update", key, value);
   },
 
   get(key) {
@@ -75,23 +75,23 @@ const IndicatorCollectionModel = new GObject.Class({
         }
       }
 
-    this.connect('row-changed', mutex(this._onRowChanged.bind(this)));
+    this.connect("row-changed", mutex(this._onRowChanged.bind(this)));
 
-    this.connect('row-inserted', mutex(this._onRowInserted.bind(this)));
+    this.connect("row-inserted", mutex(this._onRowInserted.bind(this)));
 
-    this.connect('row-deleted', mutex(this._onRowDeleted.bind(this)));
+    this.connect("row-deleted", mutex(this._onRowDeleted.bind(this)));
   },
 
   getConfig(iter) {
     const json = this.get_value(iter, this.Columns.CONFIG);
 
     if (!json) {
-      throw new Error('getConfig() failed for iter=' + iter);
+      throw new Error("getConfig() failed for iter=" + iter);
     }
 
     const config = new ConfigModel(JSON.parse(json));
 
-    config.connect('update', () => {
+    config.connect("update", () => {
       this.set(
         iter,
         [this.Columns.CONFIG],
@@ -108,10 +108,10 @@ const IndicatorCollectionModel = new GObject.Class({
 
   _getDefaults() {
     return {
-      api: 'bitcoinaverage',
-      currency: 'USD',
-      coin: 'BTC',
-      attribute: 'last'
+      api: "bitcoinaverage",
+      currency: "USD",
+      coin: "BTC",
+      attribute: "last"
     };
   },
 

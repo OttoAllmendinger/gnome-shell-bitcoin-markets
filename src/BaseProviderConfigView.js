@@ -4,7 +4,7 @@ const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 const Signals = imports.signals;
 
-const Gettext = imports.gettext.domain('bitcoin-markets');
+const Gettext = imports.gettext.domain("bitcoin-markets");
 const _ = Gettext.gettext;
 
 const makeConfigRow = (description, widget) => {
@@ -42,16 +42,16 @@ const ComboBoxView = new Lang.Class({
     const renderer = new Gtk.CellRendererText();
 
     comboBox.pack_start(renderer, true);
-    comboBox.add_attribute(renderer, 'text', 0);
+    comboBox.add_attribute(renderer, "text", 0);
 
     this.widget = comboBox;
     this.model = model;
     this.setOptions(options);
 
-    comboBox.connect('changed', (entry) => {
+    comboBox.connect("changed", (entry) => {
       const i = comboBox.get_active();
       if (i in this._options) {
-        this.emit('changed', this._options[i].value);
+        this.emit("changed", this._options[i].value);
       }
     });
   },
@@ -114,11 +114,11 @@ const BaseProviderConfigView = new Lang.Class({
 
   _addSelectCurrency(currencies) {
     const comboBoxCurrency = makeComboBoxCurrency(
-      currencies, this._indicatorConfig.get('currency')
+      currencies, this._indicatorConfig.get("currency")
     );
 
-    comboBoxCurrency.connect('changed', (view, value) => {
-      this._indicatorConfig.set('currency', value);
+    comboBoxCurrency.connect("changed", (view, value) => {
+      this._indicatorConfig.set("currency", value);
     });
 
     const rowWidget = this._addRow(_("Currency"), comboBoxCurrency.widget);
@@ -131,11 +131,11 @@ const BaseProviderConfigView = new Lang.Class({
 
   _addSelectCoin(coins) {
     const comboBoxCurrency = makeComboBoxCoin(
-      coins, this._indicatorConfig.get('coin')
+      coins, this._indicatorConfig.get("coin")
     );
 
-    comboBoxCurrency.connect('changed', (view, value) => {
-      this._indicatorConfig.set('coin', value);
+    comboBoxCurrency.connect("changed", (view, value) => {
+      this._indicatorConfig.set("coin", value);
     });
 
     const rowWidget = this._addRow(_("Coin"), comboBoxCurrency.widget);
@@ -147,7 +147,7 @@ const BaseProviderConfigView = new Lang.Class({
   },
 
   _setDefaults(config) {
-    config.set('show_change', config.get('show_change') !== false);
+    config.set("show_change", config.get("show_change") !== false);
   },
 
   destroy() {

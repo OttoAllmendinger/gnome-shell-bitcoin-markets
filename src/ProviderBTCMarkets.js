@@ -5,11 +5,11 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'BTCMarkets.Api',
+  Name: "BTCMarkets.Api",
   Extends: BaseProvider.Api,
   apiName: "BTCMarkets",
-  currencies: ['AUD', 'BTC'],
-  coins: ['BTC', 'LTC', 'ETH', 'ETC', 'XRP', 'BCH'],
+  currencies: ["AUD", "BTC"],
+  coins: ["BTC", "LTC", "ETH", "ETC", "XRP", "BCH"],
   interval: 10,
 
   attributes: {
@@ -24,10 +24,10 @@ const Api = new Lang.Class({
   },
 
   getLabel(options) {
-    return 'BTCMarkets.net ' + options.currency + '/' + options.coin;
+    return "BTCMarkets.net " + options.currency + "/" + options.coin;
   },
 
   getUrl(options) {
-    return 'https://api.btcmarkets.net/market/' + options.coin + '/' + options.currency + '/tick';
+    return "https://api.btcmarkets.net/market/" + options.coin + "/" + options.currency + "/tick";
   }
 });

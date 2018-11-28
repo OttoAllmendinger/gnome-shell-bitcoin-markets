@@ -17,15 +17,15 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'bxinth') {
+    if (config.get("api") !== "bxinth") {
       config.attributes = {
-        api: 'bxinth',
-        currency: 'THB',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "bxinth",
+        currency: "THB",
+        coin: "BTC",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });

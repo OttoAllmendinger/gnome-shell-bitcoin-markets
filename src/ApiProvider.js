@@ -52,7 +52,7 @@ const ApiProvider = new Lang.Class({
     if (name in this.apis) {
       return this.apis[name];
     } else {
-      throw new Error('unknown api ' + name);
+      throw new Error("unknown api " + name);
     }
   },
 
@@ -73,7 +73,7 @@ if (window["ARGV"] && ARGV[0] === "test") {
 
   const options = {currency: "USD", attribute: "last", coin: "BTC"};
 
-  const indicator = apiProvider.get('bitpay', options);
+  const indicator = apiProvider.get("bitpay", options);
 
   indicator.connect("update-start", () => {
     log("signal update-start");

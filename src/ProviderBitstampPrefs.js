@@ -17,15 +17,15 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'bitstamp') {
+    if (config.get("api") !== "bitstamp") {
       config.attributes = {
-        api: 'bitstamp',
-        currency: 'USD',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "bitstamp",
+        currency: "USD",
+        coin: "BTC",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });

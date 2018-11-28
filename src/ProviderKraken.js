@@ -9,10 +9,10 @@ const BaseProvider = Local.imports.BaseProvider;
 const getPairCode = (coin, currency) => {
   coin = coin.toUpperCase()
   currency = currency.toUpperCase()
-  if (coin.toUpperCase() === 'BTC') {
-    coin = 'XBT';
+  if (coin.toUpperCase() === "BTC") {
+    coin = "XBT";
   }
-  const unprefixed = ['BCH', 'DASH', 'EOS', 'GNO'];
+  const unprefixed = ["BCH", "DASH", "EOS", "GNO"];
   if (unprefixed.includes(coin)) {
     return `${coin}${currency}`;
   } else {
@@ -21,24 +21,24 @@ const getPairCode = (coin, currency) => {
 }
 
 const Api = new Lang.Class({
-  Name: 'Kraken.Api',
+  Name: "Kraken.Api",
   Extends: BaseProvider.Api,
 
   apiName: "Kraken",
 
-  currencies: ['USD', 'EUR'],
+  currencies: ["USD", "EUR"],
 
   coins: [
-    'BTC',
-    'BCH',
-    'DASH',
-    'ETH',
-    'LTC',
-    'ZEC',
-    'XMR',
-    'REP',
-    'XRP',
-    'ETC'
+    "BTC",
+    "BCH",
+    "DASH",
+    "ETH",
+    "LTC",
+    "ZEC",
+    "XMR",
+    "REP",
+    "XRP",
+    "ETC"
   ],
 
   interval: 10, // unknown, guessing

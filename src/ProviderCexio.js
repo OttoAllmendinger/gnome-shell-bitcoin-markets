@@ -5,14 +5,14 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'Cexio.Api',
+  Name: "Cexio.Api",
   Extends: BaseProvider.Api,
 
   apiName: "Cexio",
 
-  currencies: ['USD', 'EUR'],
+  currencies: ["USD", "EUR"],
 
-  coins: ['BTC', 'ETH', 'BCH', 'BTG', 'DASH', 'XRP', 'ZEC'],
+  coins: ["BTC", "ETH", "BCH", "BTG", "DASH", "XRP", "ZEC"],
 
   interval: 10,
 
@@ -29,10 +29,10 @@ const Api = new Lang.Class({
   },
 
   getLabel(options) {
-    return 'CEX.IO ' + options.currency + '/' + options.coin;
+    return "CEX.IO " + options.currency + "/" + options.coin;
   },
 
   getUrl(options) {
-    return 'https://cex.io/api/ticker/' + options.coin + '/' + options.currency;
+    return "https://cex.io/api/ticker/" + options.coin + "/" + options.currency;
   }
 });

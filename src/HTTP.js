@@ -28,12 +28,12 @@ const isErrTooManyRequests = (err) =>
         Number(err.soupMessage.status_code) === STATUS_TOO_MANY_REQUESTS
 
 const getExtensionVersion = () => {
-  if (Local.metadata['git-version']) {
-    return 'git-' + Local.metadata['git-version'];
+  if (Local.metadata["git-version"]) {
+    return "git-" + Local.metadata["git-version"];
   } else if (Local.metadata.version) {
-    return 'v' + Local.metadata.version;
+    return "v" + Local.metadata.version;
   } else {
-    return 'unknown';
+    return "unknown";
   }
 };
 
@@ -55,8 +55,8 @@ const _userAgent =  "gnome-shell-bitcoin-markets" +
 // a NAT or if some clients really do many requests
 const getClientId = () => {
   // GUID code from http://stackoverflow.com/a/2117523/92493
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-      var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      var r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
       return v.toString(16);
   });
 };
@@ -66,7 +66,7 @@ const _clientId = getClientId();
 const _httpSession = new Soup.SessionAsync();
 
 
-_httpSession['user-agent'] = _userAgent;
+_httpSession["user-agent"] = _userAgent;
 
 Soup.Session.prototype.add_feature.call(
   _httpSession,
@@ -77,7 +77,7 @@ Soup.Session.prototype.add_feature.call(
 const getJSON = (url, callback) => {
   const message = Soup.Message.new("GET", url);
   const headers = message.request_headers;
-  headers.append('X-Client-Id', _clientId);
+  headers.append("X-Client-Id", _clientId);
   _httpSession.queue_message(
     message,
     (session, message) => {

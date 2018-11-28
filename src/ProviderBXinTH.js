@@ -5,14 +5,14 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'BXinTH.Api',
+  Name: "BXinTH.Api",
   Extends: BaseProvider.Api,
 
   apiName: "BX.in.th",
 
-  currencies: ['THB'],
+  currencies: ["THB"],
 
-  coins: ['BTC', 'mBTC', 'ETH', 'DAS', 'REP', 'GNO', 'OMG', 'EVX', 'XRP'], //?
+  coins: ["BTC", "mBTC", "ETH", "DAS", "REP", "GNO", "OMG", "EVX", "XRP"], //?
 
   interval: 60, // unclear, should be safe
 
@@ -27,7 +27,7 @@ const Api = new Lang.Class({
         }
         Object.keys(tickerObj).forEach((k) => {
           const current = tickerObj[k];
-          if (current['primary_currency'] === currency && current['secondary_currency'] === coin) {
+          if (current["primary_currency"] === currency && current["secondary_currency"] === coin) {
             result = current;
           }
         });

@@ -17,15 +17,15 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'bitso') {
+    if (config.get("api") !== "bitso") {
       config.attributes = {
-        api: 'bitso',
-        currency: 'MXN',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "bitso",
+        currency: "MXN",
+        coin: "BTC",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });

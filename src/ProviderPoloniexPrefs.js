@@ -17,15 +17,15 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'poloniex') {
+    if (config.get("api") !== "poloniex") {
       config.attributes = {
-        api: 'poloniex',
-        currency: 'USD',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "poloniex",
+        currency: "USD",
+        coin: "BTC",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });

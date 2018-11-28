@@ -2,7 +2,7 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 
 const Gtk = imports.gi.Gtk;
-const Gettext = imports.gettext.domain('bitcoin-markets');
+const Gettext = imports.gettext.domain("bitcoin-markets");
 const _ = Gettext.gettext;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
@@ -23,8 +23,8 @@ const ConfigView = new Lang.Class({
 
     // set defaults
     indicatorConfig.set(
-      'use_average',
-      indicatorConfig.get('use_average') !== false
+      "use_average",
+      indicatorConfig.get("use_average") !== false
     );
 
     const api = new ProviderBitcoinAverage.Api();
@@ -32,8 +32,8 @@ const ConfigView = new Lang.Class({
     /* currency selection */
 
     const updateExchangeSelect = () => {
-      const useAverage = this._indicatorConfig.get('use_average');
-      const currency = this._indicatorConfig.get('currency');
+      const useAverage = this._indicatorConfig.get("use_average");
+      const currency = this._indicatorConfig.get("currency");
       exchangeSelect.rowWidget.sensitive = useAverage === false;
       exchangeSelect.comboBoxView.setOptions(
         this._makeExchangeOptions(currency)
@@ -41,15 +41,15 @@ const ConfigView = new Lang.Class({
     };
 
     const currencySelect = this._addSelectCurrency(api.currencies);
-    currencySelect.comboBoxView.connect('changed', updateExchangeSelect);
+    currencySelect.comboBoxView.connect("changed", updateExchangeSelect);
 
     this._addSelectCoin(api.coins);
 
     /* use average switch */
     // TODO use proper view method: connect("changed")
     const averageSwitch = this._addAverageSwitch();
-    averageSwitch.switchView.connect('notify::active', (obj) => {
-      this._indicatorConfig.set('use_average', obj.active);
+    averageSwitch.switchView.connect("notify::active", (obj) => {
+      this._indicatorConfig.set("use_average", obj.active);
       updateExchangeSelect();
     });
 
@@ -60,7 +60,7 @@ const ConfigView = new Lang.Class({
 
   _addAverageSwitch() {
     const switchView = new Gtk.Switch({
-      active: this._indicatorConfig.get('use_average') !== false
+      active: this._indicatorConfig.get("use_average") !== false
     });
 
     const rowWidget = this._addRow(_("Average"), switchView);
@@ -75,7 +75,7 @@ const ConfigView = new Lang.Class({
     const comboBoxExchange = new ComboBoxView();
 
     comboBoxExchange.connect("changed", (view, value) => {
-      this._indicatorConfig.set('exchange', value);
+      this._indicatorConfig.set("exchange", value);
     });
 
     const rowWidget = this._addRow(_("Exchange"), comboBoxExchange.widget);
@@ -89,7 +89,7 @@ const ConfigView = new Lang.Class({
   _makeExchangeOptions(currency) {
     const coin = "BTC";
     const symbol = coin + currency.toUpperCase();
-    const currentExchange = this._indicatorConfig.get('exchange');
+    const currentExchange = this._indicatorConfig.get("exchange");
     const getVolume = (e) => {
       if (symbol in e.symbols) {
         return e.symbols[symbol].volume;
@@ -113,16 +113,16 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'bitcoinaverage') {
+    if (config.get("api") !== "bitcoinaverage") {
       config.attributes = {
-        api: 'bitcoinaverage',
-        exchange: 'average',
-        currency: 'USD',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "bitcoinaverage",
+        exchange: "average",
+        currency: "USD",
+        coin: "BTC",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });

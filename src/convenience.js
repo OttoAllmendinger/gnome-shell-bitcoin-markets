@@ -42,13 +42,13 @@ const ExtensionUtils = imports.misc.extensionUtils;
 function initTranslations(domain) {
     const extension = ExtensionUtils.getCurrentExtension();
 
-    domain = domain || extension.metadata['gettext-domain'];
+    domain = domain || extension.metadata["gettext-domain"];
 
     // check if this extension was built with "make zip-file", and thus
     // has the locale files in a subfolder
     // otherwise assume that extension has been installed in the
     // same prefix as gnome-shell
-    const localeDir = extension.dir.get_child('locale');
+    const localeDir = extension.dir.get_child("locale");
     if (localeDir.query_exists(null))
         Gettext.bindtextdomain(domain, localeDir.get_path());
     else
@@ -66,7 +66,7 @@ function initTranslations(domain) {
 function getSettings(schema) {
     const extension = ExtensionUtils.getCurrentExtension();
 
-    schema = schema || extension.metadata['settings-schema'];
+    schema = schema || extension.metadata["settings-schema"];
 
     const GioSSS = Gio.SettingsSchemaSource;
 
@@ -75,7 +75,7 @@ function getSettings(schema) {
     // otherwise assume that extension has been installed in the
     // same prefix as gnome-shell (and therefore schemas are available
     // in the standard folders)
-    const schemaDir = extension.dir.get_child('schemas');
+    const schemaDir = extension.dir.get_child("schemas");
     let schemaSource;
     if (schemaDir.query_exists(null))
         schemaSource = GioSSS.new_from_directory(schemaDir.get_path(),
@@ -87,8 +87,8 @@ function getSettings(schema) {
     const schemaObj = schemaSource.lookup(schema, true);
     if (!schemaObj)
         throw new Error(
-                'Schema ' + schema + ' could not be found for extension ' +
-                extension.metadata.uuid + '. Please check your installation.');
+                "Schema " + schema + " could not be found for extension " +
+                extension.metadata.uuid + ". Please check your installation.");
 
     return new Gio.Settings({ settings_schema: schemaObj });
 }

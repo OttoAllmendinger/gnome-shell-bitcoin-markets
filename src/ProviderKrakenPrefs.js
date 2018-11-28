@@ -17,15 +17,15 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'kraken') {
+    if (config.get("api") !== "kraken") {
       config.attributes = {
-        api: 'kraken',
-        currency: 'EUR',
-        coin: 'XBT',
-        attribute: 'last'
+        api: "kraken",
+        currency: "EUR",
+        coin: "XBT",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });

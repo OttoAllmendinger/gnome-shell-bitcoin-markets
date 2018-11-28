@@ -5,7 +5,7 @@ const BaseProvider = Local.imports.BaseProvider;
 
 
 const Api = new Lang.Class({
-  Name: 'Bitstamp.Api',
+  Name: "Bitstamp.Api",
   Extends: BaseProvider.Api,
 
   // Quote 2013-08-09  ---  https://www.bitstamp.net/api/
@@ -13,9 +13,9 @@ const Api = new Lang.Class({
   //  IP address. ''
   apiName: "Bitstamp",
 
-  currencies: ['USD', 'EUR'],
+  currencies: ["USD", "EUR"],
 
-  coins: ['BTC', 'mBTC', 'LTC', 'ETH', 'XRP', 'BCH'],
+  coins: ["BTC", "mBTC", "LTC", "ETH", "XRP", "BCH"],
 
   interval: 10, // 60 requests per 10 minutes
 
@@ -38,6 +38,6 @@ const Api = new Lang.Class({
   getUrl(options) {
     const coin = BaseProvider.baseCoin(options.coin);
     return "https://www.bitstamp.net/api/v2/ticker/" +
-      coin.toLowerCase() + options.currency.toLowerCase() + '/';
+      coin.toLowerCase() + options.currency.toLowerCase() + "/";
   }
 });

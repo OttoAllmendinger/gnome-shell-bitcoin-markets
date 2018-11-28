@@ -3,6 +3,7 @@ module.exports = {
   "env": {
     "es6": true
   },
+
   "globals": {
     "global": true,
     "window": true,
@@ -26,6 +27,7 @@ module.exports = {
         "args": "none",
         "varsIgnorePattern": "(init|enable|disable|buildPrefsWidget|[A-Z])"
     }],
+    "quotes": ["error", "double"],
     "prefer-template": "off",
     "comma-spacing": "error",
     "max-len": ["error", 100]

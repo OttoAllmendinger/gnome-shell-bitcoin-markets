@@ -7,7 +7,7 @@ const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 const Signals = imports.signals;
 
-const Gettext = imports.gettext.domain('bitcoin-markets');
+const Gettext = imports.gettext.domain("bitcoin-markets");
 const _ = Gettext.gettext;
 const N_ = (e) => e;
 
@@ -93,7 +93,7 @@ const IndicatorConfigView = new Lang.Class({
 
     this._addIndicatorSettings();
 
-    this._selectApi(indicatorConfig.get('api'));
+    this._selectApi(indicatorConfig.get("api"));
 
     this.widget.show_all();
   },
@@ -159,24 +159,24 @@ const IndicatorConfigView = new Lang.Class({
   },
 
   _confProvider() {
-    const preset = this._indicatorConfig.get('api');
+    const preset = this._indicatorConfig.get("api");
 
     const options = [
-        {label: 'Binance', value: 'binance'},
-        {label: 'BitcoinAverage', value: 'bitcoinaverage'},
-        {label: 'BitStamp', value: 'bitstamp'},
-        {label: 'Bitfinex', value: 'bitfinex'},
-        {label: 'Poloniex', value: 'poloniex'},
-        {label: 'BitPay',   value: 'bitpay'},
-        {label: 'Kraken',   value: 'kraken'},
-        {label: 'CEX.IO',   value: 'cexio'},
-        {label: 'CoinBase', value: 'coinbase'},
-        {label: 'BXinTH',   value: 'bxinth'},
-        {label: 'Paymium',  value: 'paymium'},
-        {label: 'BtcChina', value: 'btcchina'},
-        {label: 'Bitso',    value: 'bitso'},
-        {label: 'BTCMarkets',    value: 'btcmarkets'},
-        {label: 'WEX',      value: 'wex'}
+        {label: "Binance", value: "binance"},
+        {label: "BitcoinAverage", value: "bitcoinaverage"},
+        {label: "BitStamp", value: "bitstamp"},
+        {label: "Bitfinex", value: "bitfinex"},
+        {label: "Poloniex", value: "poloniex"},
+        {label: "BitPay",   value: "bitpay"},
+        {label: "Kraken",   value: "kraken"},
+        {label: "CEX.IO",   value: "cexio"},
+        {label: "CoinBase", value: "coinbase"},
+        {label: "BXinTH",   value: "bxinth"},
+        {label: "Paymium",  value: "paymium"},
+        {label: "BtcChina", value: "btcchina"},
+        {label: "Bitso",    value: "bitso"},
+        {label: "BTCMarkets",    value: "btcmarkets"},
+        {label: "WEX",      value: "wex"}
     ];
 
     options.forEach((o) => {
@@ -193,12 +193,12 @@ const IndicatorConfigView = new Lang.Class({
   },
 
   _confShowChange() {
-    const preset = this._indicatorConfig.get('show_change') !== false;
+    const preset = this._indicatorConfig.get("show_change") !== false;
 
     const switchView = new Gtk.Switch({active: preset});
 
-    switchView.connect('notify::active', (obj) => {
-      this._indicatorConfig.set('show_change', obj.active);
+    switchView.connect("notify::active", (obj) => {
+      this._indicatorConfig.set("show_change", obj.active);
     });
 
     return makeConfigRow(_("Show Change"), switchView);
@@ -206,12 +206,12 @@ const IndicatorConfigView = new Lang.Class({
 
 
   _confShowBaseCurrency() {
-    const preset = this._indicatorConfig.get('show_base_currency') === true;
+    const preset = this._indicatorConfig.get("show_base_currency") === true;
 
     const switchView = new Gtk.Switch({active: preset});
 
-    switchView.connect('notify::active', (obj) => {
-      this._indicatorConfig.set('show_base_currency', obj.active);
+    switchView.connect("notify::active", (obj) => {
+      this._indicatorConfig.set("show_base_currency", obj.active);
     });
 
     return makeConfigRow(_("Show Base Currency"), switchView);
@@ -219,7 +219,7 @@ const IndicatorConfigView = new Lang.Class({
 
 
   _confDecimals() {
-    const preset = this._indicatorConfig.get('decimals');
+    const preset = this._indicatorConfig.get("decimals");
 
     const getLabel = (v) => {
       if (v === undefined) {
@@ -235,8 +235,8 @@ const IndicatorConfigView = new Lang.Class({
 
     const decimalsView = new ComboBoxView(options);
 
-    decimalsView.connect('changed', (view, value) => {
-      this._indicatorConfig.set('decimals', value);
+    decimalsView.connect("changed", (view, value) => {
+      this._indicatorConfig.set("decimals", value);
     });
 
     return makeConfigRow(_("Decimals"), decimalsView.widget);
@@ -294,7 +294,7 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
     /* behavior */
 
     this._selection = this._treeView.get_selection();
-    this._selection.connect('changed', this._onSelectionChanged.bind(this));
+    this._selection.connect("changed", this._onSelectionChanged.bind(this));
   },
 
   _getTreeView() {
@@ -324,13 +324,13 @@ const BitcoinMarketsSettingsWidget = new GObject.Class({
 
     /* new widget button with menu */
     const newButton = new Gtk.ToolButton({icon_name: "list-add-symbolic"});
-    newButton.connect('clicked', this._addClicked.bind(this));
+    newButton.connect("clicked", this._addClicked.bind(this));
     toolbar.add(newButton);
 
     /* delete button */
     const delButton = this._delButton =
       new Gtk.ToolButton({icon_name: "list-remove-symbolic"});
-    delButton.connect('clicked', this._delClicked.bind(this));
+    delButton.connect("clicked", this._delClicked.bind(this));
 
     toolbar.add(delButton);
 

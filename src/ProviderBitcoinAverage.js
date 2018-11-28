@@ -8,7 +8,7 @@ const _invalidExchangeError = () =>
     new Error("use_average !== true and no exchange defined");
 
 const Api = new Lang.Class({
-  Name: 'BitcoinAverage.Api',
+  Name: "BitcoinAverage.Api",
   Extends: BaseProvider.Api,
 
   apiName: "BitcoinAverage",
@@ -16,7 +16,7 @@ const Api = new Lang.Class({
   // FIXME: remote attribute, derive from ExchangeData instead
   currencies: BaseProvider.DefaultCurrencies,
 
-  coins: ['BTC', 'mBTC'],
+  coins: ["BTC", "mBTC"],
 
   /* Quote 429 response:
    *

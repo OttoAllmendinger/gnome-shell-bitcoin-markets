@@ -16,14 +16,14 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'btcmarkets') {
+    if (config.get("api") !== "btcmarkets") {
       config.attributes = {
-        api: 'btcmarkets',
-        currency: 'USD',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "btcmarkets",
+        currency: "USD",
+        coin: "BTC",
+        attribute: "last"
       };
-      config.emit('update');
+      config.emit("update");
     }
   }
 });

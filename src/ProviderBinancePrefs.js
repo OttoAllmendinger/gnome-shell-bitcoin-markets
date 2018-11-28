@@ -17,15 +17,15 @@ const ConfigView = new Lang.Class({
   },
 
   _setApiDefaults(config) {
-    if (config.get('api') !== 'binance') {
+    if (config.get("api") !== "binance") {
       config.attributes = {
-        api: 'binance',
-        currency: 'USDT',
-        coin: 'BTC',
-        attribute: 'last'
+        api: "binance",
+        currency: "USDT",
+        coin: "BTC",
+        attribute: "last"
       };
 
-      config.emit('update');
+      config.emit("update");
     }
   },
 });
