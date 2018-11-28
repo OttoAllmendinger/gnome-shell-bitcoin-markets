@@ -18,10 +18,8 @@ const {
   ProviderKraken,
   ProviderBXinTH,
   ProviderPaymium,
-  ProviderBtcChina,
   ProviderBitso,
   ProviderBTCMarkets,
-  ProviderWex
 } = Local.imports;
 
 const Providers = {
@@ -36,10 +34,8 @@ const Providers = {
   coinbase: new ProviderCoinbase.Api(),
   bxinth: new ProviderBXinTH.Api(),
   paymium: new ProviderPaymium.Api(),
-  btcchina: new ProviderBtcChina.Api(),
   bitso: new ProviderBitso.Api(),
   btcmarkets: new ProviderBTCMarkets.Api(),
-  wex: new ProviderWex.Api()
 };
 
 
