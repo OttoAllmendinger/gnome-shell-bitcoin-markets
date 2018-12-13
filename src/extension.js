@@ -232,7 +232,7 @@ const IndicatorCollection = new Lang.Class({
         try {
           this.add(new MarketIndicatorView(options));
         } catch (e) {
-          log("error creating indicator: " + e);
+          log("error creating indicator omg: " + this);
         }
       });
   },

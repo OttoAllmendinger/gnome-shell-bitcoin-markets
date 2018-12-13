@@ -29,7 +29,8 @@ const {
   ProviderPaymium,
   ProviderBtcChina,
   ProviderBTCMarkets,
-  ProviderWex
+  ProviderWex,
+  ProviderBitMex
 } = Local.imports;
 
 const {
@@ -47,7 +48,8 @@ const {
   ProviderBtcChinaPrefs,
   ProviderBitsoPrefs,
   ProviderBTCMarketsPrefs,
-  ProviderWexPrefs
+  ProviderWexPrefs,
+  ProviderBitMexPrefs
 } = Local.imports;
 
 const {
@@ -141,7 +143,9 @@ const IndicatorConfigView = new Lang.Class({
       btcmarkets: () =>
         new ProviderBTCMarketsPrefs.ConfigView(widget, config),
       wex: () =>
-        new ProviderWexPrefs.ConfigView(widget, config)
+        new ProviderWexPrefs.ConfigView(widget, config),
+      bitmex: () =>
+        new ProviderBitMexPrefs.ConfigView(widget, config)
     };
 
     if (this._apiConfigView) {
@@ -176,7 +180,8 @@ const IndicatorConfigView = new Lang.Class({
         {label: 'BtcChina', value: 'btcchina'},
         {label: 'Bitso',    value: 'bitso'},
         {label: 'BTCMarkets',    value: 'btcmarkets'},
-        {label: 'WEX',      value: 'wex'}
+        {label: 'WEX',      value: 'wex'},
+        {label: 'BitMex',   value: 'bitmex'}
     ];
 
     options.forEach((o) => {
