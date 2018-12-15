@@ -73,29 +73,31 @@ Soup.Session.prototype.add_feature.call(
   new Soup.ProxyResolverDefault()
 );
 
+const cache = new Map();
 
-const getJSON = (url, callback) => {
+const getJSON = (url, params) => {
   const message = Soup.Message.new("GET", url);
   const headers = message.request_headers;
   headers.append("X-Client-Id", _clientId);
-  _httpSession.queue_message(
-    message,
-    (session, message) => {
-      if (message.status_code == 200) {
-        let data;
+  // log(`> GET ${url}`);
+  return new Promise((resolve, reject) => {
+    _httpSession.queue_message(
+      message,
+      (session, message) => {
+        // log(`< GET ${url}: ${message.status_code}`);
+        if (message.status_code !== 200) {
+          const err = new HTTPError(message);
+          logError(err);
+          return reject(err);
+        }
+
         try {
-          data = JSON.parse(message.response_body.data);
+          const data = JSON.parse(message.response_body.data);
+          return resolve(data);
         } catch (e) {
-          callback(
-            new Error("GET " + url + ": error parsing JSON: " + e), null
-          );
+          return reject(new Error(`GET ${url}: error parsing JSON: ${e}`));
         }
-        if (data) {
-          callback(null, data);
-        }
-      } else {
-        callback(new HTTPError(message), null);
       }
-    }
-  );
+    );
+  });
 };

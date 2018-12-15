@@ -147,7 +147,9 @@ const Api = new Lang.Class({
 
   poll(options, callback) {
     const url = this.getUrl(options);
-    HTTP.getJSON(url, callback);
+    HTTP.getJSON(url)
+      .then((data) => callback(null, data))
+      .catch((error) => callback(error, null));
   },
 
   _getHandlerId(options) {
