@@ -3,6 +3,7 @@ const Lang = imports.lang;
 const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 const Signals = imports.signals;
+const Mainloop = imports.mainloop;
 
 const Gettext = imports.gettext.domain("bitcoin-markets");
 const _ = Gettext.gettext;
@@ -31,6 +32,18 @@ const makeConfigRow = (description, widget) => {
   return box;
 };
 
+const debounce = (milliseconds, func) => {
+  let tag = null;
+  return () => {
+    if (tag !== null) {
+      Mainloop.source_remove(tag);
+    }
+    tag = Mainloop.timeout_add(milliseconds, () => {
+      func();
+      tag = null;
+    });
+  };
+};
 
 
 const ComboBoxView = new Lang.Class({
@@ -42,7 +55,7 @@ const ComboBoxView = new Lang.Class({
     const model = new Gtk.ListStore();
     model.set_column_types([GObject.TYPE_STRING]);
 
-    const comboBox = new Gtk.ComboBox({model});
+    const comboBox = new Gtk.ComboBox({ model });
     const renderer = new Gtk.CellRendererText();
 
     comboBox.pack_start(renderer, true);
@@ -80,23 +93,6 @@ const ComboBoxView = new Lang.Class({
 Signals.addSignalMethods(ComboBoxView.prototype);
 
 
-const makeComboBoxCurrency = (currencies, selected) => {
-  const options = currencies.map(
-    (c) => ({label: c, value: c, active: (c === selected)})
-  );
-
-  return new ComboBoxView(options);
-};
-
-const makeComboBoxCoin = (coins, selected) => {
-  const options = coins.map(
-    (c) => ({label: c, value: c, active: (c === selected)})
-  );
-
-  return new ComboBoxView(options);
-};
-
-
 const BaseProviderConfigView = new Lang.Class({
   Name: "BaseProviderConfigView",
 
@@ -111,16 +107,9 @@ const BaseProviderConfigView = new Lang.Class({
     this._initWidgets();
   },
 
-  _addRow(label, widget) {
-    const rowWidget = makeConfigRow(label, widget);
-    this._configWidget.add(rowWidget);
-    this._widgets.push(rowWidget);
-    return rowWidget;
-  },
-
   _initWidgets() {
-    this._addSelectCurrency(this._provider.currencies);
-    this._addSelectCoin(this._provider.coins);
+    this._addBaseEntry();
+    this._addQuoteEntry();
   },
 
   _setDefaults(config) {
@@ -133,45 +122,46 @@ const BaseProviderConfigView = new Lang.Class({
     }
   },
 
-  _addSelectCurrency(currencies) {
-    const comboBoxCurrency = makeComboBoxCurrency(
-      currencies, this._indicatorConfig.get("currency")
-    );
-
-    comboBoxCurrency.connect("changed", (view, value) => {
-      this._indicatorConfig.set("currency", value);
-    });
-
-    const rowWidget = this._addRow(_("Currency"), comboBoxCurrency.widget);
-
-    return {
-      rowWidget,
-      comboBoxView: comboBoxCurrency
-    };
+  _addConfigWidget(w) {
+    this._configWidget.add(w);
+    this._widgets.push(w);
   },
 
-  _addSelectCoin(coins) {
-    const comboBoxCurrency = makeComboBoxCoin(
-      coins, this._indicatorConfig.get("coin")
-    );
+  _addRow(label, widget) {
+    const rowWidget = makeConfigRow(label, widget);
+    this._addConfigWidget(rowWidget);
+    return rowWidget;
+  },
 
-    comboBoxCurrency.connect("changed", (view, value) => {
-      this._indicatorConfig.set("coin", value);
+  _addBaseEntry() {
+    return this._addSymbolEntry(_("Base"), "base", "BTC");
+  },
+
+  _addQuoteEntry() {
+    return this._addSymbolEntry(_("Quote"), "quote", "USD");
+  },
+
+  _addSymbolEntry(label, key, defaultValue) {
+    const entry = new Gtk.Entry({
+      text: this._indicatorConfig.get(key) || defaultValue
     });
+    entry.connect("changed", debounce(500, () => {
+      if (entry.text.length < 2) {
+        return;
+      }
+      this._indicatorConfig.set(key, entry.text.toUpperCase());
+    }));
 
-    const rowWidget = this._addRow(_("Coin"), comboBoxCurrency.widget);
+    const rowWidget = this._addRow(label, entry);
 
-    return {
-      rowWidget,
-      comboBoxView: comboBoxCurrency
-    };
+    return { rowWidget, entry };
   },
 
   destroy() {
     this._widgets.forEach((widget) =>
       this._configWidget.remove(widget)
     );
-
+    this._widgets.slice(0);
     this._configWidget.show_all();
   }
 });

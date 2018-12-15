@@ -26,6 +26,9 @@ const {
   makeConfigRow
 } = Local.imports.BaseProviderConfigView;
 
+const { dump } = Local.imports.dump;
+
+
 const IndicatorCollectionModel =
   Local.imports.IndicatorCollectionModel.IndicatorCollectionModel;
 
@@ -42,25 +45,27 @@ const IndicatorConfigView = new Lang.Class({
       orientation: Gtk.Orientation.VERTICAL,
     });
 
-
-    let frame;
-
-    frame = new Gtk.Frame({ label: _("Indicator Settings") });
-    this._layoutIndicatorSettings = new Gtk.Box({
-      orientation: Gtk.Orientation.VERTICAL,
-      border_width: padding
-    });
-    frame.add(this._layoutIndicatorSettings);
-    this.widget.add(frame);
-
-
-    frame = new Gtk.Frame({ label: _("Provider Settings") });
-    this._layoutProviderSettings = new Gtk.Box({
-      orientation: Gtk.Orientation.VERTICAL,
-      border_width: padding
-    });
-    frame.add(this._layoutProviderSettings);
-    this.widget.add(frame);
+    {
+      const frame = new Gtk.Frame({
+        label: _("Indicator Settings"),
+        margin_bottom: 8,
+      });
+      this._layoutIndicatorSettings = new Gtk.Box({
+        orientation: Gtk.Orientation.VERTICAL,
+        border_width: padding
+      });
+      frame.add(this._layoutIndicatorSettings);
+      this.widget.add(frame);
+    }
+    {
+      const frame = new Gtk.Frame({ label: _("Provider Settings") });
+      this._layoutProviderSettings = new Gtk.Box({
+        orientation: Gtk.Orientation.VERTICAL,
+        border_width: padding
+      });
+      frame.add(this._layoutProviderSettings);
+      this.widget.add(frame);
+    }
 
     this._addIndicatorSettings();
 
@@ -71,12 +76,12 @@ const IndicatorConfigView = new Lang.Class({
 
 
   _addIndicatorSettings() {
-    var layout = this._layoutIndicatorSettings;
-    layout.add(this._confDecimals());
+    const layout = this._layoutIndicatorSettings;
+    layout.add(this._confFormat());
     layout.add(this._confShowChange());
-    layout.add(this._confShowBaseCurrency());
     layout.add(this._confProvider());
   },
+
 
   _selectApi(api) {
     const widget = this._layoutProviderSettings;
@@ -102,6 +107,23 @@ const IndicatorConfigView = new Lang.Class({
 
     widget.show_all();
   },
+
+
+  _confFormat() {
+    const format = this._indicatorConfig.get("format");
+
+    const entry = new Gtk.Entry({
+      text: format,
+      tooltip_markup: Format.tooltipText()
+    });
+
+    entry.connect("changed", () => {
+      this._indicatorConfig.set("format", entry.text);
+    });
+
+    return makeConfigRow(_("Format"), entry);
+  },
+
 
   _confProvider() {
     const preset = this._indicatorConfig.get("api");
@@ -151,29 +173,6 @@ const IndicatorConfigView = new Lang.Class({
   },
 
 
-  _confDecimals() {
-    const preset = this._indicatorConfig.get("decimals");
-
-    const getLabel = (v) => {
-      if (v === undefined) {
-        return _("Default");
-      } else {
-        return String(v);
-      }
-    };
-
-    const options = [undefined, 0, 1, 2, 3, 4, 5].map(
-      (v) => ({label: getLabel(v), value: v, active: (v === preset)})
-    );
-
-    const decimalsView = new ComboBoxView(options);
-
-    decimalsView.connect("changed", (view, value) => {
-      this._indicatorConfig.set("decimals", value);
-    });
-
-    return makeConfigRow(_("Decimals"), decimalsView.widget);
-  },
 
   destroy() {
     this.disconnectAll();

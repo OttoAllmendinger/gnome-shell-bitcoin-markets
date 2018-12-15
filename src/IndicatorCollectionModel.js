@@ -8,12 +8,20 @@ const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
-const { ApiService } = Local.imports;
 const Convenience = Local.imports.convenience;
+const { ApiService } = Local.imports;
+
 
 const INDICATORS_KEY = "indicators";
 
-
+const Defaults = {
+  api: "bitcoinaverage",
+  coin: "BTC",
+  currency: "USD",
+  attribute: "last",
+  show_change: true,
+  format: "{v} {qs}"
+};
 
 const ConfigModel = new Lang.Class({
   Name: "ConfigModel",
@@ -23,12 +31,30 @@ const ConfigModel = new Lang.Class({
   },
 
   set(key, value) {
+    // legacy support
+    if (key === "base") {
+      return this.set("coin", value);
+    }
+
+    if (key === "quote") {
+      return this.set("currency", value);
+    }
+
     this.attributes[key] = value;
     this.emit("update", key, value);
   },
 
   get(key) {
-    return this.attributes[key];
+    if (key === "base") {
+      return this.get("coin");
+    }
+    if (key === "quote") {
+      return this.get("currency");
+    }
+    if (key in this.attributes) {
+      return this.attributes[key];
+    }
+    return Defaults[key];
   },
 
   toString() {
@@ -106,17 +132,8 @@ const IndicatorCollectionModel = new GObject.Class({
       return ApiService.getProvider(config.api).getLabel(config);
     } catch (e) {
       logError(e);
-      return `[error: ${config.api}]`
+      return `[unsupported: ${config.api}]`;
     }
-  },
-
-  _getDefaults() {
-    return {
-      api: "bitcoinaverage",
-      currency: "USD",
-      coin: "BTC",
-      attribute: "last"
-    };
   },
 
   _reloadFromSettings() {
@@ -124,8 +141,7 @@ const IndicatorCollectionModel = new GObject.Class({
 
     const configs = this._settings.get_strv(INDICATORS_KEY);
 
-    // eslint-disable-next-line
-    for (let key in configs) {
+    Object.keys(configs).forEach(key => {
       const json = configs[key];
       try {
         const label = this._getLabel(JSON.parse(json));
@@ -135,9 +151,9 @@ const IndicatorCollectionModel = new GObject.Class({
           [label, json]
         );
       } catch (e) {
-        log("error loading indicator config: " + e);
+        logError("error loading indicator config", e);
       }
-    }
+    });
   },
 
   _writeSettings() {
@@ -166,12 +182,10 @@ const IndicatorCollectionModel = new GObject.Class({
   },
 
   _onRowInserted(self, path, iter) {
-    const defaults = this._getDefaults();
-
     this.set(
       iter,
       [this.Columns.LABEL, this.Columns.CONFIG],
-      [this._getLabel(defaults), JSON.stringify(defaults)]
+      [this._getLabel(Defaults), JSON.stringify(Defaults)]
     );
 
     this._writeSettings();
