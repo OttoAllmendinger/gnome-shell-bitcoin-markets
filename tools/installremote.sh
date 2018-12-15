@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-REMOTE_RESTART=${GSEDEV_REMOTE_RESTART:-true}
+GSEDEV_REMOTE_RESTART=${GSEDEV_REMOTE_RESTART:-true}
 git ls-files | tar Tc - |
   ssh -v $GSEDEV_REMOTE_SSH_OPTS "
     mkdir -p /tmp/gsext/ && \
