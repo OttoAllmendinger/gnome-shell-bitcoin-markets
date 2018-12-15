@@ -7,27 +7,25 @@ const BaseProvider = Local.imports.BaseProvider;
 const Api = new Lang.Class({
   Name: "BTCMarkets.Api",
   Extends: BaseProvider.Api,
+
   apiName: "BTCMarkets",
-  currencies: ["AUD", "BTC"],
-  coins: ["BTC", "LTC", "ETH", "ETC", "XRP", "BCH"],
+
+  apiDocs: [
+    ["API Docs", "https://github.com/BTCMarkets/API/wiki/Market-data-API"],
+    ["Active Markets (JSON)", "https://api.btcmarkets.net/v2/market/active"],
+  ],
+
   interval: 10,
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-      return {
-        text: (data) => renderCurrency(data.lastPrice),
-        change: (data) => renderChange(data.lastPrice)
-      };
+  getUrl({ base, quote }) {
+    return `https://api.btcmarkets.net/market/${base}/${quote}/tick`;
+  },
+
+  getLast(data) {
+    if (data.success !== false) {
+      return data.lastPrice;
     }
-  },
-
-  getLabel(options) {
-    return "BTCMarkets.net " + options.currency + "/" + options.coin;
-  },
-
-  getUrl(options) {
-    return "https://api.btcmarkets.net/market/" + options.coin + "/" + options.currency + "/tick";
+    const { errorCode, errorMessage } = data;
+    throw new Error(`${errorCode}: ${errorMessage}`);
   }
 });

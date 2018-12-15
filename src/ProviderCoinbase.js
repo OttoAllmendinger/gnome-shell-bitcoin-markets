@@ -10,31 +10,21 @@ const Api = new Lang.Class({
 
   apiName: "Coinbase",
 
-  currencies: BaseProvider.DefaultCurrencies,
-
-  coins: ["BTC", "mBTC", "LTC", "ETH"],
+  apiDocs: [
+    ["API Docs", "https://developers.coinbase.com/docs/wallet/guides/price-data"]
+  ],
 
   interval: 60, // unclear, should be safe
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-      const coin = BaseProvider.baseCoin(options.coin);
-      const key = coin.toLowerCase() + "_to_" + options.currency.toLowerCase();
-
-      return {
-        text: (data) => renderCurrency(data[key]),
-        change: (data) => renderChange(data[key])
-      };
-    }
-  },
-
-  getLabel(options) {
-    return "Coinbase " + options.currency + "/" + options.coin;
-  },
-
   getUrl(options) {
     return "https://coinbase.com/api/v1/currencies/exchange_rates";
+  },
+
+  getLast(data, { base, quote }) {
+    const pair = `${base}_to_${quote}`.toLowerCase();
+    if (pair in data) {
+      return data[pair];
+    }
+    throw new Error(`no such pair ${pair}`);
   }
 });

@@ -10,11 +10,10 @@ const Api = new Lang.Class({
 
   apiName: "Bitfinex",
 
-  currencies: ["USD"],
-
-  coins: ["BTC", "LTC", "ETH", "ETC", "RRT", "ZEC", "XMR", "DASH", "BCC", "BCU", "XRP", "IOTA",
-          "EOS", "SAN", "OMG", "BCH", "NEO", "ETP", "QTUM", "BT1", "BT2", "AVT", "EDO", "BTG",
-          "DATA", "QASH", "YYW"],
+  apiDocs: [
+    ["API Docs", "https://docs.bitfinex.com/v1/reference#rest-public-ticker"],
+    ["Symbols (JSON)", "https://api.bitfinex.com/v1/symbols"]
+  ],
 
   /* quote https://www.bitfinex.com/posts/188
    *
@@ -23,44 +22,30 @@ const Api = new Lang.Class({
    */
   interval: 10,
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-
-      return {
-        text: (data) => renderCurrency(data[6]),
-        change: (data) => renderChange(data[6])
-      };
-    }
-  },
-
-  getLabel(options) {
-    return "Bitfinex " + options.currency + "/" + options.coin;
-  },
-
-  getUrl(options) {
-    const coin = BaseProvider.baseCoin(options.coin);
-    let coinParam = coin;
-    switch (coin) {
+  getUrl({ base, quote }) {
+    switch (base) {
       case "DASH":
-        coinParam = "DSH"
+        base = "DSH"
         break;
       case "IOTA":
-        coinParam = "IOT"
+        base = "IOT"
         break;
       case "QTUM":
-        coinParam = "QTM"
+        base = "QTM"
         break;
       case "DATA":
-        coinParam = "DAT"
+        base = "DAT"
         break;
       case "QASH":
-        coinParam = "QSH"
+        base = "QSH"
         break;
       default:
         break;
     }
-    return "https://api.bitfinex.com/v2/ticker/t" + coinParam + options.currency + "/";
+    return `https://api.bitfinex.com/v2/ticker/t${base}${quote}/`;
+  },
+
+  getLast(data) {
+    return data[6];
   }
 });

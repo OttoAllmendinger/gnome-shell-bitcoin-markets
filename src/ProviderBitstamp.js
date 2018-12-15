@@ -8,36 +8,22 @@ const Api = new Lang.Class({
   Name: "Bitstamp.Api",
   Extends: BaseProvider.Api,
 
+  apiName: "Bitstamp",
+
+  apiDocs: [
+    ["API Docs", "https://www.bitstamp.net/api/"]
+  ],
+
   // Quote 2013-08-09  ---  https://www.bitstamp.net/api/
   // `` Do not make more than 600 request per 10 minutes or we will ban your
   //  IP address. ''
-  apiName: "Bitstamp",
-
-  currencies: ["USD", "EUR"],
-
-  coins: ["BTC", "mBTC", "LTC", "ETH", "XRP", "BCH"],
-
   interval: 10, // 60 requests per 10 minutes
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-
-      return {
-        text: (data) => renderCurrency(data.last),
-        change: (data) => renderChange(data.last)
-      };
-    }
+  getUrl({ base, quote }) {
+    return `https://www.bitstamp.net/api/v2/ticker/${base}${quote}`.toLowerCase();
   },
 
-  getLabel(options) {
-    return "BitStamp " + options.currency + "/" + options.coin;
-  },
-
-  getUrl(options) {
-    const coin = BaseProvider.baseCoin(options.coin);
-    return "https://www.bitstamp.net/api/v2/ticker/" +
-      coin.toLowerCase() + options.currency.toLowerCase() + "/";
+  getLast(data) {
+    return data.last;
   }
 });

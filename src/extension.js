@@ -1,10 +1,10 @@
 /*jshint moz:true */
 // vi: sw=2 sts=2 et
 
-const Gdk = imports.gi.Gdk;
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
-const GnomeDesktop = imports.gi.GnomeDesktop;
+// const Gdk = imports.gi.Gdk;
+// const Gio = imports.gi.Gio;
+// const GLib = imports.gi.GLib;
+// const GnomeDesktop = imports.gi.GnomeDesktop;
 const Lang = imports.lang;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
@@ -22,13 +22,18 @@ const N_ = (e) => e;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 
-const { ApiService } = Local.imports;
+const ApiService = Local.imports.ApiService;
 
 const Convenience = Local.imports.convenience;
+
+const { Format } = Local.imports;
+const { Defaults } = Local.imports.IndicatorCollectionModel;
+
 
 const INDICATORS_KEY = "indicators";
 const FIRST_RUN_KEY = "first-run";
 
+const DEBUG_HANDLERS = true;
 
 const _Symbols = {
   error: "\u26A0",
@@ -42,17 +47,7 @@ const _Colors = {
   error: "#ff0000",
 };
 
-const _Defaults = [
-  {
-    api: "bitcoinaverage",
-    currency: "USD",
-    coin: "BTC",
-    attribute: "last",
-    show_change: true,
-    show_base_currency: false
-  }
-];
-
+const settings = Convenience.getSettings();
 
 const MarketIndicatorView = new Lang.Class({
   Name: "MarketIndicatorView",
@@ -60,10 +55,23 @@ const MarketIndicatorView = new Lang.Class({
 
   _init(options) {
     this.parent(0);
-    this._options = options;
-    this._api = ApiService.getProvider(options.api);
+    this.providerLabel = "";
     this._initLayout();
-    this._initBehavior();
+    this.setOptions(options);
+  },
+
+  setOptions(options) {
+    try {
+      this.providerLabel =
+        ApiService.getProvider(options.api).getLabel(options);
+    } catch (e) {
+      logError(e);
+      this.providerLabel = `[${options.api}]`;
+      this.onUpdateError(e);
+      return;
+    }
+
+    this.options = options;
   },
 
   _initLayout() {
@@ -108,55 +116,57 @@ const MarketIndicatorView = new Lang.Class({
     });
   },
 
-  _initBehavior() {
-    this._model = this._api.getModel(this._options);
+  getChange(lastValue, newValue) {
+    if (lastValue === undefined) {
+      return "unchanged";
+    }
+    if (lastValue > newValue) {
+      return "down";
+    } else if (lastValue < newValue) {
+      return "up";
+    }
+    return "unchanged";
+  },
 
-    this._model.connect("update-start", () => {
-      this._displayStatus(_Symbols.refresh);
-    });
-
-    this._model.connect("update", (obj, err, data) => {
-      if (err) {
-        this._showError(err);
-      } else {
-        this._showData(data);
-      }
-
-      this._updatePopupItemLabel(err, data);
-    });
-
-
+  onUpdateStart() {
     this._displayStatus(_Symbols.refresh);
   },
 
-  _showError(error) {
-    log("err " + JSON.stringify(error));
+  onUpdateError(error) {
     this._displayText("error");
     this._displayStatus(_Symbols.error);
-    this._popupItemStatus.text = "error";
+    this._updatePopupItemLabel(error);
   },
 
-  _showData(data) {
+  onClearValue() {
+    this._displayStatus(_Symbols.refresh);
+    this._displayText(Format.format(undefined, this.options));
+    this._updatePopupItemLabel();
+  },
+
+  onUpdatePriceData(priceData) {
+    const [p, p1] = priceData;
+
+    const change = p1
+      ? this.getChange(p.value, p1.value)
+      : "unchanged";
+
     const _StatusToSymbol = {
       up: _Symbols.up,
       down: _Symbols.down,
       unchanged: " "
     };
 
-    let {text} = data;
-    if (this._options.show_base_currency) {
-      text += "/" + this._options.coin;
-    }
-    this._displayText(text);
-
     let symbol = " ";
-
-    if (this._options.show_change) {
-      symbol = _StatusToSymbol[data.change];
+    if (this.options.show_change) {
+      symbol = _StatusToSymbol[change];
       this._displayStatus(symbol);
     } else {
       this._statusView.width = 0;
     }
+
+    this._displayText(Format.format(p.value, this.options));
+    this._updatePopupItemLabel();
   },
 
   _displayStatus(text) {
@@ -167,19 +177,17 @@ const MarketIndicatorView = new Lang.Class({
     this._indicatorView.text = text;
   },
 
-  _updatePopupItemLabel(err, data) {
-    let text = this._api.getLabel(this._options);
+  _updatePopupItemLabel(err) {
+    let text = this.providerLabel;
     if (err) {
-      text += "\n\nError:\n" + String(err);
+      text += "\n\n" + String(err);
     }
     this._popupItemStatus.label.text = text;
   },
 
   destroy() {
-    this._model.destroy();
     this._indicatorView.destroy();
     this._statusView.destroy();
-
     this.parent();
   }
 });
@@ -189,52 +197,94 @@ const IndicatorCollection = new Lang.Class({
 
   _init() {
     this._indicators = [];
-    this._settings = Convenience.getSettings();
 
-    if (this._settings.get_boolean(FIRST_RUN_KEY)) {
+    if (settings.get_boolean(FIRST_RUN_KEY)) {
       this._initDefaults();
-      this._settings.set_boolean(FIRST_RUN_KEY, false);
+      settings.set_boolean(FIRST_RUN_KEY, false);
     } else {
       this._upgradeSettings();
     }
 
-    this._settingsChangedId = this._settings.connect(
+    const tryUpdateIndicators = () => {
+      try {
+        this._updateIndicators();
+      } catch (e) {
+        logError(e);
+      }
+    }
+
+    this._settingsChangedId = settings.connect(
       "changed::" + INDICATORS_KEY,
-      this._createIndicators.bind(this)
+      tryUpdateIndicators
     );
 
-    this._createIndicators();
+    tryUpdateIndicators();
   },
 
   _initDefaults() {
-    this._settings.set_strv(INDICATORS_KEY, _Defaults.map(JSON.stringify));
+    settings.set_strv(INDICATORS_KEY, [Defaults].map(JSON.stringify));
   },
 
   _upgradeSettings() {
     const applyDefaults = (options) => {
-      if (options.coin === undefined) {
-        options.coin = "BTC";
+      if (options.base === undefined) {
+        options.base = options.coin || "BTC";
       }
+
+      if (options.quote === undefined) {
+        options.quote = options.currency || "USD";
+      }
+
+      if (options.format === undefined) {
+        if (options.show_base_currency) {
+          options.format = "{b}/{q} {v}";
+        } else {
+          options.format = "{v} {qs}";
+        }
+      }
+      delete options.show_base_currency;
+      delete options.coin;
+      delete options.currency;
       return options;
     };
-    const updated = this._settings.get_strv(INDICATORS_KEY)
+    const updated = settings.get_strv(INDICATORS_KEY)
       .map(JSON.parse)
       .map(applyDefaults);
-    this._settings.set_strv(INDICATORS_KEY, updated.map(JSON.stringify));
+    settings.set_strv(INDICATORS_KEY, updated.map(JSON.stringify));
   },
 
-  _createIndicators() {
-    this._removeAll();
-
-    this._settings.get_strv(INDICATORS_KEY)
-      .map(JSON.parse)
-      .forEach((options) => {
+  _updateIndicators() {
+    const arrOptions = settings.get_strv(INDICATORS_KEY)
+      .map(str => {
         try {
-          this.add(new MarketIndicatorView(options));
+          return JSON.parse(str);
         } catch (e) {
-          log("error creating indicator: " + e);
+          e.message = `Error parsing string ${str}: ${e.message}`;
+          logError(e);
+        }
+      })
+      .filter(Boolean);
+
+    if (arrOptions.length === this._indicators.length) {
+      arrOptions.forEach((options, i) => {
+        try {
+          this._indicators[i].setOptions(options);
+        } catch (e) {
+          logError(e);
         }
       });
+    } else {
+      this._removeAll();
+      const indicators = arrOptions.map((options) => {
+        return new MarketIndicatorView(options);
+      });
+      indicators.forEach((view, i) => {
+        Main.panel.addToStatusArea(`bitcoin-market-indicator-${i}`, view);
+      });
+      this._indicators = indicators;
+    }
+
+    ApiService.setSubscribers(this._indicators);
   },
 
   _removeAll() {
@@ -242,15 +292,10 @@ const IndicatorCollection = new Lang.Class({
     this._indicators = [];
   },
 
-  add(indicator) {
-    this._indicators.push(indicator);
-    const name = "bitcoin-market-indicator-" + this._indicators.length;
-    Main.panel.addToStatusArea(name, indicator);
-  },
-
   destroy() {
     this._removeAll();
-    this._settings.disconnect(this._settingsChangedId);
+    ApiService.setSubscribers([]);
+    settings.disconnect(this._settingsChangedId);
   }
 });
 
@@ -270,5 +315,4 @@ function enable() {
 
 function disable() {
   _indicatorCollection.destroy();
-  ApiService.stop();
 }

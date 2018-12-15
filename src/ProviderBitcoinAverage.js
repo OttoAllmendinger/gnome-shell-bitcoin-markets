@@ -13,10 +13,10 @@ const Api = new Lang.Class({
 
   apiName: "BitcoinAverage",
 
-  // FIXME: remote attribute, derive from ExchangeData instead
-  currencies: BaseProvider.DefaultCurrencies,
-
-  coins: ["BTC", "mBTC"],
+  apiDocs: [
+    ["API Docs", "https://apiv2.bitcoinaverage.com/"],
+    ["Symbols (JSON)", "https://apiv2.bitcoinaverage.com/symbols/indices/ticker"]
+  ],
 
   /* Quote 429 response:
    *
@@ -28,49 +28,50 @@ const Api = new Lang.Class({
    */
   interval: 15 * 60,
 
-  attributes: {
-    last: (options) => {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-      const symbol = "BTC" + options.currency.toUpperCase();
-
-      const getNumber = (data) => {
-        if (options.use_average !== false) {
-          return data[symbol].last;
-        } else if (options.exchange !== undefined) {
-          return data.symbols[symbol].last;
-        } else {
-          throw _invalidExchangeError();
-        }
-      };
-
-      return {
-        text: (data) => renderCurrency(getNumber(data)),
-        change: (data) => renderChange(getNumber(data))
-      };
+  getLabel({ use_average, exchange, base, quote }) {
+    const pair = `${base}/${quote}`
+    if (use_average !== false) {
+      return `BitAvg ${pair}`;
+    } else if (exchange !== undefined) {
+      return `BitAvg/${exchange} ${pair}`;
+    } else {
+      throw _invalidExchangeError();
     }
   },
 
-  getUrl({use_average, exchange, coin, currency}) {
-    coin = BaseProvider.baseCoin(coin).toUpperCase();
-    currency = currency.toUpperCase();
+  getUrl({ use_average, exchange, base, quote }) {
     if (use_average !== false) {
       return "https://apiv2.bitcoinaverage.com/indices/global/ticker/short" +
-        "?crypto=" + coin + "&fiats=" + currency;
+        `?crypto=${base}&fiats=${quote}`;
     } else if (exchange !== undefined) {
-      return "https://apiv2.bitcoinaverage.com/exchanges/" + exchange;
+      return `https://apiv2.bitcoinaverage.com/exchanges/${exchange}`;
     } else {
       throw _invalidExchangeError();
     }
   },
 
-  getLabel(options) {
-    if (options.use_average !== false) {
-      return "BitAvg " + options.currency + "/" + options.coin;
-    } else if (options.exchange !== undefined) {
-      return "BitAvg " + options.currency + "/" + options.coin + "@" + options.exchange;
+  getTicker({ base, quote, exchange, use_average, attribute }) {
+    return this._getTickerInstance({
+      base, quote, exchange, use_average, attribute
+    });
+  },
+
+  getLast: (data, { base, quote, use_average, exchange }) => {
+    let tickers;
+    if (use_average !== false) {
+      tickers = data;
+    } else if (exchange !== undefined) {
+      tickers = data.symbols;
+      if (!tickers) {
+        throw new Error(`illegal response for exchange=${exchange}`)
+      }
     } else {
       throw _invalidExchangeError();
     }
+    const symbol = `${base}${quote}`;
+    if (symbol in tickers) {
+      return tickers[symbol].last;
+    }
+    throw new Error(`no data for symbol ${symbol}`);
   }
 });

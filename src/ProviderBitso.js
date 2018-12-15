@@ -10,37 +10,23 @@ const Api = new Lang.Class({
 
   apiName: "Bitso",
 
-  currencies: ["MXN"],
-
-  coins: ["BTC", "mBTC", "ETH", "XRP", "LTC"],
+  apiDocs: [
+    ["API Docs", "https://bitso.com/api_info#http-api-responses"],
+    ["Books (JSON)", "https://api.bitso.com/v3/available_books"]
+  ],
 
   /* quote https://bitso.com/api_info#rate-limits
    *
    * > Rate limits are are based on one minute windows. If you do more than 30
    * > requests in a minute, you get locked out for one minute.
    */
-  interval: 30,
+  interval: 10,
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-
-      return {
-        text: (data) => renderCurrency(data.payload.last),
-        change: (data) => renderChange(data.payload.last)
-      };
-    }
+  getUrl({ base, quote }) {
+    return `https://api.bitso.com/v3/ticker?book=${base}_${quote}`.toLowerCase();
   },
 
-  getLabel(options) {
-    return "Bitso " + options.currency + "/" + options.coin;
-  },
-
-  getUrl(options) {
-    const coin = BaseProvider.baseCoin(options.coin);
-    return "https://api.bitso.com/v3/ticker?book=" +
-          coin.toLowerCase() + "_" +
-          options.currency.toLowerCase();
+  getLast({ payload }) {
+    return payload.last;
   }
 });

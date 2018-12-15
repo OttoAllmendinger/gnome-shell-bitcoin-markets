@@ -10,39 +10,21 @@ const Api = new Lang.Class({
 
   apiName: "BitPay",
 
-  currencies: BaseProvider.DefaultCurrencies,
-
-  coins: ["BTC", "mBTC"],
+  apiDocs: [
+    ["API Docs", "https://bitpay.com/api"]
+  ],
 
   interval: 60, // unclear, should be safe
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-      const find = (currency, arr) => {
-        // eslint-disable-next-line
-        for (let {code, rate} of arr) {
-          if (code === currency) {
-            return rate;
-          }
-        }
+  getUrl({ base }) {
+    return `https://bitpay.com/api/rates/${base}`;
+  },
 
-        throw Error("currency " + currency + " not found");
-      };
-
-      return {
-        text: (data) => renderCurrency(find(options.currency, data)),
-        change: (data) => renderChange(find(options.currency, data))
-      };
+  getLast(data, { base, quote }) {
+    const result = data.find(({ code }) => code === quote);
+    if (!result) {
+      throw new Error(`no data for quote ${quote}`);
     }
-  },
-
-  getLabel(options) {
-    return "BitPay " + options.currency + "/" + options.coin;
-  },
-
-  getUrl(options) {
-    return "https://bitpay.com/api/rates";
+    return result.rate;
   }
 });

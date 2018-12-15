@@ -8,31 +8,23 @@ const Api = new Lang.Class({
   Name: "Cexio.Api",
   Extends: BaseProvider.Api,
 
-  apiName: "Cexio",
+  apiName: "CEX.IO",
 
-  currencies: ["USD", "EUR"],
-
-  coins: ["BTC", "ETH", "BCH", "BTG", "DASH", "XRP", "ZEC"],
+  apiDocs: [
+    ["API Docs", "https://cex.io/rest-api#ticker"],
+    ["Pairs (JSON)", "https://cex.io/api/currency_limits"]
+  ],
 
   interval: 10,
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
+  getUrl({ base, quote }) {
+    return `https://cex.io/api/ticker/${base}/${quote}`;
+  },
 
-      return {
-        text: (data) => renderCurrency(data.last),
-        change: (data) => renderChange(data.last)
-      };
+  getLast({ last, error }) {
+    if (error) {
+      throw new Error(error);
     }
-  },
-
-  getLabel(options) {
-    return "CEX.IO " + options.currency + "/" + options.coin;
-  },
-
-  getUrl(options) {
-    return "https://cex.io/api/ticker/" + options.coin + "/" + options.currency;
+    return last;
   }
 });

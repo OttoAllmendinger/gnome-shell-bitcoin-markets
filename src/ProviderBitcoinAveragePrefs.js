@@ -57,6 +57,8 @@ const ConfigView = new Lang.Class({
     /* exchange selection */
     const exchangeSelect = this._addSelectExchange();
     updateExchangeSelect();
+
+    this._addHelp();
   },
 
   _addAverageSwitch() {

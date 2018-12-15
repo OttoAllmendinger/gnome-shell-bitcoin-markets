@@ -110,6 +110,7 @@ const BaseProviderConfigView = new Lang.Class({
   _initWidgets() {
     this._addBaseEntry();
     this._addQuoteEntry();
+    this._addHelp();
   },
 
   _setDefaults(config) {
@@ -155,6 +156,32 @@ const BaseProviderConfigView = new Lang.Class({
     const rowWidget = this._addRow(label, entry);
 
     return { rowWidget, entry };
+  },
+
+  _addHelp(config) {
+    const { apiDocs } = this._provider;
+    if (!apiDocs) {
+      return logError(new Error(`no apiDocs for ${this._api}`));
+    }
+
+    const helpText = apiDocs.map(
+      ([label, url]) => `<a href="${url}">${label}</a>`
+    ).join(`, `);
+
+    this._addRow(_("Help"), new Gtk.Label({
+      label: helpText, use_markup: true,
+    }));
+    /*
+    apiDocs.forEach(([label, url]) => {
+      this._addConfigWidget(
+        new Gtk.Label({
+          label: `<a href="${url}">${label}</a>`,
+          use_markup: true,
+          margin_bottom: 8
+        })
+      );
+    });
+    */
   },
 
   destroy() {

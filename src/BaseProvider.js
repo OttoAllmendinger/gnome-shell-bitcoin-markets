@@ -6,132 +6,6 @@ const Mainloop = imports.mainloop;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const HTTP = Local.imports.HTTP;
-const { Format } = Local.imports;
-const { CurrencyData } = Local.imports.CurrencyData;
-const { IndicatorModel } = Local.imports.IndicatorModel;
-
-
-const DefaultCurrencies = [
-      "USD", "EUR", "CNY", "GBP", "CAD", "RUB", "AUD",
-      "BRL", "CZK", "JPY", "NZD", "SEK", "SGD", "PLN",
-      "MXN", "RUR"
-];
-
-const IndicatorChange = {
-  up: "up",
-  down: "down",
-  unchanged: "unchanged"
-};
-
-
-// Normalize pseudo-coins like "mBTC" to "BTC"
-const baseCoin = (coin) => {
-  if (coin === "mBTC") {
-    return "BTC";
-  }
-  return coin;
-}
-
-
-const ChangeRenderer = (options) => {
-  /**
-   * Returns a function that returns the change
-   * in value between consecutive calls.
-   */
-  let lastValue;
-
-  return (newValue) => {
-    let ret = IndicatorChange.unchanged;
-
-    if (lastValue !== undefined) {
-      if (lastValue > newValue) {
-        ret = IndicatorChange.down;
-      } else if (lastValue < newValue) {
-        ret = IndicatorChange.up;
-      }
-    }
-
-    lastValue = newValue;
-
-    return ret;
-  };
-};
-
-
-
-const CurrencyRenderer = ({currency, coin, decimals}) => {
-  const base = coin;
-  const quote = currency;
-  const decimalSpecifier = (decimals === undefined) ? "" : String(decimals);
-  const format = `{v${decimalSpecifier}} {qs}`;
-
-  return (number) => Format.format(Number(number), { format, base, quote })
-};
-
-
-
-/**
- * We want to return a handler for each data source. The handler
- * polls the API in periodic intervals and calls onUpdate and
- * onUpdateStart methods.
- *
- * Some URLs respond with data for many different indicators, others
- * have different URLs for each poll request. Thus we request a handler
- * id for each set of query options
- */
-const Handler = new Lang.Class({
-  Name: "Handler",
-
-  _init(id, options, poll, interval) {
-    this.disabled = false;
-
-    if ((!interval) || (interval < 1)) {
-      throw new Error("invalid interval " + interval);
-    }
-
-    this._id = id;
-
-    const loop = () => {
-      this.emit("update-start");
-
-      poll(options, (error, data) => {
-        if (this.disabled) {
-          return;
-        }
-
-        if (error) {
-          logError(error);
-        }
-
-        this._lastError = error;
-        this._lastData = data;
-        this.emit("update", error, data);
-
-        if (HTTP.isErrTooManyRequests(error)) {
-          log("http error: too many requests: disable handler " + id);
-          this.disabled = true;
-        }
-      });
-
-      if (!this.disabled) {
-        this._signalTimeout = Mainloop.timeout_add_seconds(
-          interval, loop
-        );
-      }
-    };
-
-    Mainloop.idle_add(loop);
-  },
-
-  destroy() {
-    if (this._signalTimeout) {
-      Mainloop.source_remove(this._signalTimeout);
-    }
-
-    this.disconnectAll();
-  }
-});
-Signals.addSignalMethods(Handler.prototype);
 
 
 /**
@@ -141,64 +15,60 @@ const Api = new Lang.Class({
   Name: "BaseApi",
 
   _init() {
-    this._urlHandlers = {};
-    this._update = undefined;
+    this.permanentError = null;
+    this.lastUpdate = -Infinity;
+    this.tickers = [];
   },
 
-  poll(options, callback) {
-    const url = this.getUrl(options);
-    HTTP.getJSON(url)
-      .then((data) => callback(null, data))
-      .catch((error) => callback(error, null));
+  getLabel({base, quote}) {
+    return `${this.apiName} ${base}/${quote}`;
   },
 
-  _getHandlerId(options) {
-    /**
-     * default case: each poll URL gets a separate handler. This doesn't
-     * work so well if the url needs to be dynamic (MtGox nonce)
-     */
-    return this.getUrl(options);
+  fetch(url) {
+    return new Promise((resolve, reject) => {
+      if (this.permanentError) {
+        return reject(this.permanentError);
+      }
+
+      return HTTP.getJSON(url)
+        .then(data => resolve(data))
+        .catch(err => {
+          if (HTTP.isErrTooManyRequests(err)) {
+            this.permanentError = err;
+          }
+          return reject(err)
+        });
+    });
   },
 
-  getHandler(options) {
-    const id = this._getHandlerId(options);
-    let handler = this._urlHandlers[id];
+  _getTickerInstance(ticker) {
+    const equalArray = (arr1, arr2) =>
+      arr1.length === arr2.length && arr1.every((v, i) => v === arr2[i]);
 
-    if (handler === undefined) {
-      handler = this._urlHandlers[id] =
-        new Handler(
-          id, options, this.poll.bind(this), this.interval
-        );
+    const equalObjects = (obj1, obj2) => {
+      const keys1 = Object.keys(obj1).sort();
+      const keys2 = Object.keys(obj2).sort();
+      return equalArray(keys1, keys2) &&
+        equalArray(keys1.map(k => obj1[k]), keys1.map(k => obj2[k]))
     }
 
-    return handler;
-  },
-
-  getFormatter(options) {
-    if (this.attributes[options.attribute]) {
-      return this.attributes[options.attribute](options);
-    } else {
-      throw new Error("unknown attribute: " + options.attribute);
+    const match = this.tickers.find(t => equalObjects(t, ticker));
+    if (match) {
+      return match;
     }
+    this.tickers.push(ticker);
+    return ticker;
   },
 
-  getModel(options) {
-    return new IndicatorModel(
-      options,
-      this.getHandler(options),
-      this.getFormatter(options)
-    );
+  getTicker({ base, quote, attribute }) {
+    return this._getTickerInstance({ base, quote, attribute });
   },
 
-  getLabel({api, currency}) {
-    return api + " " + currency;
-  },
-
-  destroy() {
-    // eslint-disable-next-line
-    for (let key in this._urlHandlers) {
-      this._urlHandlers[key].destroy();
+  parseData(data, ticker) {
+    if (ticker.attribute === "last") {
+      return this.getLast(data, ticker);
     }
+    throw new Error(`unknown attribute ${ticker.attribute}`);
   }
 });
 

@@ -16,8 +16,8 @@ const INDICATORS_KEY = "indicators";
 
 const Defaults = {
   api: "bitcoinaverage",
-  coin: "BTC",
-  currency: "USD",
+  base: "BTC",
+  quote: "USD",
   attribute: "last",
   show_change: true,
   format: "{v} {qs}"
@@ -31,26 +31,11 @@ const ConfigModel = new Lang.Class({
   },
 
   set(key, value) {
-    // legacy support
-    if (key === "base") {
-      return this.set("coin", value);
-    }
-
-    if (key === "quote") {
-      return this.set("currency", value);
-    }
-
     this.attributes[key] = value;
     this.emit("update", key, value);
   },
 
   get(key) {
-    if (key === "base") {
-      return this.get("coin");
-    }
-    if (key === "quote") {
-      return this.get("currency");
-    }
     if (key in this.attributes) {
       return this.attributes[key];
     }

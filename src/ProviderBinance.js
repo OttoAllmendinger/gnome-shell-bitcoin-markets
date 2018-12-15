@@ -10,36 +10,17 @@ const Api = new Lang.Class({
 
   apiName: "Binance",
 
-  currencies: ["USDT"],
+  apiDocs: [
+    ["API Docs", "https://www.binance.com/restapipub.html"]
+  ],
 
-  coins: ["BTC", "LTC", "ETH", "BNB", "BCC", "NEO"],
-
-  /* I couldn't find any limitations
-   *
-   * https://www.binance.com/restapipub.html
-   *
-   */
   interval: 15,
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-
-      return {
-        text: (data) => renderCurrency(data.price),
-        change: (data) => renderChange(data.price)
-      };
-    }
+  getUrl({ base, quote }) {
+    return `https://api.binance.com/api/v3/ticker/price?symbol=${base}${quote}`;
   },
 
-  getLabel(options) {
-    return "Binance " + options.currency + "/" + options.coin;
-  },
-
-  getUrl(options) {
-    const coin = BaseProvider.baseCoin(options.coin);
-    return "https://api.binance.com/api/v3/ticker/price?symbol=" +
-      coin.toUpperCase() + options.currency.toUpperCase();
+  getLast({ price }) {
+    return price;
   }
 });

@@ -4,64 +4,33 @@ const Local = imports.misc.extensionUtils.getCurrentExtension();
 const BaseProvider = Local.imports.BaseProvider;
 
 
-// horrific api
-// curl https://api.kraken.com/0/public/AssetPairs | jq '.[] | keys'
-const getPairCode = (coin, currency) => {
-  coin = coin.toUpperCase()
-  currency = currency.toUpperCase()
-  if (coin.toUpperCase() === "BTC") {
-    coin = "XBT";
-  }
-  const unprefixed = ["BCH", "DASH", "EOS", "GNO"];
-  if (unprefixed.includes(coin)) {
-    return `${coin}${currency}`;
-  } else {
-    return `X${coin}Z${currency}`;
-  }
-}
-
 const Api = new Lang.Class({
   Name: "Kraken.Api",
   Extends: BaseProvider.Api,
 
   apiName: "Kraken",
 
-  currencies: ["USD", "EUR"],
-
-  coins: [
-    "BTC",
-    "BCH",
-    "DASH",
-    "ETH",
-    "LTC",
-    "ZEC",
-    "XMR",
-    "REP",
-    "XRP",
-    "ETC"
+  apiDocs: [
+    ["API Docs", "https://www.kraken.com/help/api#public-market-data"],
+    ["Asset Pairs (JSON)", "https://api.kraken.com/0/public/AssetPairs"]
   ],
 
   interval: 10, // unknown, guessing
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-      const { coin, currency } = options;
-      const id = getPairCode(coin, currency);
-      return {
-        text: ({result}) => renderCurrency(result[id].a[0]),
-        change: ({result}) => renderChange(result[id].a[0])
-      };
+  getUrl({ base, quote }) {
+    return `https://api.kraken.com/0/public/Ticker?pair=${base}${quote}`;
+  },
+
+  getLast({ result, error }, { base, quote }) {
+    if (error && error.length) {
+      throw new Error(error[0]);
     }
-  },
 
-  getLabel({coin, currency}) {
-    return "Kraken " + currency + "/" + coin;
-  },
+    const pair = `${base}${quote}`;
+    if (pair in result) {
+      return result[pair].c[0];
+    }
 
-  getUrl({coin, currency}) {
-    return "https://api.kraken.com/0/public/Ticker?pair=" +
-      getPairCode(coin, currency);
+    throw new Error(`no data for pair ${pair}`);
   }
 });

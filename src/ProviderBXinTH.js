@@ -10,43 +10,28 @@ const Api = new Lang.Class({
 
   apiName: "BX.in.th",
 
-  currencies: ["THB"],
-
-  coins: ["BTC", "mBTC", "ETH", "DAS", "REP", "GNO", "OMG", "EVX", "XRP"], //?
+  apiDocs: [
+    ["API Docs", "https://bx.in.th/info/api/"],
+    ["Pairings (JSON)", "https://bx.in.th/api/pairing/"]
+  ],
 
   interval: 60, // unclear, should be safe
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-      const find = (currency, coin, tickerObj) => {
-        let result = {
-          "last_price": 0,
-          "change": 0
-        }
-        Object.keys(tickerObj).forEach((k) => {
-          const current = tickerObj[k];
-          if (current["primary_currency"] === currency && current["secondary_currency"] === coin) {
-            result = current;
-          }
-        });
-        return result;
-      };
-      const coin = BaseProvider.baseCoin(options.coin);
-
-      return {
-        text: (data) => renderCurrency(find(options.currency, coin, data)["last_price"]),
-        change: (data) => renderChange(find(options.currency, coin, data)["change"])
-      };
-    }
-  },
-
-  getLabel(options) {
-    return "BXinTH " + options.currency + "/" + options.coin;
-  },
-
   getUrl(options) {
     return "https://bx.in.th/api/";
+  },
+
+  getLast(data, { base, quote }) {
+    const result = Object.keys(data).map(k => data[k])
+      .find(
+        ({ primary_currency, secondary_currency }) =>
+          (primary_currency === quote && secondary_currency === base)
+      );
+
+    if (!result) {
+      throw new Error(`could not find pair ${base}/${quote}`)
+    }
+
+    return result.last_price;
   }
 });

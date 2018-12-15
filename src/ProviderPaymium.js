@@ -10,29 +10,24 @@ const Api = new Lang.Class({
 
   apiName: "Paymium",
 
-  currencies: ["EUR"],
-
-  coins: ["BTC", "mBTC"],
+  apiDocs: [
+    ["API Docs", "https://github.com/Paymium/api-documentation#ticker"]
+  ],
 
   interval: 60, // unclear, should be safe
 
-  attributes: {
-    last(options) {
-      const renderCurrency = BaseProvider.CurrencyRenderer(options);
-      const renderChange = BaseProvider.ChangeRenderer();
-
-      return {
-        text: (data) => renderCurrency(data["price"]),
-        change: (data) => renderChange(data["price"])
-      };
+  getUrl({ base, quote }) {
+    if (quote === "BTC") {
+      // returns some garbage
+      throw new Error(`invalid quote ${quote}`);
     }
+    return `https://paymium.com/api/v1/data/${quote}/ticker`.toLowerCase();
   },
 
-  getLabel(options) {
-    return "Paymium " + options.currency + "/" + options.coin;
-  },
-
-  getUrl(options) {
-    return "https://paymium.com/api/v1/data/" + options.currency.toLowerCase() + "/ticker";
+  getLast({ price }, { base }) {
+    if (base !== "BTC") {
+      throw new Error(`invalid base ${base}`);
+    }
+    return price;
   }
 });
