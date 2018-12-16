@@ -59,6 +59,8 @@ On most systems you can use `journalctl /usr/bin/gnome-shell -f` to get log outp
 * https://github.com/plehatron -- CEX.io support
 * https://github.com/h6w - BTCMarkets.net support
 * https://github.com/vecr25 - Binance support
+* https://github.com/joaoescribano - CoinGecko support
+* https://github.com/volandku - BitMEX support
 
 ## TODO
 
