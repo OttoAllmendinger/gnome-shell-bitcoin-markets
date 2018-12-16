@@ -23,7 +23,8 @@ const {
   ProviderBXinTH,
   ProviderPaymium,
   ProviderBitso,
-  ProviderBTCMarkets
+  ProviderBTCMarkets,
+  ProviderBitMEX,
 } = Local.imports;
 
 
@@ -44,6 +45,7 @@ const Providers = {
   paymium: new ProviderPaymium.Api(),
   bitso: new ProviderBitso.Api(),
   btcmarkets: new ProviderBTCMarkets.Api(),
+  bitmex: new ProviderBitMEX.Api(),
 };
 
 const getProvider = (name) => {
