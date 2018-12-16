@@ -11,20 +11,20 @@ const HTTP = Local.imports.HTTP;
 const {
   ProviderBinance,
   ProviderBitcoinAverage,
-  ProviderBitstamp,
   ProviderBitfinex,
-  ProviderPoloniex,
+  ProviderBitMEX,
+  ProviderBitPay,
+  ProviderBitso,
+  ProviderBitstamp,
+  ProviderBTCMarkets,
+  ProviderBXinTH,
   ProviderCexio,
   ProviderCoinbase,
   ProviderCoinGecko,
   ProviderCoinMarketCap,
-  ProviderBitPay,
   ProviderKraken,
-  ProviderBXinTH,
   ProviderPaymium,
-  ProviderBitso,
-  ProviderBTCMarkets,
-  ProviderBitMEX,
+  ProviderPoloniex,
 } = Local.imports;
 
 
@@ -32,20 +32,20 @@ const {
 const Providers = {
   binance: new ProviderBinance.Api(),
   bitcoinaverage: new ProviderBitcoinAverage.Api(),
-  bitstamp: new ProviderBitstamp.Api(),
   bitfinex: new ProviderBitfinex.Api(),
-  poloniex: new ProviderPoloniex.Api(),
+  bitmex: new ProviderBitMEX.Api(),
   bitpay: new ProviderBitPay.Api(),
-  kraken: new ProviderKraken.Api(),
+  bitso: new ProviderBitso.Api(),
+  bitstamp: new ProviderBitstamp.Api(),
+  btcmarkets: new ProviderBTCMarkets.Api(),
+  bxinth: new ProviderBXinTH.Api(),
   cexio: new ProviderCexio.Api(),
   coinbase: new ProviderCoinbase.Api(),
   coingecko: new ProviderCoinGecko.Api(),
   coinmarketcap: new ProviderCoinMarketCap.Api(),
-  bxinth: new ProviderBXinTH.Api(),
+  kraken: new ProviderKraken.Api(),
   paymium: new ProviderPaymium.Api(),
-  bitso: new ProviderBitso.Api(),
-  btcmarkets: new ProviderBTCMarkets.Api(),
-  bitmex: new ProviderBitMEX.Api(),
+  poloniex: new ProviderPoloniex.Api(),
 };
 
 const getProvider = (name) => {
@@ -266,3 +266,14 @@ const setSubscribers = (subscribers) => {
 
   _pollLoops.forEach(loop => loop.setSubscribers(subscribers));
 };
+
+
+const dumpProvidersToStdout = () => {
+  if (dumpProvidersToStdout) {
+    Object.keys(Providers).forEach((key) => {
+      print(`* ${getProvider(key).apiName}`);
+    });
+  }
+}
+
+// dumpProvidersToStdout();

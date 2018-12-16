@@ -6,21 +6,21 @@ Displays Bitcoin and Altcoin market information in the Gnome Shell.
 Available APIs:
 
 * Binance
-* BitcoinAverage.com
-* BitStamp
+* BitcoinAverage
 * Bitfinex
+* BitMEX
 * BitPay
-* Poloniex
+* Bitso
+* Bitstamp
+* BTCMarkets
+* BX.in.th
 * CEX.IO
 * Coinbase
-* BX.in.th
+* CoinGecko
+* CoinMarketCap
 * Kraken
 * Paymium
-* BTCChina
-* Bitso
-* WEX
-* BTCMarkets.net
-* Binance
+* Poloniex
 
 
 ## Installation
