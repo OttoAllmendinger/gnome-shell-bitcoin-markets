@@ -91,11 +91,24 @@ const getJSON = (url, params) => {
           return reject(err);
         }
 
+        if (!("response_body" in message)) {
+          return reject(new Error(`GET ${url}: message.response_body not defined`));
+        }
+
+        const { response_body } = message;
+
+        if (!("data" in response_body)) {
+          return reject(new Error(`GET ${url}: response_body.data not defined`));
+        }
+
+        const { data } = message.response_body;
+
         try {
-          const data = JSON.parse(message.response_body.data);
-          return resolve(data);
+          return resolve(JSON.parse(message.response_body.data));
         } catch (e) {
-          return reject(new Error(`GET ${url}: error parsing JSON: ${e}`));
+          return reject(new Error(
+            `GET ${url}: error parsing as JSON: ${e}; data=${JSON.stringify(data)}`
+          ));
         }
       }
     );
