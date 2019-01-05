@@ -11,20 +11,25 @@ const Api = new Lang.Class({
   apiName: "Coinbase",
 
   apiDocs: [
-    ["API Docs", "https://developers.coinbase.com/docs/wallet/guides/price-data"]
+    ["API Docs", "https://developers.coinbase.com/api/v2#exchange-rates"]
   ],
 
   interval: 60, // unclear, should be safe
 
-  getUrl(options) {
-    return "https://coinbase.com/api/v1/currencies/exchange_rates";
+  getUrl({ base }) {
+    base = base.toUpperCase();
+    return `https://api.coinbase.com/v2/exchange-rates?currency=${base}`;
   },
 
-  getLast(data, { base, quote }) {
-    const pair = `${base}_to_${quote}`.toLowerCase();
-    if (pair in data) {
-      return data[pair];
+  getLast(data, { quote }) {
+    const { rates } = data.data;
+    if (!rates) {
+      throw new Error("invalid response");
     }
-    throw new Error(`no such pair ${pair}`);
+    quote = quote.toUpperCase();
+    if (!(quote in rates)) {
+      throw new Error(`no data for quote ${quote}`);
+    }
+    return rates[quote];
   }
 });
