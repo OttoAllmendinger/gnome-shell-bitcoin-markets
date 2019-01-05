@@ -191,12 +191,14 @@ function PollLoop(provider) {
     },
 
     updateUrl(url, cache) {
-      const urlSubscribers = filterSubscribers(this.subscribers, { url });
-      const tickers = new Set(urlSubscribers.map(getSubscriberTicker));
+      const getUrlSubscribers = () =>
+        filterSubscribers(this.subscribers, { url });
+
+      const tickers = new Set(getUrlSubscribers().map(getSubscriberTicker));
 
       const processResponse = (response, date) => {
         tickers.forEach(ticker => {
-          const tickerSubscribers = filterSubscribers(urlSubscribers, { ticker });
+          const tickerSubscribers = filterSubscribers(getUrlSubscribers(), { ticker });
           try {
             const priceData = this.priceData.addValue(
               ticker, date, this.provider.parseData(response, ticker)
@@ -214,7 +216,7 @@ function PollLoop(provider) {
         return processResponse(cache.response, cache.date);
       }
 
-      applySubscribers(urlSubscribers, s => s.onUpdateStart());
+      applySubscribers(getUrlSubscribers(), s => s.onUpdateStart());
 
       this.provider.fetch(url)
         .then(response => {
@@ -224,7 +226,7 @@ function PollLoop(provider) {
         })
         .catch(e => {
           logError(e);
-          applySubscribers(urlSubscribers, s => s.onUpdateError(e));
+          applySubscribers(getUrlSubscribers(), s => s.onUpdateError(e));
           this.cache.delete(url);
         });
     },
