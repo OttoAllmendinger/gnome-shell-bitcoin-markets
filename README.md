@@ -18,6 +18,7 @@ Available APIs:
 * Coinbase
 * CoinGecko
 * CoinMarketCap
+* CryptoCompare
 * Kraken
 * Paymium
 * Poloniex
@@ -61,6 +62,7 @@ On most systems you can use `journalctl /usr/bin/gnome-shell -f` to get log outp
 * https://github.com/vecr25 - Binance support
 * https://github.com/joaoescribano - CoinGecko support
 * https://github.com/volandku - BitMEX support
+* https://github.com/HawtDogFlvrWtr - CryptoCompare support
 
 ## TODO
 

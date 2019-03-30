@@ -21,12 +21,10 @@ const Api = new Lang.Class({
   },
 
   getLast(data, { quote }) {
-    const last = `${quote}`;
-
-    if (!data[last]) {
-      throw new Error(`no data for quote ${last}`);
+    if (!(quote in data)) {
+      throw new Error(`no data for quote ${quote}`);
     }
 
-    return data[last];
+    return data[quote];
   }
 });
