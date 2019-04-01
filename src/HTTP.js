@@ -91,7 +91,7 @@ const getJSON = (url, params) => {
           return reject(err);
         }
 
-        if (!("response_body" in message)) {
+        if (message.response_body === undefined) {
           return reject(new Error(`GET ${url}: message.response_body not defined`));
         }
 
