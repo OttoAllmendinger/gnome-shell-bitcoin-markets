@@ -16,6 +16,7 @@ const {
   ProviderBitPay,
   ProviderBitso,
   ProviderBitstamp,
+  ProviderBlinktrade,
   ProviderBTCMarkets,
   ProviderBXinTH,
   ProviderCexio,
@@ -28,8 +29,6 @@ const {
   ProviderPoloniex,
 } = Local.imports;
 
-
-
 const Providers = {
   binance: new ProviderBinance.Api(),
   bitcoinaverage: new ProviderBitcoinAverage.Api(),
@@ -38,6 +37,7 @@ const Providers = {
   bitpay: new ProviderBitPay.Api(),
   bitso: new ProviderBitso.Api(),
   bitstamp: new ProviderBitstamp.Api(),
+  blinktrade: new ProviderBlinktrade.Api(),
   btcmarkets: new ProviderBTCMarkets.Api(),
   bxinth: new ProviderBXinTH.Api(),
   cexio: new ProviderCexio.Api(),
