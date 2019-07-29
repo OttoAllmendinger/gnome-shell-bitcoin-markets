@@ -12,7 +12,7 @@ Available APIs:
 * BitPay
 * Bitso
 * Bitstamp
-* Blinktrade (Bitcambio)
+* Blinktrade
 * BTCMarkets
 * BX.in.th
 * CEX.IO

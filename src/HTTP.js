@@ -104,7 +104,7 @@ const getJSON = (url, params) => {
         const { data } = message.response_body;
 
         try {
-          return resolve(JSON.parse(message.response_body.data));
+          return resolve(JSON.parse(data));
         } catch (e) {
           return reject(new Error(
             `GET ${url}: error parsing as JSON: ${e}; data=${JSON.stringify(data)}`
