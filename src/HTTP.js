@@ -66,25 +66,26 @@ const getClientId = () => {
 
 const _clientId = getClientId();
 
-const _httpSession = new Soup.SessionAsync();
-
-
-_httpSession["user-agent"] = _userAgent;
-
-Soup.Session.prototype.add_feature.call(
-  _httpSession,
-  new Soup.ProxyResolverDefault()
-);
+const getSession = () => {
+  const session = new Soup.SessionAsync();
+  session["user-agent"] = _userAgent;
+  Soup.Session.prototype.add_feature.call(
+    session,
+    new Soup.ProxyResolverDefault()
+  );
+  return session;
+}
 
 const cache = new Map();
 
 const getJSON = (url, params) => {
+  const session = getSession();
   const message = Soup.Message.new("GET", url);
   const headers = message.request_headers;
   headers.append("X-Client-Id", _clientId);
   // log(`> GET ${url}`);
   return new Promise((resolve, reject) => {
-    _httpSession.queue_message(
+    session.queue_message(
       message,
       (session, message) => {
         // log(`< GET ${url}: ${message.status_code}`);
