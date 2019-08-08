@@ -5,15 +5,18 @@ const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Config = imports.misc.config;
 
 function HTTPError(soupMessage, error) {
-    this.name = "HTTPError";
-    this.soupMessage = soupMessage;
-    this.stack = (new Error()).stack;
+  this.name = "HTTPError";
+  this.soupMessage = soupMessage;
+  this.stack = (new Error()).stack;
 
-    this.toString = () =>
-        "method=" + this.soupMessage.method +
-        " uri=" + this.soupMessage.uri.to_string(false /* short */) +
-        " status_code=" + this.soupMessage.status_code +
-        " reason_phrase= " + this.soupMessage.reason_phrase;
+  this.format = (sep = " ") => [
+      "status_code=" + this.soupMessage.status_code,
+      "reason_phrase=" + this.soupMessage.reason_phrase,
+      "method=" + this.soupMessage.method,
+      "uri=" + this.soupMessage.uri.to_string(false /* short */),
+  ].join(sep);
+
+  this.toString = () => this.format();
 }
 
 HTTPError.prototype = Object.create(Error.prototype);

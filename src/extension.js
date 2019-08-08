@@ -26,7 +26,7 @@ const ApiService = Local.imports.ApiService;
 
 const Convenience = Local.imports.convenience;
 
-const { Format } = Local.imports;
+const { Format, HTTP } = Local.imports;
 const { Defaults } = Local.imports.IndicatorCollectionModel;
 
 
@@ -180,9 +180,13 @@ const MarketIndicatorView = new Lang.Class({
   _updatePopupItemLabel(err) {
     let text = this.providerLabel;
     if (err) {
-      text += "\n\n" + String(err);
+      text += "\n\n" + (
+        (err instanceof HTTP.HTTPError)
+          ? err.format("\n\n")
+          : String(err)
+      );
     }
-    this._popupItemStatus.label.text = text;
+    this._popupItemStatus.label.clutter_text.set_markup(text);
   },
 
   destroy() {
