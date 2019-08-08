@@ -3,6 +3,7 @@ const Soup = imports.gi.Soup;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const Config = imports.misc.config;
+const Mainloop = imports.mainloop;
 
 function HTTPError(soupMessage, error) {
   this.name = "HTTPError";
@@ -66,6 +67,9 @@ const getClientId = () => {
 
 const _clientId = getClientId();
 
+const _testDelayMs = 0;
+const _timeoutMs = 30000;
+
 const getSession = () => {
   const session = new Soup.SessionAsync();
   session["user-agent"] = _userAgent;
@@ -76,45 +80,58 @@ const getSession = () => {
   return session;
 }
 
-const cache = new Map();
 
 const getJSON = (url, params) => {
+  if (_testDelayMs) {
+    url = `http://slowwly.robertomurray.co.uk/delay/${_testDelayMs}/url/${url}`;
+  }
+
   const session = getSession();
   const message = Soup.Message.new("GET", url);
   const headers = message.request_headers;
   headers.append("X-Client-Id", _clientId);
   // log(`> GET ${url}`);
-  return new Promise((resolve, reject) => {
-    session.queue_message(
-      message,
-      (session, message) => {
-        // log(`< GET ${url}: ${message.status_code}`);
-        if (message.status_code !== 200) {
-          const err = new HTTPError(message);
-          logError(err);
-          return reject(err);
+  return Object.assign(
+    new Promise((resolve, reject) => {
+      session.queue_message(
+        message,
+        (session, message) => {
+          // log(`< GET ${url}: ${message.status_code}`);
+          if (message.status_code !== 200) {
+            const err = new HTTPError(message);
+            logError(err);
+            return reject(err);
+          }
+
+          if (message.response_body === undefined) {
+            return reject(new Error(`GET ${url}: message.response_body not defined`));
+          }
+
+          const { response_body } = message;
+
+          if (!("data" in response_body)) {
+            return reject(new Error(`GET ${url}: response_body.data not defined`));
+          }
+
+          const { data } = message.response_body;
+
+          try {
+            return resolve(JSON.parse(data));
+          } catch (e) {
+            return reject(new Error(
+              `GET ${url}: error parsing as JSON: ${e}; data=${JSON.stringify(data)}`
+            ));
+          }
         }
+      );
 
-        if (message.response_body === undefined) {
-          return reject(new Error(`GET ${url}: message.response_body not defined`));
-        }
+      Mainloop.timeout_add(_timeoutMs, () => session.abort());
+    }),
 
-        const { response_body } = message;
-
-        if (!("data" in response_body)) {
-          return reject(new Error(`GET ${url}: response_body.data not defined`));
-        }
-
-        const { data } = message.response_body;
-
-        try {
-          return resolve(JSON.parse(data));
-        } catch (e) {
-          return reject(new Error(
-            `GET ${url}: error parsing as JSON: ${e}; data=${JSON.stringify(data)}`
-          ));
-        }
+    {
+      cancel() {
+        session.abort();
       }
-    );
-  });
+    }
+  );
 };

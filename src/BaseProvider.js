@@ -18,6 +18,7 @@ const Api = new Lang.Class({
     this.permanentError = null;
     this.lastUpdate = -Infinity;
     this.tickers = [];
+    this.pendingRequest = null;
   },
 
   getLabel({base, quote}) {
@@ -30,14 +31,21 @@ const Api = new Lang.Class({
         return reject(this.permanentError);
       }
 
-      return HTTP.getJSON(url)
+      if (this.pendingRequest) {
+        this.pendingRequest.cancel();
+      }
+
+      this.pendingRequest = HTTP.getJSON(url);
+
+      return this.pendingRequest
         .then(data => resolve(data))
         .catch(err => {
           if (HTTP.isErrTooManyRequests(err)) {
             this.permanentError = err;
           }
-          return reject(err)
-        });
+          return reject(err);
+        })
+        .finally(() => this.pendingRequest = null);
     });
   },
 
