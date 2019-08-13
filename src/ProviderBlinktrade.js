@@ -18,9 +18,13 @@ const Api = new Lang.Class({
     base = base.toUpperCase();
     quote = quote.toUpperCase();
 
+    const host =
+      (quote === "BRL")
+        ? "bitcambio_api.blinktrade.com"
+        : "api.blinktrade.com";
+
     return (
-      `https://api.blinktrade.com/api/v1/${quote}/` +
-      `ticker?crypto_currency=${base}`
+      `https://${host}/api/v1/${quote}/ticker?crypto_currency=${base}`
     );
   },
 
