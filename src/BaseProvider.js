@@ -38,14 +38,19 @@ const Api = new Lang.Class({
       this.pendingRequest = HTTP.getJSON(url);
 
       return this.pendingRequest
-        .then(data => resolve(data))
+        .then(data => {
+          this.pendingRequest = null;
+          resolve(data);
+        })
         .catch(err => {
+          this.pendingRequest = null;
           if (HTTP.isErrTooManyRequests(err)) {
             this.permanentError = err;
           }
           return reject(err);
-        })
-        .finally(() => this.pendingRequest = null);
+        });
+        // not supported in Gnome 3.24
+        // .finally(() => this.pendingRequest = null);
     });
   },
 
