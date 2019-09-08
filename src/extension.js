@@ -90,7 +90,7 @@ const MarketIndicatorView = new Lang.Class({
     layout.add_actor(this._statusView);
     layout.add_actor(this._indicatorView);
 
-    this.actor.add_actor(layout);
+    (("actor" in this) ? this.actor : this).add_actor(layout);
 
     this._popupItemStatus = new PopupMenu.PopupMenuItem(
       "", {activate: false, hover: false, can_focus: false}
