@@ -27,6 +27,7 @@ const {
   ProviderKraken,
   ProviderPaymium,
   ProviderPoloniex,
+  ProviderSatangPro,
 } = Local.imports;
 
 const Providers = {
@@ -48,6 +49,7 @@ const Providers = {
   kraken: new ProviderKraken.Api(),
   paymium: new ProviderPaymium.Api(),
   poloniex: new ProviderPoloniex.Api(),
+  satangpro: new ProviderSatangPro.Api(),
 };
 
 const getProvider = (name) => {
