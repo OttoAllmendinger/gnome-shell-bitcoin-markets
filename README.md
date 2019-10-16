@@ -66,6 +66,7 @@ On most systems you can use `journalctl /usr/bin/gnome-shell -f` to get log outp
 * https://github.com/volandku - BitMEX support
 * https://github.com/HawtDogFlvrWtr - CryptoCompare support
 * https://github.com/jpereira - Blinktrade support
+* https://github.com/rossigee - BX.in.th and Satang.pro support
 
 ## TODO
 
