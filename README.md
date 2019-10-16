@@ -23,6 +23,7 @@ Available APIs:
 * Kraken
 * Paymium
 * Poloniex
+* Satang.pro
 
 
 ## Installation
