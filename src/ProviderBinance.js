@@ -11,7 +11,7 @@ const Api = new Lang.Class({
   apiName: "Binance",
 
   apiDocs: [
-    ["API Docs", "https://www.binance.com/restapipub.html"]
+    ["API Docs", "https://binance-docs.github.io/apidocs/spot/en/#symbol-price-ticker"]
   ],
 
   interval: 15,
