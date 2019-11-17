@@ -166,7 +166,7 @@ const BaseProviderConfigView = new Lang.Class({
 
     const helpText = apiDocs.map(
       ([label, url]) => `<a href="${url}">${label}</a>`
-    ).join(`, `);
+    ).join(", ");
 
     this._addRow(_("Help"), new Gtk.Label({
       label: helpText, use_markup: true,
