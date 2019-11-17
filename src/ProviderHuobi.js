@@ -17,11 +17,12 @@ const Api = new Lang.Class({
   interval: 15,
 
   getUrl({ base, quote }) {
-    return `https://api.huobi.pro/market/detail/merged?symbol=${base}${quote}`.toLowerCase();
+    return "https://api.huobi.pro/market/detail/" +
+      `merged?symbol=${base}${quote}`.toLowerCase();
   },
 
   getLast(data) {
-    if (data["status"] == "error") {
+    if (data["status"] === "error") {
       throw new Error(data["err-msg"]);
     }
 
