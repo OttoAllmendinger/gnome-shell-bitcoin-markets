@@ -29,6 +29,7 @@ const {
   ProviderPaymium,
   ProviderPoloniex,
   ProviderSatangPro,
+  ProviderVccExchange,
 } = Local.imports;
 
 const Providers = {
@@ -52,6 +53,7 @@ const Providers = {
   paymium: new ProviderPaymium.Api(),
   poloniex: new ProviderPoloniex.Api(),
   satangpro: new ProviderSatangPro.Api(),
+  vccexchange: new ProviderVccExchange.Api(),
 };
 
 const getProvider = (name) => {
