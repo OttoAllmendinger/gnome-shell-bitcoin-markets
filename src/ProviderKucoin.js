@@ -18,7 +18,8 @@ const Api = new Lang.Class({
         base,
         quote
     }) {
-        return `https://openapi-v2.kucoin.com/api/v1/market/orderbook/level1?symbol=${base}-${quote}`
+      return "https://openapi-v2.kucoin.com/api/v1/market/orderbook/" +
+        `level1?symbol=${base}-${quote}`
     },
 
     getLast({
