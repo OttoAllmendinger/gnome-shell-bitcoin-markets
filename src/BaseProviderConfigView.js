@@ -5,7 +5,7 @@ const GObject = imports.gi.GObject;
 const Signals = imports.signals;
 const Mainloop = imports.mainloop;
 
-const Gettext = imports.gettext.domain("bitcoin-markets");
+const Gettext = imports.gettext.domain("gnome-shell-bitcoin-markets");
 const _ = Gettext.gettext;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();

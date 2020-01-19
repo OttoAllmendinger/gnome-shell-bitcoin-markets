@@ -2,7 +2,7 @@ const Lang = imports.lang;
 const Signals = imports.signals;
 
 const Gtk = imports.gi.Gtk;
-const Gettext = imports.gettext.domain("bitcoin-markets");
+const Gettext = imports.gettext.domain("gnome-shell-bitcoin-markets");
 const _ = Gettext.gettext;
 
 const Local = imports.misc.extensionUtils.getCurrentExtension();

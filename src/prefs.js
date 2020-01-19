@@ -7,7 +7,7 @@ const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 const Signals = imports.signals;
 
-const Gettext = imports.gettext.domain("bitcoin-markets");
+const Gettext = imports.gettext.domain("gnome-shell-bitcoin-markets");
 const _ = Gettext.gettext;
 const N_ = (e) => e;
 

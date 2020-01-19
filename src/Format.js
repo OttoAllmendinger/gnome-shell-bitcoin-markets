@@ -1,4 +1,4 @@
-const Gettext = imports.gettext.domain("bitcoin-markets");
+const Gettext = imports.gettext.domain("gnome-shell-bitcoin-markets");
 const _ = Gettext.gettext;
 const Local = imports.misc.extensionUtils.getCurrentExtension();
 const { CurrencyData } = Local.imports.CurrencyData;
