@@ -11,7 +11,11 @@ const Api = new Lang.Class({
   apiName: "Binance Futures",
 
   apiDocs: [
-    ["API Docs", "https://binance-docs.github.io/apidocs/futures/en/#24hr-ticker-price-change-statistics-market_data"]
+    [
+      "API Docs",
+      "https://binance-docs.github.io/apidocs/futures/en/" +
+      "#24hr-ticker-price-change-statistics-market_data"
+    ]
   ],
 
   interval: 15,
