@@ -279,7 +279,7 @@ const IndicatorCollection = new Lang.Class({
       this._indicators = indicators;
     }
 
-    ApiService.setSubscribers(this._indicators);
+    ApiService.setSubscribers(this._indicators.filter(i => i.options));
   },
 
   _removeAll() {

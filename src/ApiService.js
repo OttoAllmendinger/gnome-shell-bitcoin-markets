@@ -11,7 +11,6 @@ const HTTP = Local.imports.HTTP;
 const {
   ProviderBinance,
   ProviderBinanceFutures,
-  ProviderBitcoinAverage,
   ProviderBitfinex,
   ProviderBitMEX,
   ProviderBitPay,
@@ -39,7 +38,6 @@ const {
 const Providers = {
   binance: new ProviderBinance.Api(),
   binanceFutures: new ProviderBinanceFutures.Api(),
-  bitcoinaverage: new ProviderBitcoinAverage.Api(),
   bitfinex: new ProviderBitfinex.Api(),
   bitmex: new ProviderBitMEX.Api(),
   bitpay: new ProviderBitPay.Api(),

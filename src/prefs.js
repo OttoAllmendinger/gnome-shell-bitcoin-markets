@@ -18,7 +18,6 @@ const {
   Format,
   ApiService,
   BaseProviderConfigView,
-  ProviderBitcoinAveragePrefs,
 } = Local.imports;
 
 const {
@@ -93,13 +92,8 @@ const IndicatorConfigView = new Lang.Class({
     }
 
     try {
-      if (api === "bitcoinaverage") {
-        this._apiConfigView =
-          new ProviderBitcoinAveragePrefs.ConfigView(widget, config);
-      } else {
-        this._apiConfigView =
-          new BaseProviderConfigView.BaseProviderConfigView(api, widget, config);
-      }
+      this._apiConfigView =
+        new BaseProviderConfigView.BaseProviderConfigView(api, widget, config);
     } catch (e) {
       e.message = `Error creating configView for api ${api}: ${e.message}`;
       logError(e);

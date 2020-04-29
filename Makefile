@@ -10,6 +10,3 @@ update_dependencies:
 	git submodule update --init
 
 -include gselib/make/gnome-shell-extension.mk
-
-exchange_data:
-	gjs tools/MakeExchangeData.js > src/ProviderBitcoinAverageExchangeData.js
