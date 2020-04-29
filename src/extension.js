@@ -1,10 +1,6 @@
 /*jshint moz:true */
 // vi: sw=2 sts=2 et
 
-// const Gdk = imports.gi.Gdk;
-// const Gio = imports.gi.Gio;
-// const GLib = imports.gi.GLib;
-// const GnomeDesktop = imports.gi.GnomeDesktop;
 const Lang = imports.lang;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
@@ -28,6 +24,9 @@ const Convenience = Local.imports.convenience;
 
 const { Format, HTTP } = Local.imports;
 const { Defaults } = Local.imports.IndicatorCollectionModel;
+
+const version = Local.imports.gselib.version.currentVersion();
+const { openPrefs } = Local.imports.gselib.openPrefs;
 
 
 const INDICATORS_KEY = "indicators";
@@ -104,15 +103,7 @@ const MarketIndicatorView = new Lang.Class({
     this._popupItemSettings = new PopupMenu.PopupMenuItem(_("Settings"));
     this.menu.addMenuItem(this._popupItemSettings);
     this._popupItemSettings.connect("activate", () => {
-      const app_sys = Shell.AppSystem.get_default();
-      const prefs = app_sys.lookup_app("gnome-shell-extension-prefs.desktop");
-      if (prefs.get_state() == prefs.SHELL_APP_STATE_RUNNING) {
-        prefs.activate();
-      } else {
-        prefs
-          .get_app_info()
-          .launch_uris(["extension:///" + Local.metadata.uuid], null);
-      }
+      openPrefs(version, Local.metadata.uuid, { shell: Shell });
     });
   },
 
