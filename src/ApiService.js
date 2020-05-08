@@ -31,6 +31,7 @@ const {
   ProviderPaymium,
   ProviderPoloniex,
   ProviderSatangPro,
+  ProviderTomoX,
   ProviderVccExchange,
 } = Local.imports;
 
@@ -57,6 +58,7 @@ const Providers = {
   paymium: new ProviderPaymium.Api(),
   poloniex: new ProviderPoloniex.Api(),
   satangpro: new ProviderSatangPro.Api(),
+  tomox: new ProviderTomoX.Api(),
   vccexchange: new ProviderVccExchange.Api(),
 };
 
