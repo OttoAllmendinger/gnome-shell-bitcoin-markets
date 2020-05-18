@@ -72,3 +72,7 @@ On most systems you can use `journalctl /usr/bin/gnome-shell -f` to get log outp
 * https://github.com/rossigee - BX.in.th and Satang.pro support
 * https://github.com/WeirdFishBK201 - Huobi support
 * https://github.com/thanhnguyennguyen - HitBTC, Kucoin, VccExchange, BinanceFutures and FTX support
+
+## Tips
+
+Bitcoin 3MuUGXgSyZXdqdgn6V4VxGBR3dtA92w1C1
