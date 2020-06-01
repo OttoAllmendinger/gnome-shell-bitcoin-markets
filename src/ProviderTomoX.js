@@ -8,6 +8,7 @@ const TokenInfo = {
 "BTC": {address: "0xae44807d8a9ce4b30146437474ed6faaafa1b809", decimal: 8},
 "ETH": {address: "0x2eaa73bd0db20c64f53febea7b5f5e5bccc7fb8b", decimal: 18},
 "USDT": {address: "0x381B31409e4D220919B2cFF012ED94d70135A59e", decimal: 6},
+"POMO": { address: "0x31e58cca9ecaa057edabaccff5abfbbc3443480c", decimal: 18},
 }
 const Api = new Lang.Class({
   Name: "TomoX.Api",
