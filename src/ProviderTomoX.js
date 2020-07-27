@@ -5,10 +5,12 @@ const BaseProvider = Local.imports.BaseProvider;
 
 const TokenInfo = {
 "TOMO": {address: "0x0000000000000000000000000000000000000001", decimal: 18},
-"BTC": {address: "0xae44807d8a9ce4b30146437474ed6faaafa1b809", decimal: 8},
-"ETH": {address: "0x2eaa73bd0db20c64f53febea7b5f5e5bccc7fb8b", decimal: 18},
+"BTC": {address: "0xAE44807D8A9CE4B30146437474Ed6fAAAFa1B809", decimal: 8},
+"ETH": {address: "0x2EAA73Bd0db20c64f53fEbeA7b5F5E5Bccc7fb8b", decimal: 18},
 "USDT": {address: "0x381B31409e4D220919B2cFF012ED94d70135A59e", decimal: 6},
-"POMO": { address: "0x31e58cca9ecaa057edabaccff5abfbbc3443480c", decimal: 18},
+"POMO": { address: "0X31E58CCA9ECAA057EDABACCFF5ABFBBC3443480C", decimal: 18},
+"YFI": { address: "0XE189A56891F6CA22797878E34992395A4AFBDE46", decimal: 18},
+"ORBYT": {address: "0X4DD28C75B28F05DF193B4E1BBB61CD186EB968C6", decimal: 18},
 }
 const Api = new Lang.Class({
   Name: "TomoX.Api",
