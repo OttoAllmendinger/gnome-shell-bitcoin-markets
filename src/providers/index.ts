@@ -27,6 +27,7 @@ import * as ProviderKucoin from './ProviderKucoin';
 import * as ProviderPaymium from './ProviderPaymium';
 import * as ProviderPoloniex from './ProviderBitPay';
 import * as ProviderSatangPro from './ProviderSatangPro';
+import * as ProviderTomoX from './ProviderTomoX';
 import * as ProviderVccExchange from './ProviderVccExchange';
 
 export const Providers: Record<string, BaseProvider.Api> = {
@@ -56,6 +57,7 @@ export const Providers: Record<string, BaseProvider.Api> = {
   paymium: new ProviderPaymium.Api(),
   poloniex: new ProviderPoloniex.Api(),
   satangpro: new ProviderSatangPro.Api(),
+  tomox: new ProviderTomoX.Api(),
   vccexchange: new ProviderVccExchange.Api(),
 };
 
