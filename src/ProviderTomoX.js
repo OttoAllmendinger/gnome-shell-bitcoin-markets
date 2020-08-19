@@ -11,6 +11,10 @@ const TokenInfo = {
 "POMO": { address: "0X31E58CCA9ECAA057EDABACCFF5ABFBBC3443480C", decimal: 18},
 "YFI": { address: "0XE189A56891F6CA22797878E34992395A4AFBDE46", decimal: 18},
 "ORBYT": {address: "0X4DD28C75B28F05DF193B4E1BBB61CD186EB968C6", decimal: 18},
+"DEC": {address: "0xfEB9aE1cCEc15cD8CcD37894eF3E24EC5414e781", decimal: 18},
+"SRM": {address: "0xc01643aC912B6a8ffC50CF8c1390934A6142bc91", decimal: 6},
+"VNDC": {address: "0xC43A2df23dAfACb9106AB239896599B705E2e67e", decimal: 0},
+"FTX": {address: "0x33fa3c0c714638f12339F85dae89c42042a2D9Af", decimal: 18},
 }
 const Api = new Lang.Class({
   Name: "TomoX.Api",
