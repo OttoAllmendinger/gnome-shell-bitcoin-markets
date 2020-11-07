@@ -31,10 +31,6 @@ const Api = new Lang.Class({
         return reject(this.permanentError);
       }
 
-      if (this.pendingRequest) {
-        this.pendingRequest.cancel();
-      }
-
       this.pendingRequest = HTTP.getJSON(url);
 
       return this.pendingRequest
