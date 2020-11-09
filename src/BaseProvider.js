@@ -18,7 +18,6 @@ const Api = new Lang.Class({
     this.permanentError = null;
     this.lastUpdate = -Infinity;
     this.tickers = [];
-    this.pendingRequest = null;
   },
 
   getLabel({base, quote}) {
@@ -31,22 +30,16 @@ const Api = new Lang.Class({
         return reject(this.permanentError);
       }
 
-      this.pendingRequest = HTTP.getJSON(url);
-
-      return this.pendingRequest
+      return HTTP.getJSON(url)
         .then(data => {
-          this.pendingRequest = null;
           resolve(data);
         })
         .catch(err => {
-          this.pendingRequest = null;
           if (HTTP.isErrTooManyRequests(err)) {
             this.permanentError = err;
           }
           return reject(err);
         });
-        // not supported in Gnome 3.24
-        // .finally(() => this.pendingRequest = null);
     });
   },
 
