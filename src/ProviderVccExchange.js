@@ -20,7 +20,7 @@ const Api = new Lang.Class({
         base,
         quote
     }) {
-        return `https://vcc.exchange/api/v2/trades/${base}_${quote}`;
+        return `https://api.vcc.exchange/v3/trades/${base}_${quote}`;
     },
 
     getLast({
