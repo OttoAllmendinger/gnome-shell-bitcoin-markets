@@ -1,0 +1,113 @@
+# Portuguese translations for PACKAGE package
+# Traduções em português brasileiro para o pacote PACKAGE.
+# Copyright (C) 2013 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Otto <otto.allmendinger@gmail.com>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-01-19 19:43+0100\n"
+"PO-Revision-Date: 2013-09-10 22:43+0200\n"
+"Last-Translator: Otto <otto.allmendinger@gmail.com>\n"
+"Language-Team: Brazilian Portuguese\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: src/prefs/BaseProviderConfigView.ts:145
+msgid "Base"
+msgstr ""
+
+#: src/format/Format.ts:57
+msgid "Base currency code"
+msgstr ""
+
+#: src/format/Format.ts:58
+msgid "Base currency symbol"
+msgstr ""
+
+#: src/format/Format.ts:59
+msgid "Bitcoin symbol (₿)"
+msgstr ""
+
+#: src/prefs/prefs.ts:117
+msgid "Format"
+msgstr ""
+
+#: src/format/Format.ts:64
+msgid "formatted value with 0 decimals"
+msgstr ""
+
+#: src/format/Format.ts:65
+msgid "formatted value with 1 decimal"
+msgstr ""
+
+#: src/format/Format.ts:66
+msgid "formatted value with 2 decimals"
+msgstr ""
+
+#: src/format/Format.ts:68
+msgid "formatted value with 8 decimals"
+msgstr ""
+
+#: src/format/Format.ts:60
+msgid "formatted value with defaults"
+msgstr ""
+
+#: src/format/Format.ts:61
+msgid "formatted value with defaults, divided by "
+msgstr ""
+
+#: src/format/Format.ts:62 src/format/Format.ts:63
+msgid "formatted value with defaults, multiplied by "
+msgstr ""
+
+#: src/prefs/BaseProviderConfigView.ts:180
+msgid "Help"
+msgstr ""
+
+#: src/prefs/prefs.ts:52
+msgid "Indicator Settings"
+msgstr ""
+
+#: src/prefs/prefs.ts:139
+msgid "Provider"
+msgstr "Provider"
+
+#: src/prefs/prefs.ts:63
+#, fuzzy
+msgid "Provider Settings"
+msgstr "Provider"
+
+#: src/prefs/BaseProviderConfigView.ts:149
+msgid "Quote"
+msgstr ""
+
+#: src/format/Format.ts:55
+msgid "Quote currency code"
+msgstr ""
+
+#: src/format/Format.ts:56
+msgid "Quote currency symbol"
+msgstr ""
+
+#: src/format/Format.ts:69
+msgid "raw value without additional formatting"
+msgstr ""
+
+#: src/extension.ts:83
+msgid "Settings"
+msgstr ""
+
+#: src/prefs/prefs.ts:163
+#, fuzzy
+msgid "Show Base Currency"
+msgstr "Moeda"
+
+#: src/prefs/prefs.ts:151
+msgid "Show Change"
+msgstr ""

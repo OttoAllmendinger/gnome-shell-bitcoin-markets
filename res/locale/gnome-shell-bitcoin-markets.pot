@@ -1,0 +1,96 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: src/prefs/BaseProviderConfigView.ts:145
+msgid "Base"
+msgstr ""
+
+#: src/format/Format.ts:57
+msgid "Base currency code"
+msgstr ""
+
+#: src/format/Format.ts:58
+msgid "Base currency symbol"
+msgstr ""
+
+#: src/format/Format.ts:59
+msgid "Bitcoin symbol (₿)"
+msgstr ""
+
+#: src/prefs/prefs.ts:117
+msgid "Format"
+msgstr ""
+
+#: src/format/Format.ts:64
+msgid "formatted value with 0 decimals"
+msgstr ""
+
+#: src/format/Format.ts:65
+msgid "formatted value with 1 decimal"
+msgstr ""
+
+#: src/format/Format.ts:66
+msgid "formatted value with 2 decimals"
+msgstr ""
+
+#: src/format/Format.ts:68
+msgid "formatted value with 8 decimals"
+msgstr ""
+
+#: src/format/Format.ts:60
+msgid "formatted value with defaults"
+msgstr ""
+
+#: src/format/Format.ts:61
+msgid "formatted value with defaults, divided by "
+msgstr ""
+
+#: src/format/Format.ts:62
+#: src/format/Format.ts:63
+msgid "formatted value with defaults, multiplied by "
+msgstr ""
+
+#: src/prefs/BaseProviderConfigView.ts:180
+msgid "Help"
+msgstr ""
+
+#: src/prefs/prefs.ts:52
+msgid "Indicator Settings"
+msgstr ""
+
+#: src/prefs/prefs.ts:139
+msgid "Provider"
+msgstr ""
+
+#: src/prefs/prefs.ts:63
+msgid "Provider Settings"
+msgstr ""
+
+#: src/prefs/BaseProviderConfigView.ts:149
+msgid "Quote"
+msgstr ""
+
+#: src/format/Format.ts:55
+msgid "Quote currency code"
+msgstr ""
+
+#: src/format/Format.ts:56
+msgid "Quote currency symbol"
+msgstr ""
+
+#: src/format/Format.ts:69
+msgid "raw value without additional formatting"
+msgstr ""
+
+#: src/extension.ts:83
+msgid "Settings"
+msgstr ""
+
+#: src/prefs/prefs.ts:163
+msgid "Show Base Currency"
+msgstr ""
+
+#: src/prefs/prefs.ts:151
+msgid "Show Change"
+msgstr ""
