@@ -3,7 +3,7 @@ import * as BaseProvider from '../BaseProvider';
 export class Api extends BaseProvider.Api {
   apiName = 'Kucoin';
 
-  apiDocs = [['API Docs', 'https=//docs.kucoin.com/']];
+  apiDocs = [['API Docs', 'https://docs.kucoin.com/']];
 
   interval = 15;
 

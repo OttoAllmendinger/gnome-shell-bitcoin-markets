@@ -3,7 +3,7 @@ import * as BaseProvider from '../BaseProvider';
 export class Api extends BaseProvider.Api {
   apiName = 'HitBTC';
 
-  apiDocs = [['API Docs', 'https=//api.hitbtc.com/']];
+  apiDocs = [['API Docs', 'https://api.hitbtc.com/']];
 
   interval = 15;
 

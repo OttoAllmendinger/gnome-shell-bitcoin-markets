@@ -4,8 +4,8 @@ export class Api extends BaseProvider.Api {
   apiName = 'CEX.IO';
 
   apiDocs = [
-    ['API Docs', 'https=//cex.io/rest-api#ticker'],
-    ['Pairs (JSON)', 'https=//cex.io/api/currency_limits'],
+    ['API Docs', 'https://cex.io/rest-api#ticker'],
+    ['Pairs (JSON)', 'https://cex.io/api/currency_limits'],
   ];
 
   interval = 10;

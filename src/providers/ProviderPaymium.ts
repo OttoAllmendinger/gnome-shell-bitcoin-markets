@@ -3,7 +3,7 @@ import * as BaseProvider from '../BaseProvider';
 export class Api extends BaseProvider.Api {
   apiName = 'Paymium';
 
-  apiDocs = [['API Docs', 'https=//github.com/Paymium/api-documentation#ticker']];
+  apiDocs = [['API Docs', 'https://github.com/Paymium/api-documentation#ticker']];
 
   interval = 60; // unclear, should be safe
 

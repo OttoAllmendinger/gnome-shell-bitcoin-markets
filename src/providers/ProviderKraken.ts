@@ -4,8 +4,8 @@ export class Api extends BaseProvider.Api {
   apiName = 'Kraken';
 
   apiDocs = [
-    ['API Docs', 'https=//www.kraken.com/help/api#public-market-data'],
-    ['Asset Pairs (JSON)', 'https=//api.kraken.com/0/public/AssetPairs'],
+    ['API Docs', 'https://www.kraken.com/help/api#public-market-data'],
+    ['Asset Pairs (JSON)', 'https://api.kraken.com/0/public/AssetPairs'],
   ];
 
   interval = 10; // unknown, guessing

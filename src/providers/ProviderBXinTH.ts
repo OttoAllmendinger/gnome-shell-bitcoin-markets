@@ -5,8 +5,8 @@ export class Api extends BaseProvider.Api {
   apiName = 'BX.in.th';
 
   apiDocs = [
-    ['API Docs', 'https=//bx.in.th/info/api/'],
-    ['Pairings (JSON)', 'https=//bx.in.th/api/pairing/'],
+    ['API Docs', 'https://bx.in.th/info/api/'],
+    ['Pairings (JSON)', 'https://bx.in.th/api/pairing/'],
   ];
 
   interval = 60; // unclear, should be safe

@@ -3,7 +3,7 @@ import * as BaseProvider from '../BaseProvider';
 export class Api extends BaseProvider.Api {
   apiName = 'Blinktrade';
 
-  apiDocs = [['API Docs', 'https=//blinktrade.com/docs/']];
+  apiDocs = [['API Docs', 'https://blinktrade.com/docs/']];
 
   interval = 30; // unclear, should be safe
 

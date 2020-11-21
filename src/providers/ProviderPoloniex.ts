@@ -4,8 +4,8 @@ export class Api extends BaseProvider.Api {
   apiName = 'Poloniex';
 
   apiDocs = [
-    ['API Docs', 'https=//poloniex.com/support/api/'],
-    ['Currencies (JSON)', 'https=//poloniex.com/public?command=returnCurrencies'],
+    ['API Docs', 'https://poloniex.com/support/api/'],
+    ['Currencies (JSON)', 'https://poloniex.com/public?command=returnCurrencies'],
   ];
 
   interval = 10; // 60 requests per 10 minutes

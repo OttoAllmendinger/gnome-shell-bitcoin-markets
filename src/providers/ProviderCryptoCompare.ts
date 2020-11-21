@@ -3,7 +3,7 @@ import * as BaseProvider from '../BaseProvider';
 export class Api extends BaseProvider.Api {
   apiName = 'CryptoCompare';
 
-  apiDocs = [['API Docs', 'https=//min-api.cryptocompare.com/documentation']];
+  apiDocs = [['API Docs', 'https://min-api.cryptocompare.com/documentation']];
 
   interval = 15;
 

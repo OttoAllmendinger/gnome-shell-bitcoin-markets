@@ -4,8 +4,8 @@ export class Api extends BaseProvider.Api {
   apiName = 'BTCMarkets';
 
   apiDocs = [
-    ['API Docs', 'https=//github.com/BTCMarkets/API/wiki/Market-data-API'],
-    ['Active Markets (JSON)', 'https=//api.btcmarkets.net/v2/market/active'],
+    ['API Docs', 'https://github.com/BTCMarkets/API/wiki/Market-data-API'],
+    ['Active Markets (JSON)', 'https://api.btcmarkets.net/v2/market/active'],
   ];
 
   interval = 10;

@@ -3,7 +3,7 @@ import * as BaseProvider from '../BaseProvider';
 export class Api extends BaseProvider.Api {
   apiName = 'VccExchange(Vietnam)';
 
-  apiDocs = [['API Docs', 'https=//vcc.exchange/api']];
+  apiDocs = [['API Docs', 'https://vcc.exchange/api']];
 
   interval = 15;
 

@@ -3,9 +3,9 @@ import * as BaseProvider from '../BaseProvider';
 export class Api extends BaseProvider.Api {
   apiName = 'CoinMarketCap';
 
-  apiDocs = [['API Docs', 'https=//coinmarketcap.com/api/documentation/v1/#section/Introduction']];
+  apiDocs = [['API Docs', 'https://coinmarketcap.com/api/documentation/v1/#section/Introduction']];
 
-  //  https=//coinmarketcap.com
+  //  https://coinmarketcap.com
   //   /api/documentation/v1/#section/Standards-and-Conventions
   //  ```
   //     Free / Trial plans are limited to 10 API calls a minute.

@@ -419,7 +419,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'BitPay';
-            this.apiDocs = [['API Docs', 'https=//bitpay.com/api']];
+            this.apiDocs = [['API Docs', 'https://bitpay.com/api']];
             this.interval = 60; // unclear, should be safe
         }
         getUrl({ base }) {
@@ -439,10 +439,10 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
             super(...arguments);
             this.apiName = 'Bitso';
             this.apiDocs = [
-                ['API Docs', 'https=//bitso.com/api_info#http-api-responses'],
-                ['Books (JSON)', 'https=//api.bitso.com/v3/available_books'],
+                ['API Docs', 'https://bitso.com/api_info#http-api-responses'],
+                ['Books (JSON)', 'https://api.bitso.com/v3/available_books'],
             ];
-            /* quote https=//bitso.com/api_info#rate-limits
+            /* quote https://bitso.com/api_info#rate-limits
              *
              * > Rate limits are are based on one minute windows. If you do more than 30
              * > requests in a minute, you get locked out for one minute.
@@ -461,8 +461,8 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'Bitstamp';
-            this.apiDocs = [['API Docs', 'https=//www.bitstamp.net/api/']];
-            // Quote 2013-08-09  ---  https=//www.bitstamp.net/api/
+            this.apiDocs = [['API Docs', 'https://www.bitstamp.net/api/']];
+            // Quote 2013-08-09  ---  https://www.bitstamp.net/api/
             // `` Do not make more than 600 request per 10 minutes or we will ban your
             //  IP address. ''
             this.interval = 10;
@@ -479,7 +479,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'Blinktrade';
-            this.apiDocs = [['API Docs', 'https=//blinktrade.com/docs/']];
+            this.apiDocs = [['API Docs', 'https://blinktrade.com/docs/']];
             this.interval = 30; // unclear, should be safe
         }
         getUrl({ base, quote }) {
@@ -498,8 +498,8 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
             super(...arguments);
             this.apiName = 'BTCMarkets';
             this.apiDocs = [
-                ['API Docs', 'https=//github.com/BTCMarkets/API/wiki/Market-data-API'],
-                ['Active Markets (JSON)', 'https=//api.btcmarkets.net/v2/market/active'],
+                ['API Docs', 'https://github.com/BTCMarkets/API/wiki/Market-data-API'],
+                ['Active Markets (JSON)', 'https://api.btcmarkets.net/v2/market/active'],
             ];
             this.interval = 10;
         }
@@ -520,8 +520,8 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
             super(...arguments);
             this.apiName = 'BX.in.th';
             this.apiDocs = [
-                ['API Docs', 'https=//bx.in.th/info/api/'],
-                ['Pairings (JSON)', 'https=//bx.in.th/api/pairing/'],
+                ['API Docs', 'https://bx.in.th/info/api/'],
+                ['Pairings (JSON)', 'https://bx.in.th/api/pairing/'],
             ];
             this.interval = 60; // unclear, should be safe
         }
@@ -544,8 +544,8 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
             super(...arguments);
             this.apiName = 'CEX.IO';
             this.apiDocs = [
-                ['API Docs', 'https=//cex.io/rest-api#ticker'],
-                ['Pairs (JSON)', 'https=//cex.io/api/currency_limits'],
+                ['API Docs', 'https://cex.io/rest-api#ticker'],
+                ['Pairs (JSON)', 'https://cex.io/api/currency_limits'],
             ];
             this.interval = 10;
         }
@@ -564,7 +564,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'Coinbase';
-            this.apiDocs = [['API Docs', 'https=//developers.coinbase.com/api/v2#exchange-rates']];
+            this.apiDocs = [['API Docs', 'https://developers.coinbase.com/api/v2#exchange-rates']];
             this.interval = 60; // unclear, should be safe
         }
         getUrl({ base }) {
@@ -589,8 +589,8 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
             super(...arguments);
             this.apiName = 'CoinGecko';
             this.apiDocs = [
-                ['API Docs', 'https=//www.coingecko.com/api/docs/v3#/coins/get_coins_list'],
-                ['Coins List (JSON)', 'https=//api.coingecko.com/api/v3/coins/list'],
+                ['API Docs', 'https://www.coingecko.com/api/docs/v3#/coins/get_coins_list'],
+                ['Coins List (JSON)', 'https://api.coingecko.com/api/v3/coins/list'],
             ];
             // ```
             //   7 Dec 2018= Due to the overwhelming requests we are receiving, we are
@@ -618,8 +618,8 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'CoinMarketCap';
-            this.apiDocs = [['API Docs', 'https=//coinmarketcap.com/api/documentation/v1/#section/Introduction']];
-            //  https=//coinmarketcap.com
+            this.apiDocs = [['API Docs', 'https://coinmarketcap.com/api/documentation/v1/#section/Introduction']];
+            //  https://coinmarketcap.com
             //   /api/documentation/v1/#section/Standards-and-Conventions
             //  ```
             //     Free / Trial plans are limited to 10 API calls a minute.
@@ -643,7 +643,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'CryptoCompare';
-            this.apiDocs = [['API Docs', 'https=//min-api.cryptocompare.com/documentation']];
+            this.apiDocs = [['API Docs', 'https://min-api.cryptocompare.com/documentation']];
             this.interval = 15;
         }
         getUrl({ base, quote }) {
@@ -661,7 +661,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'FTX exchange';
-            this.apiDocs = [['API Docs', 'https=//docs.ftx.com/#get-markets']];
+            this.apiDocs = [['API Docs', 'https://docs.ftx.com/#get-markets']];
             this.interval = 15;
         }
         getUrl({ base, quote }) {
@@ -676,7 +676,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'HitBTC';
-            this.apiDocs = [['API Docs', 'https=//api.hitbtc.com/']];
+            this.apiDocs = [['API Docs', 'https://api.hitbtc.com/']];
             this.interval = 15;
         }
         getUrl({ base, quote }) {
@@ -691,7 +691,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'Huobi';
-            this.apiDocs = [['API Docs', 'https=//huobiapi.github.io/docs/spot/v1/en/#introduction']];
+            this.apiDocs = [['API Docs', 'https://huobiapi.github.io/docs/spot/v1/en/#introduction']];
             // Each API Key can send maximum of 100 https requests within 10 seconds
             // so 15 should be safe.
             this.interval = 15;
@@ -712,8 +712,8 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
             super(...arguments);
             this.apiName = 'Kraken';
             this.apiDocs = [
-                ['API Docs', 'https=//www.kraken.com/help/api#public-market-data'],
-                ['Asset Pairs (JSON)', 'https=//api.kraken.com/0/public/AssetPairs'],
+                ['API Docs', 'https://www.kraken.com/help/api#public-market-data'],
+                ['Asset Pairs (JSON)', 'https://api.kraken.com/0/public/AssetPairs'],
             ];
             this.interval = 10; // unknown, guessing
         }
@@ -736,7 +736,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'Kucoin';
-            this.apiDocs = [['API Docs', 'https=//docs.kucoin.com/']];
+            this.apiDocs = [['API Docs', 'https://docs.kucoin.com/']];
             this.interval = 15;
         }
         getUrl({ base, quote }) {
@@ -754,7 +754,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'Paymium';
-            this.apiDocs = [['API Docs', 'https=//github.com/Paymium/api-documentation#ticker']];
+            this.apiDocs = [['API Docs', 'https://github.com/Paymium/api-documentation#ticker']];
             this.interval = 60; // unclear, should be safe
         }
         getUrl({ base: _base, quote }) {
@@ -776,7 +776,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'Satang.pro';
-            this.apiDocs = [['API Docs', 'https=//docs.satang.pro/apis/public/orders']];
+            this.apiDocs = [['API Docs', 'https://docs.satang.pro/apis/public/orders']];
             this.interval = 60; // unclear, should be safe
         }
         getUrl({ base, quote }) {
@@ -793,7 +793,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         constructor() {
             super(...arguments);
             this.apiName = 'VccExchange(Vietnam)';
-            this.apiDocs = [['API Docs', 'https=//vcc.exchange/api']];
+            this.apiDocs = [['API Docs', 'https://vcc.exchange/api']];
             this.interval = 15;
         }
         getUrl({ base, quote }) {

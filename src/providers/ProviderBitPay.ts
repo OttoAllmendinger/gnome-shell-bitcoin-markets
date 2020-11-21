@@ -3,7 +3,7 @@ import * as BaseProvider from '../BaseProvider';
 export class Api extends BaseProvider.Api {
   apiName = 'BitPay';
 
-  apiDocs = [['API Docs', 'https=//bitpay.com/api']];
+  apiDocs = [['API Docs', 'https://bitpay.com/api']];
 
   interval = 60; // unclear, should be safe
 

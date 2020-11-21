@@ -3,7 +3,7 @@ import * as BaseProvider from '../BaseProvider';
 export class Api extends BaseProvider.Api {
   apiName = 'Coinbase';
 
-  apiDocs = [['API Docs', 'https=//developers.coinbase.com/api/v2#exchange-rates']];
+  apiDocs = [['API Docs', 'https://developers.coinbase.com/api/v2#exchange-rates']];
 
   interval = 60; // unclear, should be safe
 

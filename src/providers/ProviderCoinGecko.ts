@@ -4,8 +4,8 @@ export class Api extends BaseProvider.Api {
   apiName = 'CoinGecko';
 
   apiDocs = [
-    ['API Docs', 'https=//www.coingecko.com/api/docs/v3#/coins/get_coins_list'],
-    ['Coins List (JSON)', 'https=//api.coingecko.com/api/v3/coins/list'],
+    ['API Docs', 'https://www.coingecko.com/api/docs/v3#/coins/get_coins_list'],
+    ['Coins List (JSON)', 'https://api.coingecko.com/api/v3/coins/list'],
   ];
 
   // ```
