@@ -478,6 +478,21 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
     class Api$8 extends Api {
         constructor() {
             super(...arguments);
+            this.apiName = 'Bittrex';
+            this.apiDocs = [['API Docs', 'https://bittrex.github.io/api/v3#operation--markets--marketSymbol--ticker-get']];
+            this.interval = 15;
+        }
+        getUrl({ base, quote }) {
+            return `https://api.bittrex.com/v3/markets/${base}-${quote}/ticker`;
+        }
+        getLast({ lastTradeRate }) {
+            return lastTradeRate;
+        }
+    }
+
+    class Api$9 extends Api {
+        constructor() {
+            super(...arguments);
             this.apiName = 'Blinktrade';
             this.apiDocs = [['API Docs', 'https://blinktrade.com/docs/']];
             this.interval = 30; // unclear, should be safe
@@ -493,7 +508,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$9 extends Api {
+    class Api$a extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'BTCMarkets';
@@ -515,7 +530,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$a extends Api {
+    class Api$b extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'BX.in.th';
@@ -539,7 +554,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$b extends Api {
+    class Api$c extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CEX.IO';
@@ -560,7 +575,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$c extends Api {
+    class Api$d extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Coinbase';
@@ -584,7 +599,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$d extends Api {
+    class Api$e extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CoinGecko';
@@ -614,7 +629,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$e extends Api {
+    class Api$f extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CoinMarketCap';
@@ -639,7 +654,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$f extends Api {
+    class Api$g extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CryptoCompare';
@@ -657,7 +672,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$g extends Api {
+    class Api$h extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'FTX exchange';
@@ -672,7 +687,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$h extends Api {
+    class Api$i extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'HitBTC';
@@ -687,7 +702,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$i extends Api {
+    class Api$j extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Huobi';
@@ -707,7 +722,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$j extends Api {
+    class Api$k extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Kraken';
@@ -732,7 +747,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$k extends Api {
+    class Api$l extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Kucoin';
@@ -750,7 +765,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$l extends Api {
+    class Api$m extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Paymium';
@@ -772,7 +787,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$m extends Api {
+    class Api$n extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Satang.pro';
@@ -789,7 +804,7 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         }
     }
 
-    class Api$n extends Api {
+    class Api$o extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'VccExchange(Vietnam)';
@@ -816,23 +831,24 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
         bitpay: new Api$5(),
         bitso: new Api$6(),
         bitstamp: new Api$7(),
-        blinktrade: new Api$8(),
-        btcmarkets: new Api$9(),
-        bxinth: new Api$a(),
-        cexio: new Api$b(),
-        coinbase: new Api$c(),
-        coingecko: new Api$d(),
-        coinmarketcap: new Api$e(),
-        cryptocompare: new Api$f(),
-        ftx: new Api$g(),
-        hitbtc: new Api$h(),
-        huobi: new Api$i(),
-        kraken: new Api$j(),
-        kucoin: new Api$k(),
-        paymium: new Api$l(),
+        bittrex: new Api$8(),
+        blinktrade: new Api$9(),
+        btcmarkets: new Api$a(),
+        bxinth: new Api$b(),
+        cexio: new Api$c(),
+        coinbase: new Api$d(),
+        coingecko: new Api$e(),
+        coinmarketcap: new Api$f(),
+        cryptocompare: new Api$g(),
+        ftx: new Api$h(),
+        hitbtc: new Api$i(),
+        huobi: new Api$j(),
+        kraken: new Api$k(),
+        kucoin: new Api$l(),
+        paymium: new Api$m(),
         poloniex: new Api$5(),
-        satangpro: new Api$m(),
-        vccexchange: new Api$n(),
+        satangpro: new Api$n(),
+        vccexchange: new Api$o(),
     };
     function getProvider(name) {
         if (name in Providers) {
