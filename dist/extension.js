@@ -452,6 +452,21 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
     class Api$8 extends Api {
         constructor() {
             super(...arguments);
+            this.apiName = 'Bittrex';
+            this.apiDocs = [['API Docs', 'https://bittrex.github.io/api/v3#operation--markets--marketSymbol--ticker-get']];
+            this.interval = 15;
+        }
+        getUrl({ base, quote }) {
+            return `https://api.bittrex.com/v3/markets/${base}-${quote}/ticker`;
+        }
+        getLast({ lastTradeRate }) {
+            return lastTradeRate;
+        }
+    }
+
+    class Api$9 extends Api {
+        constructor() {
+            super(...arguments);
             this.apiName = 'Blinktrade';
             this.apiDocs = [['API Docs', 'https://blinktrade.com/docs/']];
             this.interval = 30; // unclear, should be safe
@@ -467,7 +482,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$9 extends Api {
+    class Api$a extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'BTCMarkets';
@@ -489,7 +504,22 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$a extends Api {
+    class Api$b extends Api {
+        constructor() {
+            super(...arguments);
+            this.apiName = 'Buda';
+            this.apiDocs = [['API Docs', 'https://api.buda.com/#la-api-de-buda-com']];
+            this.interval = 60;
+        }
+        getUrl({ base, quote }) {
+            return `https://www.buda.com/api/v2/markets/${base}-${quote}/ticker`;
+        }
+        getLast({ ticker }) {
+            return ticker.last_price[0];
+        }
+    }
+
+    class Api$c extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'BX.in.th';
@@ -513,7 +543,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$b extends Api {
+    class Api$d extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CEX.IO';
@@ -534,7 +564,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$c extends Api {
+    class Api$e extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Coinbase';
@@ -558,7 +588,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$d extends Api {
+    class Api$f extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CoinGecko';
@@ -588,7 +618,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$e extends Api {
+    class Api$g extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CoinMarketCap';
@@ -613,7 +643,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$f extends Api {
+    class Api$h extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CryptoCompare';
@@ -631,7 +661,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$g extends Api {
+    class Api$i extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'FTX exchange';
@@ -646,7 +676,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$h extends Api {
+    class Api$j extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'HitBTC';
@@ -661,7 +691,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$i extends Api {
+    class Api$k extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Huobi';
@@ -681,7 +711,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$j extends Api {
+    class Api$l extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Kraken';
@@ -706,7 +736,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$k extends Api {
+    class Api$m extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Kucoin';
@@ -724,7 +754,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$l extends Api {
+    class Api$n extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Paymium';
@@ -746,7 +776,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$m extends Api {
+    class Api$o extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Satang.pro';
@@ -763,7 +793,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$n extends Api {
+    class Api$p extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'VccExchange(Vietnam)';
@@ -790,23 +820,25 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         bitpay: new Api$5(),
         bitso: new Api$6(),
         bitstamp: new Api$7(),
-        blinktrade: new Api$8(),
-        btcmarkets: new Api$9(),
-        bxinth: new Api$a(),
-        cexio: new Api$b(),
-        coinbase: new Api$c(),
-        coingecko: new Api$d(),
-        coinmarketcap: new Api$e(),
-        cryptocompare: new Api$f(),
-        ftx: new Api$g(),
-        hitbtc: new Api$h(),
-        huobi: new Api$i(),
-        kraken: new Api$j(),
-        kucoin: new Api$k(),
-        paymium: new Api$l(),
+        bittrex: new Api$8(),
+        blinktrade: new Api$9(),
+        btcmarkets: new Api$a(),
+        buda: new Api$b(),
+        bxinth: new Api$c(),
+        cexio: new Api$d(),
+        coinbase: new Api$e(),
+        coingecko: new Api$f(),
+        coinmarketcap: new Api$g(),
+        cryptocompare: new Api$h(),
+        ftx: new Api$i(),
+        hitbtc: new Api$j(),
+        huobi: new Api$k(),
+        kraken: new Api$l(),
+        kucoin: new Api$m(),
+        paymium: new Api$n(),
         poloniex: new Api$5(),
-        satangpro: new Api$m(),
-        vccexchange: new Api$n(),
+        satangpro: new Api$o(),
+        vccexchange: new Api$p(),
     };
     function getProvider(name) {
         if (name in Providers) {

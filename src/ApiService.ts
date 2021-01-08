@@ -9,6 +9,7 @@ import * as ProviderBitMEX from './providers/ProviderBitMEX';
 import * as ProviderBitPay from './providers/ProviderBitPay';
 import * as ProviderBitso from './providers/ProviderBitso';
 import * as ProviderBitstamp from './providers/ProviderBitstamp';
+import * as ProviderBittrex from './providers/ProviderBittrex';
 import * as ProviderBlinktrade from './providers/ProviderBlinktrade';
 import * as ProviderBTCMarkets from './providers/ProviderBTCMarkets';
 import * as ProviderBuda from './providers/ProviderBuda';
@@ -36,6 +37,7 @@ export const Providers: Record<string, BaseProvider.Api> = {
   bitpay: new ProviderBitPay.Api(),
   bitso: new ProviderBitso.Api(),
   bitstamp: new ProviderBitstamp.Api(),
+  bittrex: new ProviderBittrex.Api(),
   blinktrade: new ProviderBlinktrade.Api(),
   btcmarkets: new ProviderBTCMarkets.Api(),
   buda: new ProviderBuda.Api(),
