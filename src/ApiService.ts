@@ -11,6 +11,7 @@ import * as ProviderBitso from './providers/ProviderBitso';
 import * as ProviderBitstamp from './providers/ProviderBitstamp';
 import * as ProviderBlinktrade from './providers/ProviderBlinktrade';
 import * as ProviderBTCMarkets from './providers/ProviderBTCMarkets';
+import * as ProviderBuda from './providers/ProviderBuda';
 import * as ProviderBXinTH from './providers/ProviderBXinTH';
 import * as ProviderCexio from './providers/ProviderCexio';
 import * as ProviderCoinbase from './providers/ProviderCoinbase';
@@ -37,6 +38,7 @@ export const Providers: Record<string, BaseProvider.Api> = {
   bitstamp: new ProviderBitstamp.Api(),
   blinktrade: new ProviderBlinktrade.Api(),
   btcmarkets: new ProviderBTCMarkets.Api(),
+  buda: new ProviderBuda.Api(),
   bxinth: new ProviderBXinTH.Api(),
   cexio: new ProviderCexio.Api(),
   coinbase: new ProviderCoinbase.Api(),
