@@ -58,7 +58,7 @@ export function tooltipText() {
     ['bs', _('Base currency symbol')],
     ['btc', _('Bitcoin symbol (₿)')],
     ['v', _('formatted value with defaults')],
-    ['mv', _('formatted value with defaults, divided by ') + (0.001).toLocaleString()],
+    ['mv', _('formatted value with defaults, divided by ') + (1000).toLocaleString()],
     ['kv', _('formatted value with defaults, multiplied by ') + (1000).toLocaleString()],
     ['satv', _('formatted value with defaults, multiplied by ') + (1e8).toLocaleString()],
     ['(m|k|sat)v0', _('formatted value with 0 decimals')],
