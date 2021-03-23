@@ -3,15 +3,17 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
 
     var ExtensionUtils = imports.misc.extensionUtils;
 
-    const versionArray = (v) => v.split('.').map(Number);
-    const zip = function (a, b, defaultValue) {
+    function versionArray(v) {
+        return v.split('.').map(Number);
+    }
+    function zip(a, b, defaultValue) {
         if (a.length === 0 && b.length === 0) {
             return [];
         }
         const headA = a.length > 0 ? a.shift() : defaultValue;
         const headB = b.length > 0 ? b.shift() : defaultValue;
         return [[headA, headB]].concat(zip(a, b, defaultValue));
-    };
+    }
     function versionEqual(a, b) {
         return zip(versionArray(a), versionArray(b), 0).reduce((prev, [a, b]) => prev && a === b, true);
     }
@@ -48,31 +50,6 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         smallerEqual(v) {
             return this.equal(v) || this.smaller(v);
         }
-    }
-    if (window['ARGV'] && ARGV[0] == 'test') {
-        log('zip("1.2.3", "1.2")=' + JSON.stringify(zip(versionArray('1.2.3'), versionArray('1.2'))));
-        log('versionEqual("1.2.3", "1.2")=' + versionEqual('1.2.3', '1.2'));
-        [
-            ['1', '1', false],
-            ['1', '1.0', false],
-            ['1', '1.0.0', false],
-            ['1.0', '1.0', false],
-            ['1.2', '2.1', false],
-            ['1.2.3', '2.1', false],
-            ['2.1', '1.2', true],
-            ['2.1.1', '1.2', true],
-            ['1.2.1', '1.2.0', true],
-            ['1.2.1', '1.2', true],
-            ['1.2', '1.2.0', false],
-            ['1.2', '1.2.1', false],
-            ['3.32.2', '3.32', true],
-            ['3.32', '3.32.2', false],
-        ].forEach(([a, b, expected]) => {
-            const actual = versionGreater(a, b);
-            if (expected !== actual) {
-                log(`ERROR: versionGreater("${a}", "${b}") is ${actual}, ` + `expected ${expected}`);
-            }
-        });
     }
 
     /**
@@ -117,8 +94,27 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
     }
 
     var uuid = "bitcoin-markets@ottoallmendinger.github.com";
+    var name = "Bitcoin Markets";
+    var url = "https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/";
+    var description = "Display info on various crypto-currency exchanges.";
+    var metadata = {
+    	"shell-version": [
+    	"3.32",
+    	"3.34",
+    	"3.36",
+    	"3.38"
+    ],
+    	uuid: uuid,
+    	name: name,
+    	url: url,
+    	description: description,
+    	"settings-schema": "org.gnome.shell.extensions.bitcoin-markets",
+    	"gettext-domain": "gnome-shell-bitcoin-markets",
+    	"git-version": "_gitversion_"
+    };
 
-    const _ = imports.gettext.domain(uuid).gettext;
+    const domain = metadata['gettext-domain'];
+    const _ = imports.gettext.domain(domain).gettext;
 
     // eslint-disable-next-line @typescript-eslint/ban-types
     function registerClass(meta, cls) {

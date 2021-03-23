@@ -14,8 +14,27 @@ var prefs = (function (Gtk, GObject, Gio, Soup) {
     }
 
     var uuid = "bitcoin-markets@ottoallmendinger.github.com";
+    var name = "Bitcoin Markets";
+    var url = "https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/";
+    var description = "Display info on various crypto-currency exchanges.";
+    var metadata = {
+    	"shell-version": [
+    	"3.32",
+    	"3.34",
+    	"3.36",
+    	"3.38"
+    ],
+    	uuid: uuid,
+    	name: name,
+    	url: url,
+    	description: description,
+    	"settings-schema": "org.gnome.shell.extensions.bitcoin-markets",
+    	"gettext-domain": "gnome-shell-bitcoin-markets",
+    	"git-version": "_gitversion_"
+    };
 
-    const _ = imports.gettext.domain(uuid).gettext;
+    const domain = metadata['gettext-domain'];
+    const _ = imports.gettext.domain(domain).gettext;
 
     var ExtensionUtils = imports.misc.extensionUtils;
 
