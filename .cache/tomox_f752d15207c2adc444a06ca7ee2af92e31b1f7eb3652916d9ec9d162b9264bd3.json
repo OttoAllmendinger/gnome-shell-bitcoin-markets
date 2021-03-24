@@ -1,0 +1,25 @@
+{
+  "data": {
+    "askPrice": "3000000",
+    "baseVolume": "20000000000000000000",
+    "bidPrice": "2200000",
+    "change": "0.000000",
+    "close": "2500000",
+    "closeBaseUsd": "2.5",
+    "count": "1",
+    "high": "2500000",
+    "low": "2500000",
+    "open": "2500000",
+    "orderCount": "0",
+    "orderVolume": "0",
+    "pair": {
+      "baseToken": "0x0000000000000000000000000000000000000001",
+      "pairName": "TOMO/USDT",
+      "quoteToken": "0x381B31409e4D220919B2cFF012ED94d70135A59e"
+    },
+    "price": "0",
+    "rank": 0,
+    "timestamp": 0,
+    "volume": "50000000"
+  }
+}

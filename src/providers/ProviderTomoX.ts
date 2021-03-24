@@ -1,6 +1,11 @@
 import * as BaseProvider from './BaseProvider';
 
-const TokenInfo = {
+type TokenInfo = {
+  address: string;
+  decimal: number;
+};
+
+const tokenInfo: Record<string, TokenInfo> = {
   TOMO: { address: '0x0000000000000000000000000000000000000001', decimal: 18 },
   BTC: { address: '0xAE44807D8A9CE4B30146437474Ed6fAAAFa1B809', decimal: 8 },
   ETH: { address: '0x2EAA73Bd0db20c64f53fEbeA7b5F5E5Bccc7fb8b', decimal: 18 },
@@ -14,6 +19,13 @@ const TokenInfo = {
   FTX: { address: '0x33fa3c0c714638f12339F85dae89c42042a2D9Af', decimal: 18 },
 };
 
+function getTokenInfo(code: string): TokenInfo {
+  if (!(code in tokenInfo)) {
+    throw new Error(`no TokenInfo for ${code}`);
+  }
+  return tokenInfo[code];
+}
+
 export class Api extends BaseProvider.Api {
   apiName = 'TomoX(TomoChain)';
 
@@ -21,17 +33,21 @@ export class Api extends BaseProvider.Api {
 
   interval = 15;
 
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'TOMO', quote: 'USDT' };
+  }
+
   getUrl({ base, quote }): string {
-    base = TokenInfo[base].address;
-    quote = TokenInfo[quote].address;
-    return `https://dex.tomochain.com/api/pair/data?baseToken=${base}&quoteToken=${quote}`;
+    const baseAddress = getTokenInfo(base).address;
+    const quoteAddress = getTokenInfo(quote).address;
+    return `https://dex.tomochain.com/api/pair/data?baseToken=${baseAddress}&quoteToken=${quoteAddress}`;
   }
 
   getLast({ data }): number {
     let decimal = 18;
-    Object.keys(TokenInfo).forEach(function (key) {
-      if (TokenInfo[key].address == data.pair.quoteToken) {
-        decimal = TokenInfo[key].decimal;
+    Object.keys(tokenInfo).forEach(function (key) {
+      if (tokenInfo[key].address == data.pair.quoteToken) {
+        decimal = tokenInfo[key].decimal;
       }
     });
     return data.close / Math.pow(10, decimal);
