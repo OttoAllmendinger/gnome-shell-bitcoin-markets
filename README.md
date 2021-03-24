@@ -4,28 +4,30 @@ Displays Bitcoin and Altcoin market information in the Gnome Shell.
 
 Available APIs:
 
+- BTCMarkets
 - Binance
-- Bitfinex
+- Binance Futures
 - BitMEX
 - BitPay
+- BitPay
+- Bitfinex
 - Bitso
 - Bitstamp
-- Blinktrade
-- BTCMarkets
-- BX.in.th
+- Bittrex
+- Buda
 - CEX.IO
-- Coinbase
 - CoinGecko
-- CoinMarketCap
+- Coinbase
 - CryptoCompare
+- FTX exchange
 - HitBTC
 - Huobi
 - Kraken
 - Kucoin
 - Paymium
-- Poloniex
 - Satang.pro
-- VccExchange
+- TomoX(TomoChain)
+- VccExchange(Vietnam)
 
 ## Installation
 
@@ -68,7 +70,9 @@ On most systems you can use `journalctl /usr/bin/gnome-shell -f` to get log outp
 - https://github.com/jpereira - Blinktrade support
 - https://github.com/rossigee - BX.in.th and Satang.pro support
 - https://github.com/WeirdFishBK201 - Huobi support
-- https://github.com/thanhnguyennguyen - HitBTC, Kucoin, VccExchange, BinanceFutures and FTX support
+- https://github.com/thanhnguyennguyen - HitBTC, Kucoin, VccExchange, BinanceFutures, FTX and Tomo support
+- https://github.com/luissantos - Bittrex support
+- https://github.com/omerta - Buda support
 
 ## Tips
 
