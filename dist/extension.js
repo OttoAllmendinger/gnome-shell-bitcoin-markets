@@ -196,7 +196,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         const headers = message.request_headers;
         headers.append('X-Client-Id', _clientId);
         // log(`> GET ${url}`);
-        return Object.assign(new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             session.queue_message(message, (session, message) => {
                 // log(`< GET ${url}: ${message.status_code}`);
                 if (message.status_code !== 200) {
@@ -220,10 +220,6 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
                 }
             });
             Mainloop.timeout_add(_timeoutMs, () => session.abort());
-        }), {
-            cancel() {
-                session.abort();
-            },
         });
     }
 
@@ -232,37 +228,12 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
      */
     class Api {
         constructor() {
-            this.permanentError = null;
-            this.lastUpdate = -Infinity;
             this.tickers = [];
-            this.pendingRequest = null;
         }
         getLabel({ base, quote }) {
             return `${this.apiName} ${base}/${quote}`;
         }
-        fetch(url) {
-            return new Promise((resolve, reject) => {
-                if (this.permanentError) {
-                    return reject(this.permanentError);
-                }
-                this.pendingRequest = getJSON(url);
-                return this.pendingRequest
-                    .then((data) => {
-                    this.pendingRequest = null;
-                    resolve(data);
-                })
-                    .catch((err) => {
-                    this.pendingRequest = null;
-                    if (isErrTooManyRequests(err)) {
-                        this.permanentError = err;
-                    }
-                    return reject(err);
-                });
-                // not supported in Gnome 3.24
-                // .finally(() => this.pendingRequest = null);
-            });
-        }
-        _getTickerInstance(ticker) {
+        getTickerInstance(ticker) {
             const equalArray = (arr1, arr2) => arr1.length === arr2.length && arr1.every((v, i) => v === arr2[i]);
             const equalObjects = (obj1, obj2) => {
                 const keys1 = Object.keys(obj1).sort();
@@ -277,14 +248,14 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             this.tickers.push(ticker);
             return ticker;
         }
-        getTicker({ base, quote, attribute }) {
-            return this._getTickerInstance({ base, quote, attribute });
+        getTicker({ base, quote }) {
+            return this.getTickerInstance({ base, quote });
         }
         parseData(data, ticker) {
-            if (ticker.attribute === 'last') {
-                return this.getLast(data, ticker);
-            }
-            throw new Error(`unknown attribute ${ticker.attribute}`);
+            return Number(this.getLast(data, ticker));
+        }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'USD' };
         }
     }
 
@@ -300,6 +271,9 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
         getLast({ price }) {
             return price;
+        }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'USDT' };
         }
     }
 
@@ -320,6 +294,9 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
         getLast({ price }) {
             return price;
+        }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'USDT' };
         }
     }
 
@@ -361,6 +338,9 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         getLast(data) {
             return data[6];
         }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'USD' };
+        }
     }
 
     class Api$4 extends Api {
@@ -386,6 +366,9 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
                 throw new Error(`expected symbol ${symbol}, get ${data.symbol}`);
             }
             return data.lastPrice;
+        }
+        getDefaultTicker() {
+            return { base: 'XBT', quote: 'USD' };
         }
     }
 
@@ -467,18 +450,18 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
     class Api$9 extends Api {
         constructor() {
             super(...arguments);
-            this.apiName = 'Blinktrade';
-            this.apiDocs = [['API Docs', 'https://blinktrade.com/docs/']];
-            this.interval = 30; // unclear, should be safe
+            this.apiName = 'Buda';
+            this.apiDocs = [['API Docs', 'https://api.buda.com/#la-api-de-buda-com']];
+            this.interval = 60;
+        }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'CLP' };
         }
         getUrl({ base, quote }) {
-            base = base.toUpperCase();
-            quote = quote.toUpperCase();
-            const host = quote === 'BRL' ? 'bitcambio_api.blinktrade.com' : 'api.blinktrade.com';
-            return `https://${host}/api/v1/${quote}/ticker?crypto_currency=${base}`;
+            return `https://www.buda.com/api/v2/markets/${base}-${quote}/ticker`;
         }
-        getLast(data) {
-            return data.last;
+        getLast({ ticker }) {
+            return ticker.last_price[0];
         }
     }
 
@@ -502,48 +485,12 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             const { errorCode, errorMessage } = data;
             throw new Error(`${errorCode}: ${errorMessage}`);
         }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'AUD' };
+        }
     }
 
     class Api$b extends Api {
-        constructor() {
-            super(...arguments);
-            this.apiName = 'Buda';
-            this.apiDocs = [['API Docs', 'https://api.buda.com/#la-api-de-buda-com']];
-            this.interval = 60;
-        }
-        getUrl({ base, quote }) {
-            return `https://www.buda.com/api/v2/markets/${base}-${quote}/ticker`;
-        }
-        getLast({ ticker }) {
-            return ticker.last_price[0];
-        }
-    }
-
-    class Api$c extends Api {
-        constructor() {
-            super(...arguments);
-            this.apiName = 'BX.in.th';
-            this.apiDocs = [
-                ['API Docs', 'https://bx.in.th/info/api/'],
-                ['Pairings (JSON)', 'https://bx.in.th/api/pairing/'],
-            ];
-            this.interval = 60; // unclear, should be safe
-        }
-        getUrl(_options) {
-            return 'https://bx.in.th/api/';
-        }
-        getLast(data, { base, quote }) {
-            const result = Object.keys(data)
-                .map((k) => data[k])
-                .find(({ primary_currency, secondary_currency }) => primary_currency === quote && secondary_currency === base);
-            if (!result) {
-                throw new Error(`could not find pair ${base}/${quote}`);
-            }
-            return result.last_price;
-        }
-    }
-
-    class Api$d extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CEX.IO';
@@ -564,7 +511,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$e extends Api {
+    class Api$c extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Coinbase';
@@ -588,7 +535,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$f extends Api {
+    class Api$d extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CoinGecko';
@@ -616,34 +563,12 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             }
             return result.last;
         }
-    }
-
-    class Api$g extends Api {
-        constructor() {
-            super(...arguments);
-            this.apiName = 'CoinMarketCap';
-            this.apiDocs = [['API Docs', 'https://coinmarketcap.com/api/documentation/v1/#section/Introduction']];
-            //  https://coinmarketcap.com
-            //   /api/documentation/v1/#section/Standards-and-Conventions
-            //  ```
-            //     Free / Trial plans are limited to 10 API calls a minute.
-            //  ```
-            this.interval = 10;
-        }
-        getUrl({ base, quote }) {
-            return `https://api.coinmarketcap.com/v1/ticker/${base}/?convert=${quote}`.toLowerCase();
-        }
-        getLast(data, { quote }) {
-            data = data[0];
-            const key = `price_${quote}`.toLowerCase();
-            if (!(key in data)) {
-                throw new Error(`could not find quote in ${quote}`);
-            }
-            return data[key];
+        getDefaultTicker() {
+            return { base: 'bitcoin', quote: 'usd' };
         }
     }
 
-    class Api$h extends Api {
+    class Api$e extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CryptoCompare';
@@ -661,7 +586,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
 
-    class Api$i extends Api {
+    class Api$f extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'FTX exchange';
@@ -669,14 +594,14 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             this.interval = 15;
         }
         getUrl({ base, quote }) {
-            return `https://ftx.com/api/markets/${base}-${quote}`;
+            return `https://ftx.com/api/markets/${base}/${quote}`;
         }
         getLast({ result }) {
             return result.last;
         }
     }
 
-    class Api$j extends Api {
+    class Api$g extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'HitBTC';
@@ -684,14 +609,14 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             this.interval = 15;
         }
         getUrl({ base, quote }) {
-            return `https://api.hitbtc.com/api/2/public/ticker/${base}${quote}`;
+            return 'https://api.hitbtc.com/api/2/public/ticker/' + `${base}${quote}`.toUpperCase();
         }
         getLast({ last }) {
             return last;
         }
     }
 
-    class Api$k extends Api {
+    class Api$h extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Huobi';
@@ -709,9 +634,12 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             }
             return data.tick.bid[0];
         }
+        getDefaultTicker() {
+            return { base: 'btc', quote: 'usdt' };
+        }
     }
 
-    class Api$l extends Api {
+    class Api$i extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Kraken';
@@ -734,9 +662,12 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             }
             throw new Error(`no data for pair ${pair}`);
         }
+        getDefaultTicker() {
+            return { base: 'XXBT', quote: 'ZUSD' };
+        }
     }
 
-    class Api$m extends Api {
+    class Api$j extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Kucoin';
@@ -744,7 +675,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             this.interval = 15;
         }
         getUrl({ base, quote }) {
-            return 'https://openapi-v2.kucoin.com/api/v1/market/orderbook/' + `level1?symbol=${base}-${quote}`;
+            return 'https://openapi-v2.kucoin.com/api/v1/market/orderbook/level1?symbol=' + `${base}-${quote}`.toUpperCase();
         }
         getLast({ code, msg, data }) {
             if (code != 200000) {
@@ -752,9 +683,12 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             }
             return data.price;
         }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'USDT' };
+        }
     }
 
-    class Api$n extends Api {
+    class Api$k extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Paymium';
@@ -774,9 +708,12 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             }
             return price;
         }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'EUR' };
+        }
     }
 
-    class Api$o extends Api {
+    class Api$l extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Satang.pro';
@@ -791,9 +728,12 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             const asking = parseFloat(data.ask[0].price);
             return (asking - bidding) * 0.5 + bidding;
         }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'THB' };
+        }
     }
 
-    class Api$p extends Api {
+    class Api$m extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'VccExchange(Vietnam)';
@@ -809,9 +749,11 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             }
             return data[0].price;
         }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'USDT' };
+        }
     }
 
-    const Mainloop$1 = imports.mainloop;
     const Providers = {
         binance: new Api$1(),
         binanceFutures: new Api$2(),
@@ -821,24 +763,25 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         bitso: new Api$6(),
         bitstamp: new Api$7(),
         bittrex: new Api$8(),
-        blinktrade: new Api$9(),
+        // blinktrade: new ProviderBlinktrade.Api(),
         btcmarkets: new Api$a(),
-        buda: new Api$b(),
-        bxinth: new Api$c(),
-        cexio: new Api$d(),
-        coinbase: new Api$e(),
-        coingecko: new Api$f(),
-        coinmarketcap: new Api$g(),
-        cryptocompare: new Api$h(),
-        ftx: new Api$i(),
-        hitbtc: new Api$j(),
-        huobi: new Api$k(),
-        kraken: new Api$l(),
-        kucoin: new Api$m(),
-        paymium: new Api$n(),
+        buda: new Api$9(),
+        // https://bitcoinmagazine.com/articles/thai-crypto-exchange-bx-in-th-shuts-down
+        // bxinth: new ProviderBXinTH.Api(),
+        cexio: new Api$b(),
+        coinbase: new Api$c(),
+        coingecko: new Api$d(),
+        // coinmarketcap: new ProviderCoinMarketCap.Api(),
+        cryptocompare: new Api$e(),
+        ftx: new Api$f(),
+        hitbtc: new Api$g(),
+        huobi: new Api$h(),
+        kraken: new Api$i(),
+        kucoin: new Api$j(),
+        paymium: new Api$k(),
         poloniex: new Api$5(),
-        satangpro: new Api$o(),
-        vccexchange: new Api$p(),
+        satangpro: new Api$l(),
+        vccexchange: new Api$m(),
     };
     function getProvider(name) {
         if (name in Providers) {
@@ -848,21 +791,26 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             throw new Error(`unknown api ${name}`);
         }
     }
-    const filterSubscribers = (subscribers, { provider, url, ticker, }) => subscribers.filter((s) => {
-        const { options } = s;
-        if (provider !== undefined && getProvider(options.api) !== provider) {
-            return false;
-        }
-        if (url !== undefined && getSubscriberUrl(s) !== url) {
-            return false;
-        }
-        if (ticker !== undefined) {
-            if (ticker !== getProvider(options.api).getTicker(s.options)) {
+
+    const Mainloop$1 = imports.mainloop;
+    const permanentErrors = new Map();
+    function filterSubscribers(subscribers, { provider, url, ticker, }) {
+        return subscribers.filter((s) => {
+            const { options } = s;
+            if (provider !== undefined && getProvider(options.api) !== provider) {
                 return false;
             }
-        }
-        return true;
-    });
+            if (url !== undefined && getSubscriberUrl(s) !== url) {
+                return false;
+            }
+            if (ticker !== undefined) {
+                if (ticker !== getProvider(options.api).getTicker(s.options)) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
     const applySubscribers = (subscribers, func) => subscribers.forEach((s) => {
         try {
             func(s);
@@ -879,21 +827,24 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             }
         }
     });
-    class PriceData {
+    class PriceDataLog {
         constructor() {
             this.map = new Map();
             this.maxHistory = 10;
         }
         get(ticker) {
-            return (this.map.has(ticker) ? this.map : this.map.set(ticker, { values: new Map(), status: undefined })).get(ticker);
+            if (!this.map.has(ticker)) {
+                this.map.set(ticker, new Map());
+            }
+            return this.map.get(ticker);
         }
         addValue(ticker, date, value) {
             if (isNaN(value)) {
                 throw new Error(`invalid price value ${value}`);
             }
-            const { values } = this.get(ticker);
+            const values = this.get(ticker);
             values.set(date, value);
-            const keys = [...values.keys()].sort((a, b) => b - a);
+            const keys = [...values.keys()].sort((a, b) => b.getTime() - a.getTime());
             keys.splice(this.maxHistory).forEach((k) => values.delete(k));
             return keys.map((k) => ({ date: k, value: values.get(k) }));
         }
@@ -903,7 +854,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
     class PollLoop {
         constructor(provider) {
             this.cache = new Map();
-            this.priceData = new PriceData();
+            this.priceDataLog = new PriceDataLog();
             this.signal = null;
             this.subscribers = [];
             this.urls = [];
@@ -941,20 +892,20 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
                 this.cache.clear();
                 return this.stop();
             }
-            this.urls = [...new Set(this.subscribers.map(getSubscriberUrl))];
+            this.urls = [...new Set(this.subscribers.map((s) => getSubscriberUrl(s)))];
             if (this.start()) {
                 return;
             }
             this.urls.forEach((url) => this.updateUrl(url, this.cache.get(url)));
         }
-        updateUrl(url, cache) {
+        async updateUrl(url, cache) {
             const getUrlSubscribers = () => filterSubscribers(this.subscribers, { url });
             const tickers = new Set(getUrlSubscribers().map(getSubscriberTicker));
             const processResponse = (response, date) => {
                 tickers.forEach((ticker) => {
                     const tickerSubscribers = filterSubscribers(getUrlSubscribers(), { ticker });
                     try {
-                        const priceData = this.priceData.addValue(ticker, date, this.provider.parseData(response, ticker));
+                        const priceData = this.priceDataLog.addValue(ticker, date, this.provider.parseData(response, ticker));
                         applySubscribers(tickerSubscribers, (s) => s.onUpdatePriceData(priceData));
                     }
                     catch (e) {
@@ -968,18 +919,25 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
                 return processResponse(cache.response, cache.date);
             }
             applySubscribers(getUrlSubscribers(), (s) => s.onUpdateStart());
-            this.provider
-                .fetch(url)
-                .then((response) => {
+            const error = permanentErrors.get(this.provider);
+            if (error) {
+                applySubscribers(getUrlSubscribers(), (s) => s.onUpdateError(error));
+                return;
+            }
+            try {
+                const response = await getJSON(url);
                 const date = new Date();
                 this.cache.set(url, { date, response });
                 processResponse(response, date);
-            })
-                .catch((e) => {
-                logError(e);
-                applySubscribers(getUrlSubscribers(), (s) => s.onUpdateError(e));
+            }
+            catch (err) {
+                if (isErrTooManyRequests(err)) {
+                    permanentErrors.set(this.provider, err);
+                }
+                logError(err);
                 this.cache.delete(url);
-            });
+                applySubscribers(getUrlSubscribers(), (s) => s.onUpdateError(err));
+            }
         }
         update() {
             const lastUpdate = (url) => (this.cache.has(url) ? this.cache.get(url).date : undefined);
@@ -994,7 +952,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }
     const _pollLoops = new Map(Object.keys(Providers).map((k) => [k, new PollLoop(Providers[k])]));
-    const setSubscribers = (subscribers) => {
+    function setSubscribers(subscribers) {
         subscribers = subscribers.filter(({ options }) => {
             if (options.api in Providers) {
                 return true;
@@ -1003,7 +961,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             return false;
         });
         _pollLoops.forEach((loop) => loop.setSubscribers(subscribers));
-    };
+    }
 
     const CurrencyData = {
         AED: {
