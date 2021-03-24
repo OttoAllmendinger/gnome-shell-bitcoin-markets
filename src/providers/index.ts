@@ -11,13 +11,10 @@ import * as ProviderBitso from './ProviderBitso';
 import * as ProviderBitstamp from './ProviderBitstamp';
 import * as ProviderBittrex from './ProviderBittrex';
 import * as ProviderBuda from './ProviderBuda';
-// import * as ProviderBlinktrade from './ProviderBlinktrade';
 import * as ProviderBTCMarkets from './ProviderBTCMarkets';
-// import * as ProviderBXinTH from './ProviderBXinTH';
 import * as ProviderCexio from './ProviderCexio';
 import * as ProviderCoinbase from './ProviderCoinbase';
 import * as ProviderCoinGecko from './ProviderCoinGecko';
-// import * as ProviderCoinMarketCap from './ProviderCoinMarketCap';
 import * as ProviderCryptoCompare from './ProviderCryptoCompare';
 import * as ProviderFtx from './ProviderFtx';
 import * as ProviderHitBTC from './ProviderHitBTC';
@@ -39,15 +36,11 @@ export const Providers: Record<string, BaseProvider.Api> = {
   bitso: new ProviderBitso.Api(),
   bitstamp: new ProviderBitstamp.Api(),
   bittrex: new ProviderBittrex.Api(),
-  // blinktrade: new ProviderBlinktrade.Api(),
   btcmarkets: new ProviderBTCMarkets.Api(),
   buda: new ProviderBuda.Api(),
-  // https://bitcoinmagazine.com/articles/thai-crypto-exchange-bx-in-th-shuts-down
-  // bxinth: new ProviderBXinTH.Api(),
   cexio: new ProviderCexio.Api(),
   coinbase: new ProviderCoinbase.Api(),
   coingecko: new ProviderCoinGecko.Api(),
-  // coinmarketcap: new ProviderCoinMarketCap.Api(),
   cryptocompare: new ProviderCryptoCompare.Api(),
   ftx: new ProviderFtx.Api(),
   hitbtc: new ProviderHitBTC.Api(),
