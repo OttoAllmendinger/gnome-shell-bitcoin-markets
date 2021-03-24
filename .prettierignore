@@ -1,0 +1,7 @@
+node_modules/
+@types/
+.cache/
+gselib/
+build/
+dist/
+tools/
