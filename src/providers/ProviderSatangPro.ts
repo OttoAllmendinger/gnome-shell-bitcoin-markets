@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'Satang.pro';
@@ -15,5 +15,9 @@ export class Api extends BaseProvider.Api {
     const bidding = parseFloat(data.bid[0].price);
     const asking = parseFloat(data.ask[0].price);
     return (asking - bidding) * 0.5 + bidding;
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'BTC', quote: 'THB' };
   }
 }

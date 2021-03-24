@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'Paymium';
@@ -20,5 +20,9 @@ export class Api extends BaseProvider.Api {
       throw new Error(`invalid base ${base}`);
     }
     return price;
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'BTC', quote: 'EUR' };
   }
 }

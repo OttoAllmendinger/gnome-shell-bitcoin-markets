@@ -1,5 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
-import { Options } from '../prefs/prefs';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'BX.in.th';
@@ -11,7 +10,7 @@ export class Api extends BaseProvider.Api {
 
   interval = 60; // unclear, should be safe
 
-  getUrl(_options: Options) {
+  getUrl(_options) {
     return 'https://bx.in.th/api/';
   }
 

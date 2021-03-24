@@ -8,7 +8,7 @@ import { _ } from 'gselib/gettext';
 import ExtensionUtils from 'gselib/extensionUtils';
 
 import * as Format from '../format/Format';
-import * as ApiService from '../ApiService';
+import { getProvider, Providers } from '../providers';
 import * as BaseProviderConfigView from './BaseProviderConfigView';
 
 const { ComboBoxView, makeConfigRow } = BaseProviderConfigView;
@@ -23,13 +23,13 @@ declare module '@imports/GObject-2.0' {
   const TYPE_INT: GObject.Type;
 }
 
-declare interface IndicatorConfigView extends SignalEmitter {}
-
-export interface Options {
+export interface ComboBoxOptions {
   value: string;
   label: string;
   active: boolean;
 }
+
+declare interface IndicatorConfigView extends SignalEmitter {}
 
 class IndicatorConfigView {
   private _indicatorConfig: any;
@@ -120,9 +120,9 @@ class IndicatorConfigView {
   _confProvider() {
     const preset = this._indicatorConfig.get('api');
 
-    const options: Options[] = Object.keys(ApiService.Providers).map((name) => ({
+    const options: ComboBoxOptions[] = Object.keys(Providers).map((name) => ({
       value: name,
-      label: ApiService.getProvider(name).apiName,
+      label: getProvider(name).apiName,
       active: false,
     }));
 

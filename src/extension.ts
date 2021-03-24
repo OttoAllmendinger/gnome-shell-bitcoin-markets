@@ -1,3 +1,5 @@
+import { Subscriber } from './ApiService';
+
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
@@ -17,6 +19,8 @@ import * as HTTP from './HTTP';
 import { Defaults } from './IndicatorCollectionModel';
 
 import { uuid } from './metadata.json';
+import { Options } from './providers/BaseProvider';
+import { getProvider } from './providers';
 
 const version = currentVersion();
 
@@ -33,8 +37,14 @@ const _Symbols = {
 
 const settings = ExtensionUtils.getSettings();
 
+interface IndicatorOptions extends Options {
+  show_change: boolean;
+}
+
 const MarketIndicatorView = extendGObject(
   class MarketIndicatorView extends PanelMenu.Button {
+    options?: IndicatorOptions;
+
     _init(options) {
       super._init(0);
       this.providerLabel = '';
@@ -42,9 +52,9 @@ const MarketIndicatorView = extendGObject(
       this.setOptions(options);
     }
 
-    setOptions(options) {
+    setOptions(options: IndicatorOptions) {
       try {
-        this.providerLabel = ApiService.getProvider(options.api).getLabel(options);
+        this.providerLabel = getProvider(options.api).getLabel(options);
       } catch (e) {
         logError(e);
         this.providerLabel = `[${options.api}]`;
@@ -111,7 +121,7 @@ const MarketIndicatorView = extendGObject(
 
     onClearValue() {
       this._displayStatus(_Symbols.refresh);
-      this._displayText(Format.format(undefined, this.options));
+      this._displayText(Format.format(undefined, this.options!));
       this._updatePopupItemLabel();
     }
 
@@ -127,14 +137,14 @@ const MarketIndicatorView = extendGObject(
       };
 
       let symbol = ' ';
-      if (this.options.show_change) {
+      if (this.options!.show_change) {
         symbol = _StatusToSymbol[change];
         this._displayStatus(symbol);
       } else {
         this._statusView.width = 0;
       }
 
-      this._displayText(Format.format(p.value, this.options));
+      this._displayText(Format.format(p.value, this.options!));
       this._updatePopupItemLabel();
     }
 
@@ -262,7 +272,7 @@ class IndicatorCollection {
       this._indicators = indicators;
     }
 
-    ApiService.setSubscribers(this._indicators.filter((i) => i.options));
+    ApiService.setSubscribers(this._indicators.filter((i) => i.options) as Subscriber[]);
   }
 
   _removeAll() {

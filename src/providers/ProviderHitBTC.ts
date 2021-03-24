@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'HitBTC';
@@ -8,7 +8,7 @@ export class Api extends BaseProvider.Api {
   interval = 15;
 
   getUrl({ base, quote }) {
-    return `https://api.hitbtc.com/api/2/public/ticker/${base}${quote}`;
+    return 'https://api.hitbtc.com/api/2/public/ticker/' + `${base}${quote}`.toUpperCase();
   }
 
   getLast({ last }) {

@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'Binance Futures';
@@ -18,5 +18,9 @@ export class Api extends BaseProvider.Api {
 
   getLast({ price }) {
     return price;
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'BTC', quote: 'USDT' };
   }
 }

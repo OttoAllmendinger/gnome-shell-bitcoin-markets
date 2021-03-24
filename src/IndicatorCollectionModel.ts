@@ -7,7 +7,7 @@ import { extendGObject } from './gselib/gobjectUtil';
 import ExtensionUtils from 'gselib/extensionUtils';
 import { SignalEmitter } from './gselib/SignalEmitter';
 
-import * as ApiService from './ApiService';
+import { getProvider } from './providers';
 
 const INDICATORS_KEY = 'indicators';
 
@@ -107,7 +107,7 @@ export const IndicatorCollectionModel = extendGObject(
 
     _getLabel(config) {
       try {
-        return ApiService.getProvider(config.api).getLabel(config);
+        return getProvider(config.api).getLabel(config);
       } catch (e) {
         logError(e);
         return `[unsupported: ${config.api}]`;

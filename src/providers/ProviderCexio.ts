@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'CEX.IO';

@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'Kraken';
@@ -25,5 +25,9 @@ export class Api extends BaseProvider.Api {
     }
 
     throw new Error(`no data for pair ${pair}`);
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'XXBT', quote: 'ZUSD' };
   }
 }

@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'CoinGecko';
@@ -28,5 +28,9 @@ export class Api extends BaseProvider.Api {
       throw new Error(`no quote currency ${quote.toUpperCase()}`);
     }
     return result.last;
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'bitcoin', quote: 'usd' };
   }
 }

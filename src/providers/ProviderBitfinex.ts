@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'Bitfinex';
@@ -40,5 +40,9 @@ export class Api extends BaseProvider.Api {
 
   getLast(data) {
     return data[6];
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'BTC', quote: 'USD' };
   }
 }

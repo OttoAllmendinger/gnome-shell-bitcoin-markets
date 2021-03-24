@@ -1,75 +1,27 @@
 const Mainloop = imports.mainloop;
 
-import * as BaseProvider from './BaseProvider';
+import * as HTTP from './HTTP';
+import { getProvider, BaseProvider, Providers } from './providers';
 
-import * as ProviderBinance from './providers/ProviderBinance';
-import * as ProviderBinanceFutures from './providers/ProviderBinanceFutures';
-import * as ProviderBitfinex from './providers/ProviderBitfinex';
-import * as ProviderBitMEX from './providers/ProviderBitMEX';
-import * as ProviderBitPay from './providers/ProviderBitPay';
-import * as ProviderBitso from './providers/ProviderBitso';
-import * as ProviderBitstamp from './providers/ProviderBitstamp';
-import * as ProviderBittrex from './providers/ProviderBittrex';
-import * as ProviderBlinktrade from './providers/ProviderBlinktrade';
-import * as ProviderBTCMarkets from './providers/ProviderBTCMarkets';
-import * as ProviderBuda from './providers/ProviderBuda';
-import * as ProviderBXinTH from './providers/ProviderBXinTH';
-import * as ProviderCexio from './providers/ProviderCexio';
-import * as ProviderCoinbase from './providers/ProviderCoinbase';
-import * as ProviderCoinGecko from './providers/ProviderCoinGecko';
-import * as ProviderCoinMarketCap from './providers/ProviderCoinMarketCap';
-import * as ProviderCryptoCompare from './providers/ProviderCryptoCompare';
-import * as ProviderFtx from './providers/ProviderFtx';
-import * as ProviderHitBTC from './providers/ProviderHitBTC';
-import * as ProviderHuobi from './providers/ProviderHuobi';
-import * as ProviderKraken from './providers/ProviderKraken';
-import * as ProviderKucoin from './providers/ProviderKucoin';
-import * as ProviderPaymium from './providers/ProviderPaymium';
-import * as ProviderPoloniex from './providers/ProviderBitPay';
-import * as ProviderSatangPro from './providers/ProviderSatangPro';
-import * as ProviderVccExchange from './providers/ProviderVccExchange';
-
-export const Providers: Record<string, BaseProvider.Api> = {
-  binance: new ProviderBinance.Api(),
-  binanceFutures: new ProviderBinanceFutures.Api(),
-  bitfinex: new ProviderBitfinex.Api(),
-  bitmex: new ProviderBitMEX.Api(),
-  bitpay: new ProviderBitPay.Api(),
-  bitso: new ProviderBitso.Api(),
-  bitstamp: new ProviderBitstamp.Api(),
-  bittrex: new ProviderBittrex.Api(),
-  blinktrade: new ProviderBlinktrade.Api(),
-  btcmarkets: new ProviderBTCMarkets.Api(),
-  buda: new ProviderBuda.Api(),
-  bxinth: new ProviderBXinTH.Api(),
-  cexio: new ProviderCexio.Api(),
-  coinbase: new ProviderCoinbase.Api(),
-  coingecko: new ProviderCoinGecko.Api(),
-  coinmarketcap: new ProviderCoinMarketCap.Api(),
-  cryptocompare: new ProviderCryptoCompare.Api(),
-  ftx: new ProviderFtx.Api(),
-  hitbtc: new ProviderHitBTC.Api(),
-  huobi: new ProviderHuobi.Api(),
-  kraken: new ProviderKraken.Api(),
-  kucoin: new ProviderKucoin.Api(),
-  paymium: new ProviderPaymium.Api(),
-  poloniex: new ProviderPoloniex.Api(),
-  satangpro: new ProviderSatangPro.Api(),
-  vccexchange: new ProviderVccExchange.Api(),
-};
-
-type Ticker = unknown;
-
-export function getProvider(name: string): BaseProvider.Api {
-  if (name in Providers) {
-    return Providers[name];
-  } else {
-    throw new Error(`unknown api ${name}`);
-  }
+interface PriceData {
+  date: Date;
+  value: number;
 }
 
-const filterSubscribers = (
-  subscribers,
+export interface Subscriber {
+  options: BaseProvider.Options;
+
+  onUpdateStart();
+
+  onUpdateError(err: Error, opts?: { ticker: BaseProvider.Ticker });
+
+  onUpdatePriceData(priceData: PriceData[]);
+}
+
+const permanentErrors: Map<BaseProvider.Api, Error> = new Map();
+
+function filterSubscribers(
+  subscribers: Subscriber[],
   {
     provider,
     url,
@@ -77,10 +29,10 @@ const filterSubscribers = (
   }: {
     provider?: BaseProvider.Api;
     url?: string;
-    ticker?: Ticker;
+    ticker?: BaseProvider.Ticker;
   },
-) =>
-  subscribers.filter((s) => {
+): Subscriber[] {
+  return subscribers.filter((s) => {
     const { options } = s;
     if (provider !== undefined && getProvider(options.api) !== provider) {
       return false;
@@ -95,8 +47,9 @@ const filterSubscribers = (
     }
     return true;
   });
+}
 
-const applySubscribers = (subscribers, func) =>
+const applySubscribers = (subscribers, func: (s: Subscriber) => void) =>
   subscribers.forEach((s) => {
     try {
       func(s);
@@ -112,40 +65,41 @@ const applySubscribers = (subscribers, func) =>
     }
   });
 
-class PriceData {
-  map = new Map();
+class PriceDataLog {
+  map: Map<BaseProvider.Ticker, Map<Date, number>> = new Map();
 
   maxHistory = 10;
 
-  get(ticker) {
-    return (this.map.has(ticker) ? this.map : this.map.set(ticker, { values: new Map(), status: undefined })).get(
-      ticker,
-    );
+  get(ticker): Map<Date, number> {
+    if (!this.map.has(ticker)) {
+      this.map.set(ticker, new Map());
+    }
+    return this.map.get(ticker)!;
   }
 
-  addValue(ticker, date, value) {
+  addValue(ticker, date, value): PriceData[] {
     if (isNaN(value)) {
       throw new Error(`invalid price value ${value}`);
     }
-    const { values } = this.get(ticker);
+    const values = this.get(ticker);
     values.set(date, value);
 
-    const keys = [...values.keys()].sort((a, b) => b - a);
+    const keys = [...values.keys()].sort((a, b) => b.getTime() - a.getTime());
     keys.splice(this.maxHistory).forEach((k) => values.delete(k));
 
-    return keys.map((k) => ({ date: k, value: values.get(k) }));
+    return keys.map((k: Date) => ({ date: k, value: values.get(k)! }));
   }
 }
 
-const getSubscriberUrl = ({ options }) => getProvider(options.api).getUrl(options);
+const getSubscriberUrl = ({ options }: Subscriber) => getProvider(options.api).getUrl(options);
 
-const getSubscriberTicker = ({ options }) => getProvider(options.api).getTicker(options);
+const getSubscriberTicker = ({ options }: Subscriber) => getProvider(options.api).getTicker(options);
 
 class PollLoop {
   private provider: BaseProvider.Api;
   private interval: number;
   private cache = new Map();
-  private priceData = new PriceData();
+  private priceDataLog = new PriceDataLog();
   private signal = null;
   private subscribers: any[] = [];
   private urls: string[] = [];
@@ -183,7 +137,7 @@ class PollLoop {
     this.signal = Mainloop.timeout_add_seconds(this.interval, this.run.bind(this));
   }
 
-  setSubscribers(subscribers) {
+  setSubscribers(subscribers: Subscriber[]) {
     this.subscribers = filterSubscribers(subscribers, { provider: this.provider });
 
     if (this.subscribers.length === 0) {
@@ -191,7 +145,7 @@ class PollLoop {
       return this.stop();
     }
 
-    this.urls = [...new Set(this.subscribers.map(getSubscriberUrl))];
+    this.urls = [...new Set(this.subscribers.map((s) => getSubscriberUrl(s)))];
 
     if (this.start()) {
       return;
@@ -200,16 +154,16 @@ class PollLoop {
     this.urls.forEach((url) => this.updateUrl(url, this.cache.get(url)));
   }
 
-  updateUrl(url, cache?) {
+  async updateUrl(url, cache?) {
     const getUrlSubscribers = () => filterSubscribers(this.subscribers, { url });
 
-    const tickers = new Set(getUrlSubscribers().map(getSubscriberTicker));
+    const tickers: Set<BaseProvider.Ticker> = new Set(getUrlSubscribers().map(getSubscriberTicker));
 
     const processResponse = (response, date) => {
       tickers.forEach((ticker) => {
         const tickerSubscribers = filterSubscribers(getUrlSubscribers(), { ticker });
         try {
-          const priceData = this.priceData.addValue(ticker, date, this.provider.parseData(response, ticker));
+          const priceData = this.priceDataLog.addValue(ticker, date, this.provider.parseData(response, ticker));
           applySubscribers(tickerSubscribers, (s) => s.onUpdatePriceData(priceData));
         } catch (e) {
           e.message = `Error updating ${url}: ${e.message}`;
@@ -225,18 +179,25 @@ class PollLoop {
 
     applySubscribers(getUrlSubscribers(), (s) => s.onUpdateStart());
 
-    this.provider
-      .fetch(url)
-      .then((response) => {
-        const date = new Date();
-        this.cache.set(url, { date, response });
-        processResponse(response, date);
-      })
-      .catch((e) => {
-        logError(e);
-        applySubscribers(getUrlSubscribers(), (s) => s.onUpdateError(e));
-        this.cache.delete(url);
-      });
+    const error = permanentErrors.get(this.provider);
+    if (error) {
+      applySubscribers(getUrlSubscribers(), (s) => s.onUpdateError(error));
+      return;
+    }
+
+    try {
+      const response = await HTTP.getJSON(url);
+      const date = new Date();
+      this.cache.set(url, { date, response });
+      processResponse(response, date);
+    } catch (err) {
+      if (HTTP.isErrTooManyRequests(err)) {
+        permanentErrors.set(this.provider, err);
+      }
+      logError(err);
+      this.cache.delete(url);
+      applySubscribers(getUrlSubscribers(), (s) => s.onUpdateError(err));
+    }
   }
 
   update() {
@@ -258,7 +219,7 @@ class PollLoop {
 
 const _pollLoops = new Map(Object.keys(Providers).map((k) => [k, new PollLoop(Providers[k])]));
 
-export const setSubscribers = (subscribers) => {
+export function setSubscribers(subscribers: Subscriber[]) {
   subscribers = subscribers.filter(({ options }) => {
     if (options.api in Providers) {
       return true;
@@ -268,4 +229,4 @@ export const setSubscribers = (subscribers) => {
   });
 
   _pollLoops.forEach((loop) => loop.setSubscribers(subscribers));
-};
+}

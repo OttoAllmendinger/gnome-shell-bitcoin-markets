@@ -94,42 +94,34 @@ export function getJSON(url, _params?) {
   const headers = message.request_headers;
   headers.append('X-Client-Id', _clientId);
   // log(`> GET ${url}`);
-  return Object.assign(
-    new Promise((resolve, reject) => {
-      session.queue_message(message, (session, message) => {
-        // log(`< GET ${url}: ${message.status_code}`);
-        if (message.status_code !== 200) {
-          const err = new HTTPError(message);
-          logError(err);
-          return reject(err);
-        }
+  return new Promise((resolve, reject) => {
+    session.queue_message(message, (session, message) => {
+      // log(`< GET ${url}: ${message.status_code}`);
+      if (message.status_code !== 200) {
+        const err = new HTTPError(message);
+        logError(err);
+        return reject(err);
+      }
 
-        if (message.response_body === undefined) {
-          return reject(new Error(`GET ${url}: message.response_body not defined`));
-        }
+      if (message.response_body === undefined) {
+        return reject(new Error(`GET ${url}: message.response_body not defined`));
+      }
 
-        const { response_body } = message;
+      const { response_body } = message;
 
-        if (!('data' in response_body)) {
-          return reject(new Error(`GET ${url}: response_body.data not defined`));
-        }
+      if (!('data' in response_body)) {
+        return reject(new Error(`GET ${url}: response_body.data not defined`));
+      }
 
-        const { data } = message.response_body;
+      const { data } = message.response_body;
 
-        try {
-          return resolve(JSON.parse(data));
-        } catch (e) {
-          return reject(new Error(`GET ${url}: error parsing as JSON: ${e}; data=${JSON.stringify(data)}`));
-        }
-      });
+      try {
+        return resolve(JSON.parse(data));
+      } catch (e) {
+        return reject(new Error(`GET ${url}: error parsing as JSON: ${e}; data=${JSON.stringify(data)}`));
+      }
+    });
 
-      Mainloop.timeout_add(_timeoutMs, () => session.abort());
-    }),
-
-    {
-      cancel() {
-        session.abort();
-      },
-    },
-  );
+    Mainloop.timeout_add(_timeoutMs, () => session.abort());
+  });
 }

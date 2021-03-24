@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'BitMEX';
@@ -24,5 +24,9 @@ export class Api extends BaseProvider.Api {
       throw new Error(`expected symbol ${symbol}, get ${data.symbol}`);
     }
     return data.lastPrice;
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'XBT', quote: 'USD' };
   }
 }

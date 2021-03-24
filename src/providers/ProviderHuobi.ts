@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'Huobi';
@@ -19,5 +19,9 @@ export class Api extends BaseProvider.Api {
     }
 
     return data.tick.bid[0];
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'btc', quote: 'usdt' };
   }
 }

@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'BTCMarkets';
@@ -20,5 +20,9 @@ export class Api extends BaseProvider.Api {
     }
     const { errorCode, errorMessage } = data;
     throw new Error(`${errorCode}: ${errorMessage}`);
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'BTC', quote: 'AUD' };
   }
 }

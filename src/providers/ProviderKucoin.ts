@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'Kucoin';
@@ -8,7 +8,7 @@ export class Api extends BaseProvider.Api {
   interval = 15;
 
   getUrl({ base, quote }) {
-    return 'https://openapi-v2.kucoin.com/api/v1/market/orderbook/' + `level1?symbol=${base}-${quote}`;
+    return 'https://openapi-v2.kucoin.com/api/v1/market/orderbook/level1?symbol=' + `${base}-${quote}`.toUpperCase();
   }
 
   getLast({ code, msg, data }) {
@@ -17,5 +17,9 @@ export class Api extends BaseProvider.Api {
     }
 
     return data.price;
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'BTC', quote: 'USDT' };
   }
 }

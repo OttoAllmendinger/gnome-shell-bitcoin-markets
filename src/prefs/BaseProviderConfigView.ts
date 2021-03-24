@@ -7,9 +7,9 @@ import * as GObject from '@imports/GObject-2.0';
 import { SignalEmitter } from '../gselib/SignalEmitter';
 import { _ } from '../gselib/gettext';
 
-import * as BaseProvider from '../BaseProvider';
-import * as ApiService from '../ApiService';
-import { Options } from './prefs';
+import * as BaseProvider from '../providers/BaseProvider';
+import { getProvider } from '../providers';
+import { ComboBoxOptions } from './prefs';
 
 export function makeConfigRow(description: string, widget: Gtk.Widget) {
   const box = new Gtk.Box({
@@ -51,7 +51,7 @@ export class ComboBoxView {
 
   public widget: Gtk.ComboBox;
   public model: Gtk.ListStore;
-  private _options?: Options[];
+  private _options?: ComboBoxOptions[];
 
   constructor(options) {
     const model = new Gtk.ListStore();
@@ -78,7 +78,7 @@ export class ComboBoxView {
     });
   }
 
-  setOptions(options: Options[]) {
+  setOptions(options: ComboBoxOptions[]) {
     this.model.clear();
     this._options = options || [];
 
@@ -103,9 +103,9 @@ export class BaseProviderConfigView {
   private _indicatorConfig;
   private _widgets: Gtk.Widget[];
 
-  constructor(api: string, configWidget: Gtk.Box, indicatorConfig: Options) {
+  constructor(api: string, configWidget: Gtk.Box, indicatorConfig: ComboBoxOptions) {
     this._api = api;
-    this._provider = ApiService.getProvider(api);
+    this._provider = getProvider(api);
     this._configWidget = configWidget;
     this._indicatorConfig = indicatorConfig;
     this._widgets = [];

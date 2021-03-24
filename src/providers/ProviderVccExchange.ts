@@ -1,4 +1,4 @@
-import * as BaseProvider from '../BaseProvider';
+import * as BaseProvider from './BaseProvider';
 
 export class Api extends BaseProvider.Api {
   apiName = 'VccExchange(Vietnam)';
@@ -16,5 +16,9 @@ export class Api extends BaseProvider.Api {
       throw new Error(message);
     }
     return data[0].price;
+  }
+
+  getDefaultTicker(): BaseProvider.Ticker {
+    return { base: 'BTC', quote: 'USDT' };
   }
 }
