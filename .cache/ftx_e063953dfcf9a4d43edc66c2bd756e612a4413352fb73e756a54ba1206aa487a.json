@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "result": {
+    "name": "BTC/USD",
+    "enabled": true,
+    "postOnly": false,
+    "priceIncrement": 1,
+    "sizeIncrement": 0.0001,
+    "minProvideSize": 0.0001,
+    "last": 56373,
+    "bid": 56368,
+    "ask": 56373,
+    "price": 56373,
+    "type": "spot",
+    "baseCurrency": "BTC",
+    "quoteCurrency": "USD",
+    "underlying": null,
+    "restricted": false,
+    "highLeverageFeeExempt": true,
+    "change1h": -0.0023890422595030793,
+    "change24h": 0.029267847361694358,
+    "changeBod": 0.03258599846136938,
+    "quoteVolume24h": 281957924.1488,
+    "volumeUsd24h": 281957924.1488
+  }
+}

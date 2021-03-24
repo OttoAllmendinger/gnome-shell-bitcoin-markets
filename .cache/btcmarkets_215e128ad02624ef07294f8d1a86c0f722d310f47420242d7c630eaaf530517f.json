@@ -1,0 +1,12 @@
+{
+  "bestBid": 74044.37,
+  "bestAsk": 74161.12,
+  "lastPrice": 74044.36,
+  "currency": "AUD",
+  "instrument": "BTC",
+  "timestamp": 1616582944,
+  "volume24h": 123.81534,
+  "price24h": 2317.15,
+  "low24h": 70433.76,
+  "high24h": 74500
+}

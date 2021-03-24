@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Gnome-Shell Extension to conveniently create, copy, store and upload screenshots",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test"
   },
   "repository": {
     "type": "git",
@@ -21,9 +21,11 @@
     "@rollup/plugin-typescript": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
+    "axios": "^0.21.0",
     "eslint": "^7.11.0",
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "mocha": "^8.2.1",
     "prettier": "^2.1.2",
     "rollup": "^2.30.0",
     "rollup-plugin-copy": "^3.3.0",
