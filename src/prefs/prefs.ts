@@ -1,6 +1,8 @@
+import { Widget_ConstructProps } from '@imports/Gtk-4.0';
+
 const Signals = imports.signals;
 
-import * as Gtk from '@imports/Gtk-3.0';
+import * as Gtk from '@imports/Gtk-4.0';
 import * as GObject from '@imports/GObject-2.0';
 
 import { extendGObject } from '../gselib/gobjectUtil';
@@ -31,6 +33,15 @@ export interface ComboBoxOptions {
 
 declare interface IndicatorConfigView extends SignalEmitter {}
 
+function getMarginAll(v: number): Partial<Widget_ConstructProps> {
+  return {
+    margin_start: v,
+    margin_top: v,
+    margin_end: v,
+    margin_bottom: v,
+  };
+}
+
 class IndicatorConfigView {
   private _indicatorConfig: any;
   private _layoutIndicatorSettings: Gtk.Box;
@@ -39,7 +50,7 @@ class IndicatorConfigView {
   private _apiConfigView?: BaseProviderConfigView.BaseProviderConfigView;
 
   constructor(indicatorConfig) {
-    const padding = 8;
+    const margin = 8;
 
     this._indicatorConfig = indicatorConfig;
 
@@ -50,37 +61,38 @@ class IndicatorConfigView {
     {
       const frame = new Gtk.Frame({
         label: _('Indicator Settings'),
-        margin_bottom: 8,
+        ...getMarginAll(margin),
       });
       this._layoutIndicatorSettings = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
-        border_width: padding,
+        ...getMarginAll(margin),
       });
-      frame.add(this._layoutIndicatorSettings);
-      this.widget.add(frame);
+      frame.set_child(this._layoutIndicatorSettings);
+      this.widget.append(frame);
     }
     {
-      const frame = new Gtk.Frame({ label: _('Provider Settings') });
+      const frame = new Gtk.Frame({
+        label: _('Provider Settings'),
+        ...getMarginAll(margin),
+      });
       this._layoutProviderSettings = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
-        border_width: padding,
+        ...getMarginAll(margin),
       });
-      frame.add(this._layoutProviderSettings);
-      this.widget.add(frame);
+      frame.set_child(this._layoutProviderSettings);
+      this.widget.append(frame);
     }
 
     this._addIndicatorSettings();
 
     this._selectApi(indicatorConfig.get('api'));
-
-    this.widget.show_all();
   }
 
   _addIndicatorSettings() {
     const layout = this._layoutIndicatorSettings;
-    layout.add(this._confFormat());
-    layout.add(this._confShowChange());
-    layout.add(this._confProvider());
+    layout.append(this._confFormat());
+    layout.append(this._confShowChange());
+    layout.append(this._confProvider());
   }
 
   _selectApi(api) {
@@ -98,11 +110,9 @@ class IndicatorConfigView {
       e.message = `Error creating configView for api ${api}: ${e.message}`;
       logError(e);
     }
-
-    widget.show_all();
   }
 
-  _confFormat() {
+  _confFormat(): Gtk.Widget {
     const format = this._indicatorConfig.get('format');
 
     const entry = new Gtk.Entry({
@@ -165,7 +175,6 @@ class IndicatorConfigView {
 
   destroy() {
     this.disconnectAll();
-    this.widget.destroy();
   }
 }
 
@@ -177,8 +186,8 @@ const BitcoinMarketsSettingsWidget = extendGObject(
     private _configLayout?: Gtk.Box;
     private _treeView?: Gtk.TreeView;
     private _selection?: Gtk.TreeSelection;
-    private _toolbar?: Gtk.Toolbar;
-    private _delButton?: Gtk.ToolButton;
+    private _toolbar?: Gtk.Box;
+    private _delButton?: Gtk.Button;
     private _indicatorConfigView: any;
 
     _init() {
@@ -191,25 +200,29 @@ const BitcoinMarketsSettingsWidget = extendGObject(
       /* sidebar (left) */
 
       const sidebar = new Gtk.Box({
-        margin: 10,
+        margin_start: 10,
+        margin_end: 10,
+        margin_top: 10,
+        margin_bottom: 10,
         orientation: Gtk.Orientation.VERTICAL,
         width_request: 240,
       });
 
-      sidebar.add(this._getTreeView());
-      sidebar.add((this._getToolbar() as unknown) as Gtk.Widget);
+      sidebar.append((this._getTreeView() as unknown) as Gtk.Widget);
+      sidebar.append((this._getToolbar() as unknown) as Gtk.Widget);
 
-      this.add(sidebar);
+      this.append(sidebar);
 
       /* config (right) */
 
       this._configLayout = new Gtk.Box({
-        margin: 10,
+        // margin: 10,
         orientation: Gtk.Orientation.HORIZONTAL,
-        expand: true,
+        hexpand: true,
+        vexpand: true,
       });
 
-      this.add(this._configLayout);
+      this.append(this._configLayout);
 
       /* behavior */
 
@@ -236,22 +249,18 @@ const BitcoinMarketsSettingsWidget = extendGObject(
     }
 
     _getToolbar() {
-      const toolbar = (this._toolbar = new Gtk.Toolbar({
-        icon_size: 1,
-      }));
-
-      toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR);
+      const toolbar = (this._toolbar = new Gtk.Box({}));
 
       /* new widget button with menu */
-      const newButton = new Gtk.ToolButton({ icon_name: 'list-add-symbolic' });
+      const newButton = new Gtk.Button({ icon_name: 'list-add-symbolic' });
       newButton.connect('clicked', this._addClicked.bind(this));
-      toolbar.add(newButton);
+      toolbar.append(newButton);
 
       /* delete button */
-      const delButton = (this._delButton = new Gtk.ToolButton({ icon_name: 'list-remove-symbolic' }));
+      const delButton = (this._delButton = new Gtk.Button({ icon_name: 'list-remove-symbolic' }));
       delButton.connect('clicked', this._delClicked.bind(this));
 
-      toolbar.add(delButton);
+      toolbar.append(delButton);
 
       this._updateToolbar();
 
@@ -282,7 +291,7 @@ const BitcoinMarketsSettingsWidget = extendGObject(
       }
 
       this._indicatorConfigView = new IndicatorConfigView(indicatorConfig);
-      this._configLayout!.add(this._indicatorConfigView.widget);
+      this._configLayout!.append(this._indicatorConfigView.widget);
     }
 
     _updateToolbar() {
@@ -324,10 +333,6 @@ export default {
   },
 
   buildPrefsWidget() {
-    const widget = new BitcoinMarketsSettingsWidget();
-
-    widget.show_all();
-
-    return widget;
+    return new BitcoinMarketsSettingsWidget();
   },
 };

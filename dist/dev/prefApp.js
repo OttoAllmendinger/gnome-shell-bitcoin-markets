@@ -1,4 +1,6 @@
-var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
+imports.gi.versions.Gtk = imports.gi.GLib.getenv("GTK");
+
+(function (Gio, Gtk$1, Gtk, GObject, GLib) {
     'use strict';
 
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -1304,9 +1306,43 @@ var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
         },
     };
 
-    return prefs;
+    class PrefsAppWindow {
+        constructor(app) {
+            this.app = app;
+        }
+        getWindow() {
+            const windowConfig = {
+                application: this.app,
+                default_height: 600,
+                default_width: 800,
+            };
+            let window;
+            switch (imports.gi.versions.Gtk) {
+                case '3.0':
+                    window = new Gtk$1.ApplicationWindow(windowConfig);
+                    window.add(prefs.buildPrefsWidget());
+                    window.show_all();
+                    break;
+                case '4.0':
+                    window = new Gtk.ApplicationWindow(windowConfig);
+                    window.set_child(prefs.buildPrefsWidget());
+                    break;
+            }
+            return window;
+        }
+    }
+    const application = new Gtk$1.Application({
+        application_id: 'org.gnome.GnomeShellScreenshot.PrefsTestApp',
+        flags: Gio.ApplicationFlags.FLAGS_NONE,
+    });
+    application.connect('activate', (app) => {
+        let activeWindow = app.active_window;
+        if (!activeWindow) {
+            const imageViewerWindow = new PrefsAppWindow(app);
+            activeWindow = imageViewerWindow.getWindow();
+        }
+        activeWindow.present();
+    });
+    application.run(null);
 
-}(imports.gi.Gtk, imports.gi.GObject, imports.gi.Gio, imports.gi.Gtk, imports.gi.GLib));
-
-var init = prefs.init;
-var buildPrefsWidget = prefs.buildPrefsWidget;
+}(imports.gi.Gio, imports.gi.Gtk, imports.gi.Gtk, imports.gi.GObject, imports.gi.GLib));

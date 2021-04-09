@@ -19,4 +19,13 @@ const targetPrefs = target({
   },
 });
 
-export default [targetExt, targetPrefs];
+const targetPrefApp = target({
+  input: 'src/prefs/app.ts',
+  output: {
+    file: `${buildPath}/dev/prefApp.js`,
+    name: 'prefApp',
+    banner: 'imports.gi.versions.Gtk = imports.gi.GLib.getenv("GTK");\n',
+  },
+});
+
+export default [targetExt, targetPrefs, targetPrefApp];
