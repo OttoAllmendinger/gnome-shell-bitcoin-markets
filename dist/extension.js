@@ -99,7 +99,8 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
     var description = "Display info on various crypto-currency exchanges.";
     var metadata = {
     	"shell-version": [
-    	"40"
+    	"40",
+    	"41"
     ],
     	uuid: uuid,
     	name: name,
@@ -2426,4 +2427,4 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
 
     return extension;
 
-}(imports.gi.St, imports.gi.Clutter, imports.gi.GLib, imports.gi.Gio, imports.gi.Shell, imports.gi.GObject, imports.gi.Soup, imports.gi.Gtk));
+}(imports.gi.St, Clutter, imports.gi.GLib, imports.gi.Gio, imports.gi.Shell, imports.gi.GObject, imports.gi.Soup, imports.gi.Gtk));

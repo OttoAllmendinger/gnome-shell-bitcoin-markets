@@ -21,7 +21,8 @@ imports.gi.versions.Gtk = imports.gi.GLib.getenv("GTK");
     var description = "Display info on various crypto-currency exchanges.";
     var metadata = {
     	"shell-version": [
-    	"40"
+    	"40",
+    	"41"
     ],
     	uuid: uuid,
     	name: name,

@@ -19,7 +19,8 @@ var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
     var description = "Display info on various crypto-currency exchanges.";
     var metadata = {
     	"shell-version": [
-    	"40"
+    	"40",
+    	"41"
     ],
     	uuid: uuid,
     	name: name,
