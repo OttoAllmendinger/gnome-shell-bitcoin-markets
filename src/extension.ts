@@ -9,7 +9,6 @@ import * as Clutter from '@imports/Clutter-8';
 
 import ExtensionUtils, { _ } from './gselib/extensionUtils';
 import { currentVersion } from './gselib/version';
-import { openPrefs } from './gselib/openPrefs';
 import { extendGObject } from './gselib/gobjectUtil';
 
 import * as ApiService from './ApiService';
@@ -93,7 +92,7 @@ const MarketIndicatorView = extendGObject(
       this._popupItemSettings = new PopupMenu.PopupMenuItem(_('Settings'));
       this.menu.addMenuItem(this._popupItemSettings);
       this._popupItemSettings.connect('activate', () => {
-        openPrefs(version, uuid, { shell: imports.gi.Shell });
+        ExtensionUtils.openPrefs();
       });
     }
 

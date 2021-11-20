@@ -1,4 +1,4 @@
-var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
+var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
     'use strict';
 
     var ExtensionUtils = imports.misc.extensionUtils;
@@ -50,47 +50,6 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
         smallerEqual(v) {
             return this.equal(v) || this.smaller(v);
-        }
-    }
-
-    /**
-     * This works for < 3.36
-     */
-    function openPrefsAppSystem(uuid, params = {}) {
-        const shell = params.shell;
-        if (!shell) {
-            throw new Error('must provide shell');
-        }
-        const appSys = shell.AppSystem.get_default();
-        const appId = 'gnome-shell-extension-prefs.desktop';
-        const prefs = appSys.lookup_app(appId);
-        if (!prefs) {
-            logError(new Error('could not find prefs app'));
-            return;
-        }
-        if (prefs.get_state() == Shell.AppState.RUNNING) {
-            prefs.activate();
-        }
-        else {
-            prefs.get_app_info().launch_uris(['extension:///' + uuid], null);
-        }
-    }
-    /**
-     * Works for >= 3.36, maybe earlier
-     */
-    function openPrefsUtilSpawn(uuid) {
-        const Util = imports.misc.util;
-        Util.spawn(['gnome-extensions', 'prefs', uuid]);
-    }
-    function openPrefs(version, uuid, params = {}) {
-        if (version.greaterEqual('3.36')) {
-            return openPrefsUtilSpawn(uuid);
-        }
-        return openPrefsAppSystem(uuid, params);
-    }
-    if ('ARGV' in window) {
-        if ('0' in window.ARGV) {
-            openPrefsAppSystem(window.ARGV[0]);
         }
     }
 
@@ -2184,8 +2143,6 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }, Gtk.ListStore);
 
-    var uuid = "bitcoin-markets@ottoallmendinger.github.com";
-
     const Main = imports.ui.main;
     const PanelMenu = imports.ui.panelMenu;
     const PopupMenu = imports.ui.popupMenu;
@@ -2240,7 +2197,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             this._popupItemSettings = new PopupMenu.PopupMenuItem(_('Settings'));
             this.menu.addMenuItem(this._popupItemSettings);
             this._popupItemSettings.connect('activate', () => {
-                openPrefs(version, uuid, { shell: imports.gi.Shell });
+                ExtensionUtils.openPrefs();
             });
         }
         getChange(lastValue, newValue) {
@@ -2425,4 +2382,4 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
 
     return extension;
 
-}(imports.gi.St, imports.gi.Clutter, imports.gi.GLib, imports.gi.Gio, imports.gi.Shell, imports.gi.GObject, imports.gi.Soup, imports.gi.Gtk));
+}(imports.gi.St, imports.gi.Clutter, imports.gi.GObject, imports.gi.GLib, imports.gi.Soup, imports.gi.Gtk, imports.gi.Gio));
