@@ -81,7 +81,7 @@ const MarketIndicatorView = extendGObject(
       layout.add_actor(this._statusView);
       layout.add_actor(this._indicatorView);
 
-      ('actor' in this ? this.actor : this).add_actor(layout);
+      this.actor.add_actor(layout);
 
       this._popupItemStatus = new PopupMenu.PopupMenuItem('', { activate: false, hover: false, can_focus: false });
       this._popupItemStatus.label.set_style('max-width: 12em;');

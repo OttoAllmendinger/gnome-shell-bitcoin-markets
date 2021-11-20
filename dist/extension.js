@@ -99,10 +99,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
     var description = "Display info on various crypto-currency exchanges.";
     var metadata = {
     	"shell-version": [
-    	"3.32",
-    	"3.34",
-    	"3.36",
-    	"3.38"
+    	"40"
     ],
     	uuid: uuid,
     	name: name,
@@ -808,15 +805,11 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         bitso: new Api$6(),
         bitstamp: new Api$7(),
         bittrex: new Api$8(),
-        // blinktrade: new ProviderBlinktrade.Api(),
         btcmarkets: new Api$a(),
         buda: new Api$9(),
-        // https://bitcoinmagazine.com/articles/thai-crypto-exchange-bx-in-th-shuts-down
-        // bxinth: new ProviderBXinTH.Api(),
         cexio: new Api$b(),
         coinbase: new Api$c(),
         coingecko: new Api$d(),
-        // coinmarketcap: new ProviderCoinMarketCap.Api(),
         cryptocompare: new Api$e(),
         ftx: new Api$f(),
         hitbtc: new Api$g(),
@@ -2038,6 +2031,46 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         return stringFormat(format, formatData);
     }
 
+    const GioSSS = Gio.SettingsSchemaSource;
+    function getSettingsSchema() {
+        // Expect USER extensions to have a schemas/ subfolder, otherwise assume a
+        // SYSTEM extension that has been installed in the same prefix as the shell
+        const schema = 'org.gnome.shell.extensions.bitcoin-markets';
+        const schemaPath = GLib.getenv('SCHEMA_DIR') || './res/schemas';
+        const schemaDir = Gio.File.new_for_path(schemaPath);
+        if (!schemaDir || !schemaDir.query_exists(null)) {
+            throw new Error(`${schemaPath} does not exist`);
+        }
+        const schemaSource = GioSSS.new_from_directory(schemaDir.get_path(), GioSSS.get_default(), false);
+        const schemaObj = schemaSource.lookup(schema, true);
+        if (!schemaObj) {
+            throw new Error(`could not lookup ${schema}`);
+        }
+        return schemaObj;
+    }
+    function getSettingsNoMisc() {
+        const schema = getSettingsSchema();
+        const settings = new Gio.Settings({ settings_schema: schema });
+        if (GLib.getenv('RESET') === '1') {
+            schema.list_keys().forEach((k) => {
+                log(`reset ${k}`);
+                settings.reset(k);
+            });
+        }
+        return settings;
+    }
+    function getSettings() {
+        try {
+            return imports.misc.extensionUtils.getSettings();
+        }
+        catch (e) {
+            if (e.name === 'ImportError') {
+                return getSettingsNoMisc();
+            }
+            throw e;
+        }
+    }
+
     const Signals = imports.signals;
     const INDICATORS_KEY = 'indicators';
     const Defaults = {
@@ -2082,7 +2115,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
                 CONFIG: 1,
             };
             this.set_column_types([GObject.TYPE_STRING, GObject.TYPE_STRING]);
-            this._settings = ExtensionUtils.getSettings();
+            this._settings = getSettings();
             this._reloadFromSettings();
             let flag;
             const mutex = (func) => function (...args) {
@@ -2200,7 +2233,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             });
             layout.add_actor(this._statusView);
             layout.add_actor(this._indicatorView);
-            ('actor' in this ? this.actor : this).add_actor(layout);
+            this.actor.add_actor(layout);
             this._popupItemStatus = new PopupMenu.PopupMenuItem('', { activate: false, hover: false, can_focus: false });
             this._popupItemStatus.label.set_style('max-width: 12em;');
             this._popupItemStatus.label.clutter_text.set_line_wrap(true);

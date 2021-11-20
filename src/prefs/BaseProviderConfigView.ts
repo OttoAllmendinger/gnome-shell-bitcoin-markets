@@ -1,7 +1,7 @@
 const Signals = imports.signals;
 const Mainloop = imports.mainloop;
 
-import * as Gtk from '@imports/Gtk-3.0';
+import * as Gtk from '@imports/Gtk-4.0';
 import * as GObject from '@imports/GObject-2.0';
 
 import { SignalEmitter } from '../gselib/SignalEmitter';
@@ -11,7 +11,7 @@ import * as BaseProvider from '../providers/BaseProvider';
 import { getProvider } from '../providers';
 import { ComboBoxOptions } from './prefs';
 
-export function makeConfigRow(description: string, widget: Gtk.Widget) {
+export function makeConfigRow(description: string, widget: Gtk.Widget): Gtk.Widget {
   const box = new Gtk.Box({
     orientation: Gtk.Orientation.HORIZONTAL,
     margin_bottom: 8,
@@ -22,11 +22,12 @@ export function makeConfigRow(description: string, widget: Gtk.Widget) {
   const label = new Gtk.Label({
     label: description,
     xalign: 0,
-    expand: true,
+    hexpand: true,
+    vexpand: true,
   });
 
-  box.add(label);
-  box.add(widget);
+  box.append(label);
+  box.append(widget);
 
   return box;
 }
@@ -99,7 +100,7 @@ Signals.addSignalMethods(ComboBoxView.prototype);
 export class BaseProviderConfigView {
   private _api: string;
   private _provider: BaseProvider.Api;
-  private _configWidget: any;
+  private _configWidget: Gtk.Box;
   private _indicatorConfig;
   private _widgets: Gtk.Widget[];
 
@@ -131,7 +132,7 @@ export class BaseProviderConfigView {
   }
 
   _addConfigWidget(w) {
-    this._configWidget.add(w);
+    this._configWidget.append(w);
     this._widgets.push(w);
   }
 
@@ -199,6 +200,5 @@ export class BaseProviderConfigView {
   destroy() {
     this._widgets.forEach((widget) => this._configWidget.remove(widget));
     this._widgets.slice(0);
-    this._configWidget.show_all();
   }
 }

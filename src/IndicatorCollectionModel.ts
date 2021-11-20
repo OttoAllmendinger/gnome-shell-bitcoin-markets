@@ -4,10 +4,10 @@ import * as Gtk from '@imports/Gtk-3.0';
 import * as GObject from '@imports/GObject-2.0';
 
 import { extendGObject } from './gselib/gobjectUtil';
-import ExtensionUtils from 'gselib/extensionUtils';
 import { SignalEmitter } from './gselib/SignalEmitter';
 
 import { getProvider } from './providers';
+import { getSettings } from './settings';
 
 const INDICATORS_KEY = 'indicators';
 
@@ -67,7 +67,7 @@ export const IndicatorCollectionModel = extendGObject(
 
       this.set_column_types([GObject.TYPE_STRING, GObject.TYPE_STRING]);
 
-      this._settings = ExtensionUtils.getSettings();
+      this._settings = getSettings();
 
       this._reloadFromSettings();
 
