@@ -78,6 +78,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
         timeoutIds.forEach((sourceId) => {
             GLib.Source.remove(sourceId);
         });
+        timeoutIds.splice(0);
     }
 
     const Config = imports.misc.config;

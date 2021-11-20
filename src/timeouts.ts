@@ -15,4 +15,5 @@ export function removeAllTimeouts() {
   timeoutIds.forEach((sourceId) => {
     GLib.Source.remove(sourceId);
   });
+  timeoutIds.splice(0);
 }
