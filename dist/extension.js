@@ -106,6 +106,21 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }, cls);
     }
 
+    const timeoutIds = [];
+    function timeoutAdd(intervalMS, callback) {
+        const sourceId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, intervalMS, () => {
+            callback();
+            return true;
+        });
+        timeoutIds.push(sourceId);
+        return sourceId;
+    }
+    function removeAllTimeouts() {
+        timeoutIds.forEach((sourceId) => {
+            GLib.Source.remove(sourceId);
+        });
+    }
+
     const Config = imports.misc.config;
     const Mainloop = imports.mainloop;
     const Metadata = imports.misc.extensionUtils.getCurrentExtension().metadata;
@@ -197,7 +212,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
                     return reject(new Error(`GET ${url}: error parsing as JSON: ${e}; data=${JSON.stringify(data)}`));
                 }
             });
-            Mainloop.timeout_add(_timeoutMs, () => session.abort());
+            timeoutAdd(_timeoutMs, () => session.abort());
         });
     }
 
@@ -904,7 +919,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             catch (e) {
                 logError(e);
             }
-            this.signal = Mainloop$1.timeout_add_seconds(this.interval, this.run.bind(this));
+            this.signal = timeoutAdd(this.interval * 1000, this.run.bind(this));
         }
         setSubscribers(subscribers) {
             this.subscribers = filterSubscribers(subscribers, { provider: this.provider });
@@ -2401,6 +2416,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
     }
     function disable() {
         _indicatorCollection.destroy();
+        removeAllTimeouts();
     }
     function extension () {
         init();

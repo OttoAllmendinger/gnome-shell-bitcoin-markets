@@ -1,3 +1,5 @@
+import { timeoutAdd } from './timeouts';
+
 const Mainloop = imports.mainloop;
 
 import * as HTTP from './HTTP';
@@ -100,7 +102,7 @@ class PollLoop {
   private interval: number;
   private cache = new Map();
   private priceDataLog = new PriceDataLog();
-  private signal = null;
+  private signal: number | null = null;
   private subscribers: any[] = [];
   private urls: string[] = [];
 
@@ -134,7 +136,7 @@ class PollLoop {
       logError(e);
     }
 
-    this.signal = Mainloop.timeout_add_seconds(this.interval, this.run.bind(this));
+    this.signal = timeoutAdd(this.interval * 1000, this.run.bind(this));
   }
 
   setSubscribers(subscribers: Subscriber[]) {

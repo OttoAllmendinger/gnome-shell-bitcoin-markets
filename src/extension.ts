@@ -20,6 +20,7 @@ import { Defaults } from './IndicatorCollectionModel';
 import { uuid } from './metadata.json';
 import { Options } from './providers/BaseProvider';
 import { getProvider } from './providers';
+import { removeAllTimeouts } from './timeouts';
 
 const version = currentVersion();
 
@@ -302,6 +303,7 @@ function enable() {
 
 function disable() {
   _indicatorCollection.destroy();
+  removeAllTimeouts();
 }
 
 export default function () {

@@ -1,3 +1,5 @@
+import { timeoutAdd } from './timeouts';
+
 const Config = imports.misc.config;
 const Mainloop = imports.mainloop;
 
@@ -122,6 +124,6 @@ export function getJSON(url, _params?) {
       }
     });
 
-    Mainloop.timeout_add(_timeoutMs, () => session.abort());
+    timeoutAdd(_timeoutMs, () => session.abort());
   });
 }
