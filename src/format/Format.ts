@@ -1,4 +1,4 @@
-import { _ } from '../gselib/gettext';
+import { _ } from '../gselib/extensionUtils';
 import { CurrencyData } from './CurrencyData';
 
 import StringFormat from 'string-format';

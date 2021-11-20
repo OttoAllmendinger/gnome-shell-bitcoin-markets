@@ -1,4 +1,4 @@
-var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
+var prefs = (function (Gtk, GObject, Gtk$1, Gio, GLib) {
     'use strict';
 
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -13,28 +13,8 @@ var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
         }, cls);
     }
 
-    var uuid = "bitcoin-markets@ottoallmendinger.github.com";
-    var name = "Bitcoin Markets";
-    var url = "https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/";
-    var description = "Display info on various crypto-currency exchanges.";
-    var metadata = {
-    	"shell-version": [
-    	"40",
-    	"41"
-    ],
-    	uuid: uuid,
-    	name: name,
-    	url: url,
-    	description: description,
-    	"settings-schema": "org.gnome.shell.extensions.bitcoin-markets",
-    	"gettext-domain": "gnome-shell-bitcoin-markets",
-    	"git-version": "_gitversion_"
-    };
-
-    const domain = metadata['gettext-domain'];
-    const _ = imports.gettext.domain(domain).gettext;
-
     var ExtensionUtils = imports.misc.extensionUtils;
+    const _ = imports.misc.extensionUtils.gettext;
 
     var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1094,6 +1074,7 @@ var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
 
     const Signals$2 = imports.signals;
     const { ComboBoxView: ComboBoxView$1, makeConfigRow: makeConfigRow$1 } = BaseProviderConfigView$1;
+    const _$1 = ExtensionUtils.gettext;
     function getMarginAll(v) {
         return {
             margin_start: v,
@@ -1110,13 +1091,13 @@ var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
                 orientation: Gtk.Orientation.VERTICAL,
             });
             {
-                const frame = new Gtk.Frame(Object.assign({ label: _('Indicator Settings') }, getMarginAll(margin)));
+                const frame = new Gtk.Frame(Object.assign({ label: _$1('Indicator Settings') }, getMarginAll(margin)));
                 this._layoutIndicatorSettings = new Gtk.Box(Object.assign({ orientation: Gtk.Orientation.VERTICAL }, getMarginAll(margin)));
                 frame.set_child(this._layoutIndicatorSettings);
                 this.widget.append(frame);
             }
             {
-                const frame = new Gtk.Frame(Object.assign({ label: _('Provider Settings') }, getMarginAll(margin)));
+                const frame = new Gtk.Frame(Object.assign({ label: _$1('Provider Settings') }, getMarginAll(margin)));
                 this._layoutProviderSettings = new Gtk.Box(Object.assign({ orientation: Gtk.Orientation.VERTICAL }, getMarginAll(margin)));
                 frame.set_child(this._layoutProviderSettings);
                 this.widget.append(frame);
@@ -1154,7 +1135,7 @@ var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
             entry.connect('changed', () => {
                 this._indicatorConfig.set('format', entry.text);
             });
-            return makeConfigRow$1(_('Format'), entry);
+            return makeConfigRow$1(_$1('Format'), entry);
         }
         _confProvider() {
             const preset = this._indicatorConfig.get('api');
@@ -1170,7 +1151,7 @@ var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
             });
             const view = new ComboBoxView$1(options);
             view.connect('changed', (view, api) => this._selectApi(api));
-            return makeConfigRow$1(_('Provider'), view.widget);
+            return makeConfigRow$1(_$1('Provider'), view.widget);
         }
         _confShowChange() {
             const preset = this._indicatorConfig.get('show_change') !== false;
@@ -1178,7 +1159,7 @@ var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
             switchView.connect('notify::active', (obj) => {
                 this._indicatorConfig.set('show_change', obj.active);
             });
-            return makeConfigRow$1(_('Show Change'), switchView);
+            return makeConfigRow$1(_$1('Show Change'), switchView);
         }
         _confShowBaseCurrency() {
             const preset = this._indicatorConfig.get('show_base_currency') === true;
@@ -1186,7 +1167,7 @@ var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
             switchView.connect('notify::active', (obj) => {
                 this._indicatorConfig.set('show_base_currency', obj.active);
             });
-            return makeConfigRow$1(_('Show Base Currency'), switchView);
+            return makeConfigRow$1(_$1('Show Base Currency'), switchView);
         }
         destroy() {
             this.disconnectAll();
@@ -1307,7 +1288,7 @@ var prefs = (function (Gtk, GObject, Gio, Gtk$1, GLib) {
 
     return prefs;
 
-}(imports.gi.Gtk, imports.gi.GObject, imports.gi.Gio, imports.gi.Gtk, imports.gi.GLib));
+}(imports.gi.Gtk, imports.gi.GObject, imports.gi.Gtk, imports.gi.Gio, imports.gi.GLib));
 
 var init = prefs.init;
 var buildPrefsWidget = prefs.buildPrefsWidget;

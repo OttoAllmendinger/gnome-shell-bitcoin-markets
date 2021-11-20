@@ -5,7 +5,7 @@ import * as Gtk from '@imports/Gtk-4.0';
 import * as GObject from '@imports/GObject-2.0';
 
 import { SignalEmitter } from '../gselib/SignalEmitter';
-import { _ } from '../gselib/gettext';
+import { _ } from '../gselib/extensionUtils';
 
 import * as BaseProvider from '../providers/BaseProvider';
 import { getProvider } from '../providers';

@@ -6,7 +6,6 @@ import * as Gtk from '@imports/Gtk-4.0';
 import * as GObject from '@imports/GObject-2.0';
 
 import { extendGObject } from '../gselib/gobjectUtil';
-import { _ } from 'gselib/gettext';
 import ExtensionUtils from 'gselib/extensionUtils';
 
 import * as Format from '../format/Format';
@@ -14,6 +13,8 @@ import { getProvider, Providers } from '../providers';
 import * as BaseProviderConfigView from './BaseProviderConfigView';
 
 const { ComboBoxView, makeConfigRow } = BaseProviderConfigView;
+
+const _ = ExtensionUtils.gettext;
 
 // const { dump } = Local.imports.dump;
 

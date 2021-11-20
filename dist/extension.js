@@ -2,6 +2,7 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
     'use strict';
 
     var ExtensionUtils = imports.misc.extensionUtils;
+    const _ = imports.misc.extensionUtils.gettext;
 
     function versionArray(v) {
         return v.split('.').map(Number);
@@ -92,27 +93,6 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
             openPrefsAppSystem(window.ARGV[0]);
         }
     }
-
-    var uuid = "bitcoin-markets@ottoallmendinger.github.com";
-    var name = "Bitcoin Markets";
-    var url = "https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/";
-    var description = "Display info on various crypto-currency exchanges.";
-    var metadata = {
-    	"shell-version": [
-    	"40",
-    	"41"
-    ],
-    	uuid: uuid,
-    	name: name,
-    	url: url,
-    	description: description,
-    	"settings-schema": "org.gnome.shell.extensions.bitcoin-markets",
-    	"gettext-domain": "gnome-shell-bitcoin-markets",
-    	"git-version": "_gitversion_"
-    };
-
-    const domain = metadata['gettext-domain'];
-    const _ = imports.gettext.domain(domain).gettext;
 
     // eslint-disable-next-line @typescript-eslint/ban-types
     function registerClass(meta, cls) {
@@ -2189,6 +2169,8 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
         }
     }, Gtk.ListStore);
 
+    var uuid = "bitcoin-markets@ottoallmendinger.github.com";
+
     const Main = imports.ui.main;
     const PanelMenu = imports.ui.panelMenu;
     const PopupMenu = imports.ui.popupMenu;
@@ -2427,4 +2409,4 @@ var init = (function (St, Clutter, GLib, Gio, Shell, GObject, Soup, Gtk) {
 
     return extension;
 
-}(imports.gi.St, Clutter, imports.gi.GLib, imports.gi.Gio, imports.gi.Shell, imports.gi.GObject, imports.gi.Soup, imports.gi.Gtk));
+}(imports.gi.St, imports.gi.Clutter, imports.gi.GLib, imports.gi.Gio, imports.gi.Shell, imports.gi.GObject, imports.gi.Soup, imports.gi.Gtk));

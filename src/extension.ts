@@ -5,12 +5,11 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 
 import * as St from '@imports/St-1.0';
-import * as Clutter from '@imports/Clutter-7';
+import * as Clutter from '@imports/Clutter-8';
 
-import ExtensionUtils from './gselib/extensionUtils';
+import ExtensionUtils, { _ } from './gselib/extensionUtils';
 import { currentVersion } from './gselib/version';
 import { openPrefs } from './gselib/openPrefs';
-import { _ } from './gselib/gettext';
 import { extendGObject } from './gselib/gobjectUtil';
 
 import * as ApiService from './ApiService';
