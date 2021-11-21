@@ -66,10 +66,15 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
     }
 
     const timeoutIds = [];
+    /**
+     * Add single-shot timeout
+     * @param intervalMS
+     * @param callback
+     */
     function timeoutAdd(intervalMS, callback) {
         const sourceId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, intervalMS, () => {
             callback();
-            return true;
+            return false /* do not run callback again */;
         });
         timeoutIds.push(sourceId);
         return sourceId;
