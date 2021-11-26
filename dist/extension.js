@@ -1,8 +1,21 @@
 var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
     'use strict';
 
-    var ExtensionUtils = imports.misc.extensionUtils;
-    const _ = imports.misc.extensionUtils.gettext;
+    const extensionUtils = imports.misc.extensionUtils;
+    if (!extensionUtils.gettext) {
+        // backport from v41
+        // https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/1deb13e1aaabfd04b2641976a224b6fc2be3b9ec/js/misc/extensionUtils.js#L117
+        const domain = extensionUtils.getCurrentExtension().metadata['gettext-domain'];
+        extensionUtils.initTranslations(domain);
+        const gettextForDomain = imports.gettext.domain(domain);
+        if (gettextForDomain.gettext) {
+            Object.assign(extensionUtils, gettextForDomain);
+        }
+        else {
+            logError(new Error(`could create gettextForDomain domain=${domain}`));
+        }
+    }
+    const _ = extensionUtils.gettext;
 
     function versionArray(v) {
         return v.split('.').map(Number);
@@ -2162,7 +2175,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
         down: '\u25bc',
         unchanged: ' ',
     };
-    const settings = ExtensionUtils.getSettings();
+    const settings = extensionUtils.getSettings();
     const MarketIndicatorView = extendGObject(class MarketIndicatorView extends PanelMenu.Button {
         _init(options) {
             super._init(0);
@@ -2203,7 +2216,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
             this._popupItemSettings = new PopupMenu.PopupMenuItem(_('Settings'));
             this.menu.addMenuItem(this._popupItemSettings);
             this._popupItemSettings.connect('activate', () => {
-                ExtensionUtils.openPrefs();
+                extensionUtils.openPrefs();
             });
         }
         getChange(lastValue, newValue) {
@@ -2367,7 +2380,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
     }
     let _indicatorCollection;
     function init(_metadata) {
-        ExtensionUtils.initTranslations();
+        extensionUtils.initTranslations();
     }
     function enable() {
         try {

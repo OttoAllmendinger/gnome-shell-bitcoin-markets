@@ -15,8 +15,21 @@ imports.gi.versions.Gtk = imports.gi.GLib.getenv("GTK");
         }, cls);
     }
 
-    var ExtensionUtils = imports.misc.extensionUtils;
-    const _ = imports.misc.extensionUtils.gettext;
+    const extensionUtils = imports.misc.extensionUtils;
+    if (!extensionUtils.gettext) {
+        // backport from v41
+        // https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/1deb13e1aaabfd04b2641976a224b6fc2be3b9ec/js/misc/extensionUtils.js#L117
+        const domain = extensionUtils.getCurrentExtension().metadata['gettext-domain'];
+        extensionUtils.initTranslations(domain);
+        const gettextForDomain = imports.gettext.domain(domain);
+        if (gettextForDomain.gettext) {
+            Object.assign(extensionUtils, gettextForDomain);
+        }
+        else {
+            logError(new Error(`could create gettextForDomain domain=${domain}`));
+        }
+    }
+    const _ = extensionUtils.gettext;
 
     var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1076,7 +1089,7 @@ imports.gi.versions.Gtk = imports.gi.GLib.getenv("GTK");
 
     const Signals$2 = imports.signals;
     const { ComboBoxView: ComboBoxView$1, makeConfigRow: makeConfigRow$1 } = BaseProviderConfigView$1;
-    const _$1 = ExtensionUtils.gettext;
+    const _$1 = extensionUtils.gettext;
     function getMarginAll(v) {
         return {
             margin_start: v,
@@ -1281,7 +1294,7 @@ imports.gi.versions.Gtk = imports.gi.GLib.getenv("GTK");
     }, Gtk.Box);
     var prefs = {
         init() {
-            ExtensionUtils.initTranslations();
+            extensionUtils.initTranslations();
         },
         buildPrefsWidget() {
             return new BitcoinMarketsSettingsWidget();
