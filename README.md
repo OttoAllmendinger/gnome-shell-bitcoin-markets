@@ -47,6 +47,38 @@ The latest development version can be installed manually with these commands
 Then go to https://extensions.gnome.org/local/ to turn on the extension or use
 gnome-tweak-tool.
 
+## Format options
+
+### Base options
+
+| option | result                                       |
+| ------ | -------------------------------------------- |
+| b      | base currency code                           |
+| bs     | base currency symbol \|\| base currency code |
+| btc    | btc symbol                                   |
+
+### Value options
+
+| option        | result                                  |
+| ------------- | --------------------------------------- |
+| v             | value                                   |
+| mv            | value divided by 1000                   |
+| kv            | value multiplied by 1000                |
+| satv          | value multiplied by 1e8                 |
+| (m\|k\|sat)v0 | value with 0 decimals                   |
+| (m\|k\|sat)v1 | value with 1 decimals                   |
+| (m\|k\|sat)v2 | value with 2 decimals                   |
+| ...           | ...                                     |
+| (m\|k\|sat)v8 | value with 8 decimals                   |
+| raw           | raw value without additional formatting |
+
+### Quote options
+
+| option | result                                         |
+| ------ | ---------------------------------------------- |
+| q      | quote currency code                            |
+| qs     | quote currency symbol \|\| quote currency code |
+
 ## Development
 
 With `make restart` the gnome-shell can be restarted during development iterations.
