@@ -1,5 +1,4 @@
 import * as Gio from '@imports/Gio-2.0';
-import * as GLib from '@imports/GLib-2.0';
 
 import * as Gtk3 from '@imports/Gtk-3.0';
 import * as Gtk4 from '@imports/Gtk-4.0';

@@ -160,6 +160,8 @@ imports.gi.versions.Gtk = imports.gi.GLib.getenv("GTK");
             ['(m|k|sat)v2', _('formatted value with 2 decimals')],
             ['...', ''],
             ['(m|k|sat)v8', _('formatted value with 8 decimals')],
+            ['moscow', _('formatted in moscow time')],
+            ['moscow!segment', _('formatted in moscow time as segment characters')],
             ['raw', _('raw value without additional formatting')],
         ]
             .map(([a, b]) => `<tt>${pad(a, 16)}</tt>${b}`)

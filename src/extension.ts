@@ -8,7 +8,6 @@ import * as St from '@imports/St-1.0';
 import * as Clutter from '@imports/Clutter-8';
 
 import ExtensionUtils, { _ } from './gselib/extensionUtils';
-import { currentVersion } from './gselib/version';
 import { extendGObject } from './gselib/gobjectUtil';
 
 import * as ApiService from './ApiService';
@@ -16,12 +15,9 @@ import * as Format from './format/Format';
 import * as HTTP from './HTTP';
 import { Defaults } from './IndicatorCollectionModel';
 
-import { uuid } from './metadata.json';
 import { Options } from './providers/BaseProvider';
 import { getProvider } from './providers';
 import { removeAllTimeouts } from './timeouts';
-
-const version = currentVersion();
 
 const INDICATORS_KEY = 'indicators';
 const FIRST_RUN_KEY = 'first-run';

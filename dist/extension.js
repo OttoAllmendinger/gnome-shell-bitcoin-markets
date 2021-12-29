@@ -17,55 +17,6 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
     }
     const _ = extensionUtils.gettext;
 
-    function versionArray(v) {
-        return v.split('.').map(Number);
-    }
-    function zip(a, b, defaultValue) {
-        if (a.length === 0 && b.length === 0) {
-            return [];
-        }
-        const headA = a.length > 0 ? a.shift() : defaultValue;
-        const headB = b.length > 0 ? b.shift() : defaultValue;
-        return [[headA, headB]].concat(zip(a, b, defaultValue));
-    }
-    function versionEqual(a, b) {
-        return zip(versionArray(a), versionArray(b), 0).reduce((prev, [a, b]) => prev && a === b, true);
-    }
-    function versionGreater(a, b) {
-        const diff = zip(versionArray(a), versionArray(b), 0).find(([a, b]) => a !== b);
-        if (!diff) {
-            return false;
-        }
-        const [x, y] = diff;
-        return x > y;
-    }
-    function versionSmaller(a, b) {
-        return !versionEqual(a, b) && !versionGreater(a, b);
-    }
-    function currentVersion() {
-        return new Version(imports.misc.config.PACKAGE_VERSION);
-    }
-    class Version {
-        constructor(packageVersion) {
-            this.packageVersion = packageVersion;
-        }
-        equal(v) {
-            return versionEqual(this.packageVersion, v);
-        }
-        greater(v) {
-            return versionGreater(this.packageVersion, v);
-        }
-        smaller(v) {
-            return versionSmaller(this.packageVersion, v);
-        }
-        greaterEqual(v) {
-            return this.equal(v) || this.greater(v);
-        }
-        smallerEqual(v) {
-            return this.equal(v) || this.smaller(v);
-        }
-    }
-
     // eslint-disable-next-line @typescript-eslint/ban-types
     function registerClass(meta, cls) {
         return GObject.registerClass(meta, cls);
@@ -976,6 +927,115 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
         _pollLoops.forEach((loop) => loop.setSubscribers(subscribers));
     }
 
+    var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+    function createCommonjsModule(fn, basedir, module) {
+    	return module = {
+    		path: basedir,
+    		exports: {},
+    		require: function (path, base) {
+    			return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
+    		}
+    	}, fn(module, module.exports), module.exports;
+    }
+
+    function commonjsRequire () {
+    	throw new Error('Dynamic requires are not currently supported by @rollup/plugin-commonjs');
+    }
+
+    var stringFormat = createCommonjsModule(function (module) {
+    void function(global) {
+
+      //  ValueError :: String -> Error
+      function ValueError(message) {
+        var err = new Error(message);
+        err.name = 'ValueError';
+        return err;
+      }
+
+      //  create :: Object -> String,*... -> String
+      function create(transformers) {
+        return function(template) {
+          var args = Array.prototype.slice.call(arguments, 1);
+          var idx = 0;
+          var state = 'UNDEFINED';
+
+          return template.replace(
+            /([{}])\1|[{](.*?)(?:!(.+?))?[}]/g,
+            function(match, literal, _key, xf) {
+              if (literal != null) {
+                return literal;
+              }
+              var key = _key;
+              if (key.length > 0) {
+                if (state === 'IMPLICIT') {
+                  throw ValueError('cannot switch from ' +
+                                   'implicit to explicit numbering');
+                }
+                state = 'EXPLICIT';
+              } else {
+                if (state === 'EXPLICIT') {
+                  throw ValueError('cannot switch from ' +
+                                   'explicit to implicit numbering');
+                }
+                state = 'IMPLICIT';
+                key = String(idx);
+                idx += 1;
+              }
+
+              //  1.  Split the key into a lookup path.
+              //  2.  If the first path component is not an index, prepend '0'.
+              //  3.  Reduce the lookup path to a single result. If the lookup
+              //      succeeds the result is a singleton array containing the
+              //      value at the lookup path; otherwise the result is [].
+              //  4.  Unwrap the result by reducing with '' as the default value.
+              var path = key.split('.');
+              var value = (/^\d+$/.test(path[0]) ? path : ['0'].concat(path))
+                .reduce(function(maybe, key) {
+                  return maybe.reduce(function(_, x) {
+                    return x != null && key in Object(x) ?
+                      [typeof x[key] === 'function' ? x[key]() : x[key]] :
+                      [];
+                  }, []);
+                }, [args])
+                .reduce(function(_, x) { return x; }, '');
+
+              if (xf == null) {
+                return value;
+              } else if (Object.prototype.hasOwnProperty.call(transformers, xf)) {
+                return transformers[xf](value);
+              } else {
+                throw ValueError('no transformer named "' + xf + '"');
+              }
+            }
+          );
+        };
+      }
+
+      //  format :: String,*... -> String
+      var format = create({});
+
+      //  format.create :: Object -> String,*... -> String
+      format.create = create;
+
+      //  format.extend :: Object,Object -> ()
+      format.extend = function(prototype, transformers) {
+        var $format = create(transformers);
+        prototype.format = function() {
+          var args = Array.prototype.slice.call(arguments);
+          args.unshift(this);
+          return $format.apply(global, args);
+        };
+      };
+
+      /* istanbul ignore else */
+      {
+        module.exports = format;
+      }
+
+    }.call(commonjsGlobal, commonjsGlobal);
+    });
+
     const CurrencyData = {
         AED: {
             symbol: 'AED',
@@ -1861,114 +1921,31 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
         },
     };
 
-    var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-    function createCommonjsModule(fn, basedir, module) {
-    	return module = {
-    		path: basedir,
-    		exports: {},
-    		require: function (path, base) {
-    			return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
-    		}
-    	}, fn(module, module.exports), module.exports;
+    const segments = ['🯰', '🯱', '🯲', '🯳', '🯴', '🯵', '🯶', '🯷', '🯸', '🯹'];
+    function getSegmentChar(v) {
+        if (0 <= v && v <= 9) {
+            return segments[v];
+        }
+        throw new Error('invalid input');
     }
-
-    function commonjsRequire () {
-    	throw new Error('Dynamic requires are not currently supported by @rollup/plugin-commonjs');
+    function toSegmentStr(base10Str) {
+        return base10Str
+            .split('')
+            .map((v) => {
+            const n = Number(v);
+            return Number.isInteger(n) ? getSegmentChar(n) : v;
+        })
+            .join('');
     }
-
-    var stringFormat = createCommonjsModule(function (module) {
-    void function(global) {
-
-      //  ValueError :: String -> Error
-      function ValueError(message) {
-        var err = new Error(message);
-        err.name = 'ValueError';
-        return err;
-      }
-
-      //  create :: Object -> String,*... -> String
-      function create(transformers) {
-        return function(template) {
-          var args = Array.prototype.slice.call(arguments, 1);
-          var idx = 0;
-          var state = 'UNDEFINED';
-
-          return template.replace(
-            /([{}])\1|[{](.*?)(?:!(.+?))?[}]/g,
-            function(match, literal, _key, xf) {
-              if (literal != null) {
-                return literal;
-              }
-              var key = _key;
-              if (key.length > 0) {
-                if (state === 'IMPLICIT') {
-                  throw ValueError('cannot switch from ' +
-                                   'implicit to explicit numbering');
-                }
-                state = 'EXPLICIT';
-              } else {
-                if (state === 'EXPLICIT') {
-                  throw ValueError('cannot switch from ' +
-                                   'explicit to implicit numbering');
-                }
-                state = 'IMPLICIT';
-                key = String(idx);
-                idx += 1;
-              }
-
-              //  1.  Split the key into a lookup path.
-              //  2.  If the first path component is not an index, prepend '0'.
-              //  3.  Reduce the lookup path to a single result. If the lookup
-              //      succeeds the result is a singleton array containing the
-              //      value at the lookup path; otherwise the result is [].
-              //  4.  Unwrap the result by reducing with '' as the default value.
-              var path = key.split('.');
-              var value = (/^\d+$/.test(path[0]) ? path : ['0'].concat(path))
-                .reduce(function(maybe, key) {
-                  return maybe.reduce(function(_, x) {
-                    return x != null && key in Object(x) ?
-                      [typeof x[key] === 'function' ? x[key]() : x[key]] :
-                      [];
-                  }, []);
-                }, [args])
-                .reduce(function(_, x) { return x; }, '');
-
-              if (xf == null) {
-                return value;
-              } else if (Object.prototype.hasOwnProperty.call(transformers, xf)) {
-                return transformers[xf](value);
-              } else {
-                throw ValueError('no transformer named "' + xf + '"');
-              }
-            }
-          );
-        };
-      }
-
-      //  format :: String,*... -> String
-      var format = create({});
-
-      //  format.create :: Object -> String,*... -> String
-      format.create = create;
-
-      //  format.extend :: Object,Object -> ()
-      format.extend = function(prototype, transformers) {
-        var $format = create(transformers);
-        prototype.format = function() {
-          var args = Array.prototype.slice.call(arguments);
-          args.unshift(this);
-          return $format.apply(global, args);
-        };
-      };
-
-      /* istanbul ignore else */
-      {
-        module.exports = format;
-      }
-
-    }.call(commonjsGlobal, commonjsGlobal);
-    });
+    function getMoscowTime(value) {
+        if (value === undefined) {
+            return '--:--';
+        }
+        const satPerBase = (1e8 / value).toFixed(0);
+        const a = satPerBase.substr(0, satPerBase.length - 2);
+        const b = satPerBase.substr(satPerBase.length - 2, satPerBase.length);
+        return `${a}:${b}`;
+    }
 
     const defaultDigits = 2;
     function format(value, { base, quote, format }) {
@@ -1980,6 +1957,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
             btc: '₿',
             bs: getSymbol(base) || base,
             qs: getSymbol(quote) || quote,
+            moscow: getMoscowTime(value),
         };
         const formatValueWithDigits = (value, scale, digits) => {
             if (value === undefined) {
@@ -2002,7 +1980,11 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
                 formatData[`${prefix}v${i}`] = formatValueWithDigits(value, scale, i);
             }
         });
-        return stringFormat(format, formatData);
+        return stringFormat.create({
+            segment(str) {
+                return toSegmentStr(str);
+            },
+        })(format, formatData);
     }
 
     const GioSSS = Gio.SettingsSchemaSource;
@@ -2165,7 +2147,6 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
     const Main = imports.ui.main;
     const PanelMenu = imports.ui.panelMenu;
     const PopupMenu = imports.ui.popupMenu;
-    const version = currentVersion();
     const INDICATORS_KEY$1 = 'indicators';
     const FIRST_RUN_KEY = 'first-run';
     const _Symbols = {

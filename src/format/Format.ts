@@ -1,11 +1,11 @@
-import { _ } from '../gselib/extensionUtils';
-import { CurrencyData } from './CurrencyData';
-
 import StringFormat from 'string-format';
+import { CurrencyData } from './CurrencyData';
+import { _ } from '../gselib/extensionUtils';
+import { getMoscowTime, toSegmentStr } from './moscowTime';
 
 const defaultDigits = 2;
 
-export function format(value, { base, quote, format }) {
+export function format(value: number | undefined, { base, quote, format }): string {
   const getSymbol = (code) => (code in CurrencyData ? CurrencyData[code].symbol_native : undefined);
 
   const info = CurrencyData[quote];
@@ -16,9 +16,10 @@ export function format(value, { base, quote, format }) {
     btc: '₿',
     bs: getSymbol(base) || base,
     qs: getSymbol(quote) || quote,
+    moscow: getMoscowTime(value),
   };
 
-  const formatValueWithDigits = (value, scale, digits) => {
+  const formatValueWithDigits = (value: number | undefined, scale: number, digits: number) => {
     if (value === undefined) {
       return (0).toFixed(digits).replace(/0/g, '–');
     }
@@ -33,7 +34,7 @@ export function format(value, { base, quote, format }) {
     ['m', 0.001],
     ['k', 1000],
     ['sat', 1e8],
-  ];
+  ] as const;
   scale.forEach(([prefix, scale]) => {
     formatData[`${prefix}v`] = formatValueWithDigits(value, scale, info ? info.decimal_digits : defaultDigits);
     for (let i = 0; i < 9; i++) {
@@ -41,7 +42,11 @@ export function format(value, { base, quote, format }) {
     }
   });
 
-  return StringFormat(format, formatData);
+  return StringFormat.create({
+    segment(str) {
+      return toSegmentStr(str);
+    },
+  })(format, formatData);
 }
 
 export function tooltipText() {
@@ -66,6 +71,8 @@ export function tooltipText() {
     ['(m|k|sat)v2', _('formatted value with 2 decimals')],
     ['...', ''],
     ['(m|k|sat)v8', _('formatted value with 8 decimals')],
+    ['moscow', _('formatted in moscow time')],
+    ['moscow!segment', _('formatted in moscow time as segment characters')],
     ['raw', _('raw value without additional formatting')],
   ]
     .map(([a, b]) => `<tt>${pad(a, 16)}</tt>${b}`)
