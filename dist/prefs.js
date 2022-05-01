@@ -1004,11 +1004,8 @@ var prefs = (function (Gtk, GObject, Gtk$1, Gio, GLib) {
     Signals$1.addSignalMethods(ConfigModel.prototype);
     const IndicatorCollectionModel = extendGObject(class IndicatorCollectionModel extends Gtk$1.ListStore {
         constructor() {
-            super(...arguments);
+            super();
             this.Columns = {};
-        }
-        _init(params) {
-            super._init(params);
             this.Columns = {
                 LABEL: 0,
                 CONFIG: 1,

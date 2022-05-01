@@ -2061,11 +2061,8 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
     Signals.addSignalMethods(ConfigModel.prototype);
     const IndicatorCollectionModel = extendGObject(class IndicatorCollectionModel extends Gtk.ListStore {
         constructor() {
-            super(...arguments);
+            super();
             this.Columns = {};
-        }
-        _init(params) {
-            super._init(params);
             this.Columns = {
                 LABEL: 0,
                 CONFIG: 1,
