@@ -57,8 +57,8 @@ export const IndicatorCollectionModel = extendGObject(
     private _settings: any;
     private Columns: Record<string, number> = {};
 
-    _init(params) {
-      super._init(params);
+    constructor() {
+      super();
 
       this.Columns = {
         LABEL: 0,

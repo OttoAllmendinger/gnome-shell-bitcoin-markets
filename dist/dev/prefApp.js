@@ -1006,11 +1006,8 @@ imports.gi.versions.Gtk = imports.gi.GLib.getenv("GTK");
     Signals$1.addSignalMethods(ConfigModel.prototype);
     const IndicatorCollectionModel = extendGObject(class IndicatorCollectionModel extends Gtk$1.ListStore {
         constructor() {
-            super(...arguments);
+            super();
             this.Columns = {};
-        }
-        _init(params) {
-            super._init(params);
             this.Columns = {
                 LABEL: 0,
                 CONFIG: 1,
