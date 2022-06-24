@@ -4,6 +4,7 @@ export * as BaseProvider from './BaseProvider';
 
 import * as ProviderBinance from './ProviderBinance';
 import * as ProviderBinanceFutures from './ProviderBinanceFutures';
+import * as ProviderBit2C from './ProviderBit2C';
 import * as ProviderBitfinex from './ProviderBitfinex';
 import * as ProviderBitMEX from './ProviderBitMEX';
 import * as ProviderBitPay from './ProviderBitPay';
@@ -30,6 +31,7 @@ import * as ProviderVccExchange from './ProviderVccExchange';
 export const Providers: Record<string, BaseProvider.Api> = {
   binance: new ProviderBinance.Api(),
   binanceFutures: new ProviderBinanceFutures.Api(),
+  bit2c: new ProviderBit2C.Api(),
   bitfinex: new ProviderBitfinex.Api(),
   bitmex: new ProviderBitMEX.Api(),
   bitpay: new ProviderBitPay.Api(),
