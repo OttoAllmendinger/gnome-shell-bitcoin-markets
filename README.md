@@ -7,6 +7,7 @@ Available APIs:
 - BTCMarkets
 - Binance
 - Binance Futures
+- Bit2C
 - BitMEX
 - BitPay
 - BitPay
@@ -107,6 +108,7 @@ On most systems you can use `journalctl /usr/bin/gnome-shell -f` to get log outp
 - https://github.com/thanhnguyennguyen - HitBTC, Kucoin, VccExchange, BinanceFutures, FTX and Tomo support
 - https://github.com/luissantos - Bittrex support
 - https://github.com/omerta - Buda support
+- https://github.com/sha-265 - Bit2C support
 
 ## Tips
 

@@ -363,6 +363,13 @@ export const CurrencyData = {
     rounding: 0,
     code: 'ILS',
   },
+  NIS: {
+    symbol: '₪',
+    symbol_native: '₪',
+    decimal_digits: 2,
+    rounding: 0,
+    code: 'NIS',
+  },
   INR: {
     symbol: '₹',
     symbol_native: '₹',
