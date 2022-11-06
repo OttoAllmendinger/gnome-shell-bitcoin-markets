@@ -1,5 +1,5 @@
-import * as Gio from '@imports/Gio-2.0';
-import * as GLib from '@imports/GLib-2.0';
+import * as Gio from '@gi-types/gio2';
+import * as GLib from '@gi-types/glib2';
 
 const GioSSS = Gio.SettingsSchemaSource;
 
@@ -38,7 +38,7 @@ export function getSettingsNoMisc(): Gio.Settings {
 export function getSettings(): Gio.Settings {
   try {
     return imports.misc.extensionUtils.getSettings();
-  } catch (e) {
+  } catch (e: any) {
     if (e.name === 'ImportError') {
       return getSettingsNoMisc();
     }

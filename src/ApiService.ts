@@ -1,9 +1,11 @@
 import { timeoutAdd } from './timeouts';
 
+const Config = imports.misc.config;
 const Mainloop = imports.mainloop;
 
 import * as HTTP from './HTTP';
 import { getProvider, BaseProvider, Providers } from './providers';
+import extensionUtils from 'gselib/extensionUtils';
 
 interface PriceData {
   date: Date;
@@ -55,7 +57,7 @@ const applySubscribers = (subscribers, func: (s: Subscriber) => void) =>
   subscribers.forEach((s) => {
     try {
       func(s);
-    } catch (e) {
+    } catch (e: any) {
       try {
         const { api, base, quote } = s.options;
         s.onUpdateError(e);
@@ -167,7 +169,7 @@ class PollLoop {
         try {
           const priceData = this.priceDataLog.addValue(ticker, date, this.provider.parseData(response, ticker));
           applySubscribers(tickerSubscribers, (s) => s.onUpdatePriceData(priceData));
-        } catch (e) {
+        } catch (e: any) {
           e.message = `Error updating ${url}: ${e.message}`;
           applySubscribers(tickerSubscribers, (s) => s.onUpdateError(e, { ticker }));
           logError(e);
@@ -188,11 +190,13 @@ class PollLoop {
     }
 
     try {
-      const response = await HTTP.getJSON(url);
+      const response = await HTTP.getJSON(url, {
+        userAgent: HTTP.getDefaultUserAgent(extensionUtils.getCurrentExtension().metadata, Config.PACKAGE_VERSION),
+      });
       const date = new Date();
       this.cache.set(url, { date, response });
       processResponse(response, date);
-    } catch (err) {
+    } catch (err: any) {
       if (HTTP.isErrTooManyRequests(err)) {
         permanentErrors.set(this.provider, err);
       }

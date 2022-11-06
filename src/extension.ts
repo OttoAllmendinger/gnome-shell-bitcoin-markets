@@ -4,8 +4,8 @@ const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 
-import * as St from '@imports/St-1.0';
-import * as Clutter from '@imports/Clutter-8';
+import * as St from '@gi-types/st1';
+import * as Clutter from '@gi-types/clutter10';
 
 import ExtensionUtils, { _ } from './gselib/extensionUtils';
 import { extendGObject } from './gselib/gobjectUtil';
@@ -241,7 +241,7 @@ class IndicatorCollection {
       .map((str) => {
         try {
           return JSON.parse(str);
-        } catch (e) {
+        } catch (e: any) {
           e.message = `Error parsing string ${str}: ${e.message}`;
           logError(e);
         }
@@ -278,7 +278,7 @@ class IndicatorCollection {
   destroy() {
     this._removeAll();
     ApiService.setSubscribers([]);
-    settings.disconnect(this._settingsChangedId);
+    (settings as any).disconnect(this._settingsChangedId);
   }
 }
 

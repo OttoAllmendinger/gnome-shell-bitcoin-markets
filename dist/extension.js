@@ -1,4 +1,4 @@
-var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
+var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
     'use strict';
 
     const extensionUtils = imports.misc.extensionUtils;
@@ -50,99 +50,180 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
         timeoutIds.splice(0);
     }
 
-    const Config = imports.misc.config;
-    const Mainloop = imports.mainloop;
-    const Metadata = imports.misc.extensionUtils.getCurrentExtension().metadata;
-    class HTTPError {
-        constructor(soupMessage, _error) {
-            this.name = 'HTTPError';
+    const dump = (v, opts = { values: true, all: false }) => {
+        const segments = [];
+        const makeSegments = (v, objects = [], indent = 1) => {
+            if (indent > 10) {
+                segments.push(' ... (indent limit)');
+                return;
+            }
+            if (segments.length > 1000) {
+                segments.push(' ... (segment limit)');
+                return;
+            }
+            if (v === null || v === undefined) {
+                segments.push(String(v));
+                return;
+            }
+            let asString;
+            try {
+                asString = String(v);
+            }
+            catch (e) {
+                asString = '<???>';
+            }
+            const isArguments = asString === '[object Arguments]';
+            let isArray = false;
+            let isObject = false;
+            try {
+                isObject = !isArguments && v.constructor === Object;
+                isArray = v.constructor === Array;
+            }
+            catch (e) {
+                // isUnknown = true;
+            }
+            let keys = null;
+            try {
+                if (opts.all) {
+                    keys = Object.getOwnPropertyNames(v);
+                }
+                else {
+                    keys = Object.keys(v);
+                }
+            }
+            catch (e) {
+                /* noop */
+            }
+            const hasKeys = keys !== null;
+            if (isArguments) {
+                v = Array.prototype.slice.call(v);
+            }
+            const type = typeof v;
+            const isPrimitive = v == null || (type != 'object' && type != 'function');
+            if (isArray || isArguments || isObject || hasKeys) {
+                if (objects.indexOf(v) >= 0) {
+                    segments.push('(recursion)');
+                    return;
+                }
+            }
+            const nextObjects = objects.concat([v]);
+            if (isArray || isArguments) {
+                segments.push('[');
+                v.forEach((x, i) => {
+                    if (i > 0) {
+                        segments.push(', ');
+                    }
+                    makeSegments(x, nextObjects, indent + 1);
+                });
+                segments.push(']');
+            }
+            else if (!isPrimitive && (isObject || hasKeys)) {
+                segments.push('{ <', asString, '> ');
+                let keys;
+                if (opts.all) {
+                    keys = Object.getOwnPropertyNames(v);
+                }
+                else {
+                    keys = Object.keys(v);
+                }
+                keys.forEach((k, i) => {
+                    if (i > 0) {
+                        segments.push(', ');
+                    }
+                    segments.push(k.toString());
+                    segments.push(': ');
+                    if (opts.values) {
+                        const props = Object.getOwnPropertyDescriptor(v, k);
+                        if (props && 'value' in props) {
+                            makeSegments(v[k], nextObjects, indent + 1);
+                        }
+                        else {
+                            segments.push('(property)');
+                        }
+                    }
+                    else {
+                        segments.push('(', typeof v[k], ')');
+                    }
+                });
+                segments.push('}');
+            }
+            else {
+                segments.push(asString, ' (', typeof v, ')');
+            }
+        };
+        makeSegments(v);
+        return segments.join('');
+    };
+
+    function _promisify(cls, function_name) {
+        Gio._promisify(cls, function_name, undefined);
+    }
+    _promisify(Soup.Session.prototype, 'send_and_read_async');
+    _promisify(Gio.OutputStream.prototype, 'write_bytes_async');
+    _promisify(Gio.IOStream.prototype, 'close_async');
+    _promisify(Gio.Subprocess.prototype, 'wait_check_async');
+    const STATUS_TOO_MANY_REQUESTS = 429;
+    class HTTPError extends Error {
+        constructor(message, soupMessage) {
+            super(message);
             this.soupMessage = soupMessage;
-            this.stack = new Error().stack;
         }
         format(sep = ' ') {
             return [
                 'status_code=' + this.soupMessage.status_code,
                 'reason_phrase=' + this.soupMessage.reason_phrase,
                 'method=' + this.soupMessage.method,
-                'uri=' + this.soupMessage.uri.to_string(false /* short */),
+                'uri=' + this.soupMessage.uri.to_string(),
             ].join(sep);
         }
         toString() {
             return this.format();
         }
     }
-    const STATUS_TOO_MANY_REQUESTS = 429;
     function isErrTooManyRequests(err) {
-        return (err &&
-            err.soupMessage &&
+        log(dump({ err }, { all: true, values: true }));
+        return !!(err.soupMessage &&
             err.soupMessage.status_code &&
             Number(err.soupMessage.status_code) === STATUS_TOO_MANY_REQUESTS);
     }
-    function getExtensionVersion() {
-        if (Metadata['git-version']) {
-            return 'git-' + Metadata['git-version'];
+    function getExtensionVersion(metadata) {
+        if (metadata['git-version']) {
+            return 'git-' + metadata['git-version'];
         }
-        else if (Metadata['version']) {
-            return 'v' + Metadata['version'];
+        else if (metadata['version']) {
+            return 'v' + metadata['version'];
         }
         else {
             return 'unknown';
         }
     }
-    function getGnomeVersion() {
-        return Config.PACKAGE_VERSION;
+    function getDefaultUserAgent(metadata, gnomeVersion) {
+        const _repository = 'http://github.com/OttoAllmendinger/' + 'gnome-shell-bitcoin-markets';
+        return `gnome-shell-bitcoin-markets/${getExtensionVersion(metadata)}/Gnome${gnomeVersion} (${_repository})`;
     }
-    const _repository = 'http://github.com/OttoAllmendinger/' + 'gnome-shell-bitcoin-markets';
-    const _userAgent = 'gnome-shell-bitcoin-markets' + '/' + getExtensionVersion() + '/Gnome' + getGnomeVersion() + ' (' + _repository + ')';
-    // Some API providers have had issues with high traffic coming from single IPs
-    // this code helps determine if these are actually different clients from behind
-    // a NAT or if some clients really do many requests
-    function getClientId() {
-        // GUID code from http://stackoverflow.com/a/2117523/92493
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-            const r = (Math.random() * 16) | 0, v = c == 'x' ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
+    async function getJSON(url, { userAgent }) {
+        const session = new Soup.Session({
+            user_agent: userAgent,
+            timeout: 30000,
         });
-    }
-    const _clientId = getClientId();
-    const _timeoutMs = 30000;
-    function getSession() {
-        const session = new Soup.SessionAsync();
-        session['user-agent'] = _userAgent;
-        Soup.Session.prototype.add_feature.call(session, new Soup.ProxyResolverDefault());
-        return session;
-    }
-    function getJSON(url, _params) {
-        const session = getSession();
         const message = Soup.Message.new('GET', url);
-        const headers = message.request_headers;
-        headers.append('X-Client-Id', _clientId);
-        // log(`> GET ${url}`);
-        return new Promise((resolve, reject) => {
-            session.queue_message(message, (session, message) => {
-                // log(`< GET ${url}: ${message.status_code}`);
-                if (message.status_code !== 200) {
-                    const err = new HTTPError(message);
-                    logError(err);
-                    return reject(err);
-                }
-                if (message.response_body === undefined) {
-                    return reject(new Error(`GET ${url}: message.response_body not defined`));
-                }
-                const { response_body } = message;
-                if (!('data' in response_body)) {
-                    return reject(new Error(`GET ${url}: response_body.data not defined`));
-                }
-                const { data } = message.response_body;
-                try {
-                    return resolve(JSON.parse(data));
-                }
-                catch (e) {
-                    return reject(new Error(`GET ${url}: error parsing as JSON: ${e}; data=${JSON.stringify(data)}`));
-                }
-            });
-            timeoutAdd(_timeoutMs, () => session.abort());
-        });
+        log(`> GET ${url}`);
+        const result = await session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, null);
+        log(dump({ result }));
+        const { status_code } = message;
+        if (status_code !== Soup.Status.OK) {
+            throw new HTTPError('unexpected status', message);
+        }
+        const data = result.get_data();
+        if (!data) {
+            throw new HTTPError('no result data', message);
+        }
+        try {
+            return JSON.parse(imports.byteArray.toString(data));
+        }
+        catch (e) {
+            throw new HTTPError('json parse error', message);
+        }
     }
 
     /**
@@ -756,7 +837,8 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
         }
     }
 
-    const Mainloop$1 = imports.mainloop;
+    const Config = imports.misc.config;
+    const Mainloop = imports.mainloop;
     const permanentErrors = new Map();
     function filterSubscribers(subscribers, { provider, url, ticker, }) {
         return subscribers.filter((s) => {
@@ -831,13 +913,13 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
         }
         start() {
             if (this.signal === null) {
-                this.signal = Mainloop$1.idle_add(this.run.bind(this));
+                this.signal = Mainloop.idle_add(this.run.bind(this));
                 return true;
             }
         }
         stop() {
             if (this.signal !== null) {
-                Mainloop$1.source_remove(this.signal);
+                Mainloop.source_remove(this.signal);
                 this.signal = null;
             }
         }
@@ -889,7 +971,9 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
                 return;
             }
             try {
-                const response = await getJSON(url);
+                const response = await getJSON(url, {
+                    userAgent: getDefaultUserAgent(extensionUtils.getCurrentExtension().metadata, Config.PACKAGE_VERSION),
+                });
                 const date = new Date();
                 this.cache.set(url, { date, response });
                 processResponse(response, date);
@@ -2129,11 +2213,17 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
         }
         _onRowChanged(self, path, iter) {
             const config = this.get_value(iter, this.Columns.CONFIG);
-            this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [this._getLabel(JSON.parse(config)), config]);
+            this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [
+                this._getLabel(JSON.parse(config)),
+                config,
+            ]);
             this._writeSettings();
         }
         _onRowInserted(self, path, iter) {
-            this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [this._getLabel(Defaults), JSON.stringify(Defaults)]);
+            this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [
+                this._getLabel(Defaults),
+                JSON.stringify(Defaults),
+            ]);
             this._writeSettings();
         }
         _onRowDeleted(_self, _path, _iter) {
@@ -2379,4 +2469,4 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gtk, Gio) {
 
     return extension;
 
-}(imports.gi.St, imports.gi.Clutter, imports.gi.GObject, imports.gi.GLib, imports.gi.Soup, imports.gi.Gtk, imports.gi.Gio));
+}(imports.gi.St, imports.gi.Clutter, imports.gi.GObject, imports.gi.GLib, imports.gi.Soup, imports.gi.Gio, imports.gi.Gtk));

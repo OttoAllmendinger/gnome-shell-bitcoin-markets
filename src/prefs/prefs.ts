@@ -1,12 +1,8 @@
-import { Widget_ConstructProps } from '@imports/Gtk-4.0';
-
 const Signals = imports.signals;
 
-import * as Gtk from '@imports/Gtk-4.0';
-import * as GObject from '@imports/GObject-2.0';
+import * as Gtk from '@gi-types/gtk4';
 
 import { extendGObject } from '../gselib/gobjectUtil';
-import ExtensionUtils from 'gselib/extensionUtils';
 import ExtensionUtils, { _ } from 'gselib/extensionUtils';
 
 import * as Format from '../format/Format';
@@ -15,17 +11,8 @@ import * as BaseProviderConfigView from './BaseProviderConfigView';
 
 const { ComboBoxView, makeConfigRow } = BaseProviderConfigView;
 
-const _ = ExtensionUtils.gettext;
-
-// const { dump } = Local.imports.dump;
-
 import { IndicatorCollectionModel } from '../IndicatorCollectionModel';
 import { SignalEmitter } from 'gselib/SignalEmitter';
-
-declare module '@imports/GObject-2.0' {
-  const TYPE_STRING: GObject.Type;
-  const TYPE_INT: GObject.Type;
-}
 
 export interface ComboBoxOptions {
   value: string;
@@ -35,7 +22,7 @@ export interface ComboBoxOptions {
 
 declare interface IndicatorConfigView extends SignalEmitter {}
 
-function getMarginAll(v: number): Partial<Widget_ConstructProps> {
+function getMarginAll(v: number) {
   return {
     margin_start: v,
     margin_top: v,
@@ -108,7 +95,7 @@ class IndicatorConfigView {
 
     try {
       this._apiConfigView = new BaseProviderConfigView.BaseProviderConfigView(api, widget, config);
-    } catch (e) {
+    } catch (e: any) {
       e.message = `Error creating configView for api ${api}: ${e.message}`;
       logError(e);
     }

@@ -1,7 +1,7 @@
-import * as Gio from '@imports/Gio-2.0';
+import * as Gio from '@gi-types/gio2';
 
-import * as Gtk3 from '@imports/Gtk-3.0';
-import * as Gtk4 from '@imports/Gtk-4.0';
+import * as Gtk3 from '@gi-types/gtk3';
+import * as Gtk4 from '@gi-types/gtk4';
 
 import prefs from './prefs';
 
@@ -47,4 +47,4 @@ application.connect('activate', (app) => {
   activeWindow.present();
 });
 
-application.run(null);
+(application as any).run(null);
