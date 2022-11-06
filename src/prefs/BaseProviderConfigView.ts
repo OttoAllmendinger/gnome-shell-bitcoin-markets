@@ -1,8 +1,8 @@
 const Signals = imports.signals;
 const Mainloop = imports.mainloop;
 
-import * as Gtk from '@imports/Gtk-4.0';
-import * as GObject from '@imports/GObject-2.0';
+import * as Gtk from '@gi-types/gtk4';
+import * as GObject from '@gi-types/gobject2';
 
 import { SignalEmitter } from '../gselib/SignalEmitter';
 import { _ } from '../gselib/extensionUtils';

@@ -1,7 +1,7 @@
 const Signals = imports.signals;
 
-import * as Gtk from '@imports/Gtk-3.0';
-import * as GObject from '@imports/GObject-2.0';
+import * as Gtk from '@gi-types/gtk3';
+import * as GObject from '@gi-types/gobject2';
 
 import { extendGObject } from './gselib/gobjectUtil';
 import { SignalEmitter } from './gselib/SignalEmitter';
@@ -82,11 +82,11 @@ export const IndicatorCollectionModel = extendGObject(
           }
         };
 
-      this.connect('row-changed', mutex(this._onRowChanged.bind(this)));
+      (this as any).connect('row-changed', mutex(this._onRowChanged.bind(this)));
 
-      this.connect('row-inserted', mutex(this._onRowInserted.bind(this)));
+      (this as any).connect('row-inserted', mutex(this._onRowInserted.bind(this)));
 
-      this.connect('row-deleted', mutex(this._onRowDeleted.bind(this)));
+      (this as any).connect('row-deleted', mutex(this._onRowDeleted.bind(this)));
     }
 
     getConfig(iter) {
@@ -96,10 +96,10 @@ export const IndicatorCollectionModel = extendGObject(
         throw new Error('getConfig() failed for iter=' + iter);
       }
 
-      const config = new ConfigModel(JSON.parse(json));
+      const config = new ConfigModel(JSON.parse(json as string));
 
       config.connect('update', () => {
-        this.set(iter, [this.Columns.CONFIG], [config.toString()]);
+        this.set(iter, [this.Columns.CONFIG], [(config.toString() as unknown) as GObject.Value]);
       });
 
       return config;
@@ -147,13 +147,19 @@ export const IndicatorCollectionModel = extendGObject(
     _onRowChanged(self, path, iter) {
       const config = this.get_value(iter, this.Columns.CONFIG);
 
-      this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [this._getLabel(JSON.parse(config)), config]);
+      this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], ([
+        this._getLabel(JSON.parse(config as any)),
+        config,
+      ] as unknown) as GObject.Value[]);
 
       this._writeSettings();
     }
 
     _onRowInserted(self, path, iter) {
-      this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [this._getLabel(Defaults), JSON.stringify(Defaults)]);
+      this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], ([
+        this._getLabel(Defaults),
+        JSON.stringify(Defaults),
+      ] as unknown) as GObject.Value[]);
 
       this._writeSettings();
     }

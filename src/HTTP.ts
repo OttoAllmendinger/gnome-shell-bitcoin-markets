@@ -1,129 +1,84 @@
-import { timeoutAdd } from './timeouts';
+import * as Soup from '@gi-types/soup3';
+import * as Gio from '@gi-types/gio2';
+import { PRIORITY_DEFAULT } from '@gi-types/glib2';
 
-const Config = imports.misc.config;
-const Mainloop = imports.mainloop;
+function _promisify(cls: any, function_name: string) {
+  Gio._promisify(cls, function_name, (undefined as unknown) as string);
+}
 
-import * as Soup from '@imports/Soup-2.4';
+_promisify(Soup.Session.prototype, 'send_and_read_async');
+_promisify(Gio.OutputStream.prototype, 'write_bytes_async');
+_promisify(Gio.IOStream.prototype, 'close_async');
+_promisify(Gio.Subprocess.prototype, 'wait_check_async');
 
-const Metadata = imports.misc.extensionUtils.getCurrentExtension().metadata;
+const STATUS_TOO_MANY_REQUESTS = 429;
 
-export class HTTPError {
-  name: string;
-  soupMessage: any;
-  stack?: string;
+export class HTTPError extends Error {
+  soupMessage: Soup.Message;
 
-  constructor(soupMessage, _error?) {
-    this.name = 'HTTPError';
+  constructor(message: string, soupMessage: Soup.Message) {
+    super(message);
     this.soupMessage = soupMessage;
-    this.stack = new Error().stack;
   }
 
-  format(sep = ' ') {
+  format(sep = ' '): string {
     return [
       'status_code=' + this.soupMessage.status_code,
       'reason_phrase=' + this.soupMessage.reason_phrase,
       'method=' + this.soupMessage.method,
-      'uri=' + this.soupMessage.uri.to_string(false /* short */),
+      'uri=' + this.soupMessage.uri.to_string(),
     ].join(sep);
   }
 
-  toString() {
+  toString(): string {
     return this.format();
   }
 }
 
-const STATUS_TOO_MANY_REQUESTS = 429;
-
-export function isErrTooManyRequests(err) {
-  return (
-    err &&
+export function isErrTooManyRequests(err: HTTPError): boolean {
+  return !!(
     err.soupMessage &&
     err.soupMessage.status_code &&
     Number(err.soupMessage.status_code) === STATUS_TOO_MANY_REQUESTS
   );
 }
 
-function getExtensionVersion() {
-  if (Metadata['git-version']) {
-    return 'git-' + Metadata['git-version'];
-  } else if (Metadata['version']) {
-    return 'v' + Metadata['version'];
+function getExtensionVersion(metadata: Record<string, unknown>) {
+  if (metadata['git-version']) {
+    return 'git-' + metadata['git-version'];
+  } else if (metadata['version']) {
+    return 'v' + metadata['version'];
   } else {
     return 'unknown';
   }
 }
 
-function getGnomeVersion() {
-  return Config.PACKAGE_VERSION;
+export function getDefaultUserAgent(metadata: Record<string, unknown>, gnomeVersion: string): string {
+  const _repository = 'http://github.com/OttoAllmendinger/' + 'gnome-shell-bitcoin-markets';
+  return `gnome-shell-bitcoin-markets/${getExtensionVersion(metadata)}/Gnome${gnomeVersion} (${_repository})`;
 }
 
-const _repository = 'http://github.com/OttoAllmendinger/' + 'gnome-shell-bitcoin-markets';
-
-const _userAgent =
-  'gnome-shell-bitcoin-markets' + '/' + getExtensionVersion() + '/Gnome' + getGnomeVersion() + ' (' + _repository + ')';
-
-// Some API providers have had issues with high traffic coming from single IPs
-// this code helps determine if these are actually different clients from behind
-// a NAT or if some clients really do many requests
-function getClientId() {
-  // GUID code from http://stackoverflow.com/a/2117523/92493
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0,
-      v = c == 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
+export async function getJSON(url: string, { userAgent }: { userAgent: string }): Promise<unknown> {
+  const session = new Soup.Session({
+    user_agent: userAgent,
+    timeout: 30_000,
   });
-}
+  const message = Soup.Message.new('GET', url);
 
-const _clientId = getClientId();
-
-const _testDelayMs = 0;
-const _timeoutMs = 30000;
-
-function getSession() {
-  const session = new Soup.SessionAsync();
-  session['user-agent'] = _userAgent;
-  Soup.Session.prototype.add_feature.call(session, new Soup.ProxyResolverDefault());
-  return session;
-}
-
-export function getJSON(url, _params?) {
-  if (_testDelayMs) {
-    url = `http://slowwly.robertomurray.co.uk/delay/${_testDelayMs}/url/${url}`;
+  const result = await session.send_and_read_async(message, PRIORITY_DEFAULT, null);
+  const { status_code } = message;
+  if (status_code !== Soup.Status.OK) {
+    throw new HTTPError('unexpected status', message);
   }
 
-  const session = getSession();
-  const message = Soup.Message.new('GET', url);
-  const headers = message.request_headers;
-  headers.append('X-Client-Id', _clientId);
-  // log(`> GET ${url}`);
-  return new Promise((resolve, reject) => {
-    session.queue_message(message, (session, message) => {
-      // log(`< GET ${url}: ${message.status_code}`);
-      if (message.status_code !== 200) {
-        const err = new HTTPError(message);
-        logError(err);
-        return reject(err);
-      }
+  const data = result.get_data();
+  if (!data) {
+    throw new HTTPError('no result data', message);
+  }
 
-      if (message.response_body === undefined) {
-        return reject(new Error(`GET ${url}: message.response_body not defined`));
-      }
-
-      const { response_body } = message;
-
-      if (!('data' in response_body)) {
-        return reject(new Error(`GET ${url}: response_body.data not defined`));
-      }
-
-      const { data } = message.response_body;
-
-      try {
-        return resolve(JSON.parse(data));
-      } catch (e) {
-        return reject(new Error(`GET ${url}: error parsing as JSON: ${e}; data=${JSON.stringify(data)}`));
-      }
-    });
-
-    timeoutAdd(_timeoutMs, () => session.abort());
-  });
+  try {
+    return JSON.parse(imports.byteArray.toString(data));
+  } catch (e) {
+    throw new HTTPError('json parse error', message);
+  }
 }

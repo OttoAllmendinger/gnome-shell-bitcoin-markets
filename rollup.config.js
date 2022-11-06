@@ -28,4 +28,13 @@ const targetPrefApp = target({
   },
 });
 
-export default [targetExt, targetPrefs, targetPrefApp];
+const targetGjsHttp = target({
+  input: 'src/bin/gjs_http.ts',
+  output: {
+    file: `${buildPath}/gjs_http.js`,
+    name: 'gjs_http',
+    banner: 'imports.gi.versions.Soup = imports.gi.GLib.getenv("SOUP");\n',
+  },
+});
+
+export default [targetExt, targetPrefs];

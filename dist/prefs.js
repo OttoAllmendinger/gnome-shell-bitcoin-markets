@@ -1072,11 +1072,17 @@ var prefs = (function (Gtk, GObject, Gtk$1, Gio, GLib) {
         }
         _onRowChanged(self, path, iter) {
             const config = this.get_value(iter, this.Columns.CONFIG);
-            this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [this._getLabel(JSON.parse(config)), config]);
+            this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [
+                this._getLabel(JSON.parse(config)),
+                config,
+            ]);
             this._writeSettings();
         }
         _onRowInserted(self, path, iter) {
-            this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [this._getLabel(Defaults), JSON.stringify(Defaults)]);
+            this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [
+                this._getLabel(Defaults),
+                JSON.stringify(Defaults),
+            ]);
             this._writeSettings();
         }
         _onRowDeleted(_self, _path, _iter) {
@@ -1086,7 +1092,6 @@ var prefs = (function (Gtk, GObject, Gtk$1, Gio, GLib) {
 
     const Signals$2 = imports.signals;
     const { ComboBoxView: ComboBoxView$1, makeConfigRow: makeConfigRow$1 } = BaseProviderConfigView$1;
-    const _$1 = extensionUtils.gettext;
     function getMarginAll(v) {
         return {
             margin_start: v,
@@ -1103,13 +1108,13 @@ var prefs = (function (Gtk, GObject, Gtk$1, Gio, GLib) {
                 orientation: Gtk.Orientation.VERTICAL,
             });
             {
-                const frame = new Gtk.Frame(Object.assign({ label: _$1('Indicator Settings') }, getMarginAll(margin)));
+                const frame = new Gtk.Frame(Object.assign({ label: _('Indicator Settings') }, getMarginAll(margin)));
                 this._layoutIndicatorSettings = new Gtk.Box(Object.assign({ orientation: Gtk.Orientation.VERTICAL }, getMarginAll(margin)));
                 frame.set_child(this._layoutIndicatorSettings);
                 this.widget.append(frame);
             }
             {
-                const frame = new Gtk.Frame(Object.assign({ label: _$1('Provider Settings') }, getMarginAll(margin)));
+                const frame = new Gtk.Frame(Object.assign({ label: _('Provider Settings') }, getMarginAll(margin)));
                 this._layoutProviderSettings = new Gtk.Box(Object.assign({ orientation: Gtk.Orientation.VERTICAL }, getMarginAll(margin)));
                 frame.set_child(this._layoutProviderSettings);
                 this.widget.append(frame);
@@ -1147,7 +1152,7 @@ var prefs = (function (Gtk, GObject, Gtk$1, Gio, GLib) {
             entry.connect('changed', () => {
                 this._indicatorConfig.set('format', entry.text);
             });
-            return makeConfigRow$1(_$1('Format'), entry);
+            return makeConfigRow$1(_('Format'), entry);
         }
         _confProvider() {
             const preset = this._indicatorConfig.get('api');
@@ -1163,7 +1168,7 @@ var prefs = (function (Gtk, GObject, Gtk$1, Gio, GLib) {
             });
             const view = new ComboBoxView$1(options);
             view.connect('changed', (view, api) => this._selectApi(api));
-            return makeConfigRow$1(_$1('Provider'), view.widget);
+            return makeConfigRow$1(_('Provider'), view.widget);
         }
         _confShowChange() {
             const preset = this._indicatorConfig.get('show_change') !== false;
@@ -1171,7 +1176,7 @@ var prefs = (function (Gtk, GObject, Gtk$1, Gio, GLib) {
             switchView.connect('notify::active', (obj) => {
                 this._indicatorConfig.set('show_change', obj.active);
             });
-            return makeConfigRow$1(_$1('Show Change'), switchView);
+            return makeConfigRow$1(_('Show Change'), switchView);
         }
         _confShowBaseCurrency() {
             const preset = this._indicatorConfig.get('show_base_currency') === true;
@@ -1179,7 +1184,7 @@ var prefs = (function (Gtk, GObject, Gtk$1, Gio, GLib) {
             switchView.connect('notify::active', (obj) => {
                 this._indicatorConfig.set('show_base_currency', obj.active);
             });
-            return makeConfigRow$1(_$1('Show Base Currency'), switchView);
+            return makeConfigRow$1(_('Show Base Currency'), switchView);
         }
         destroy() {
             this.disconnectAll();
