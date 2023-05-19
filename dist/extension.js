@@ -198,6 +198,27 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
     class Api$3 extends Api {
         constructor() {
             super(...arguments);
+            this.apiName = 'Bit2C';
+            this.apiDocs = [['API Docs', 'https://bit2c.co.il/home/api']];
+            this.interval = 10; // unknown, guessing
+        }
+        getUrl({ base, quote }) {
+            return `https://bit2c.co.il/Exchanges/${base}${quote}/Ticker.json`;
+        }
+        getLast(data) {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            return data.ll;
+        }
+        getDefaultTicker() {
+            return { base: 'BTC', quote: 'NIS' };
+        }
+    }
+
+    class Api$4 extends Api {
+        constructor() {
+            super(...arguments);
             this.apiName = 'Bitfinex';
             this.apiDocs = [
                 ['API Docs', 'https://docs.bitfinex.com/v1/reference#rest-public-ticker'],
@@ -238,7 +259,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$4 extends Api {
+    class Api$5 extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'BitMEX';
@@ -267,7 +288,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$5 extends Api {
+    class Api$6 extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'BitPay';
@@ -286,7 +307,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$6 extends Api {
+    class Api$7 extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Bitso';
@@ -309,7 +330,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$7 extends Api {
+    class Api$8 extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Bitstamp';
@@ -327,7 +348,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$8 extends Api {
+    class Api$9 extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Bittrex';
@@ -342,7 +363,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$9 extends Api {
+    class Api$a extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Buda';
@@ -360,7 +381,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$a extends Api {
+    class Api$b extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'BTCMarkets';
@@ -385,7 +406,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$b extends Api {
+    class Api$c extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CEX.IO';
@@ -406,7 +427,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$c extends Api {
+    class Api$d extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Coinbase';
@@ -430,7 +451,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$d extends Api {
+    class Api$e extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CoinGecko';
@@ -463,7 +484,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$e extends Api {
+    class Api$f extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'CryptoCompare';
@@ -481,7 +502,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$f extends Api {
+    class Api$g extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'FTX exchange';
@@ -496,7 +517,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$g extends Api {
+    class Api$h extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'HitBTC';
@@ -511,7 +532,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$h extends Api {
+    class Api$i extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Huobi';
@@ -534,7 +555,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$i extends Api {
+    class Api$j extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Kraken';
@@ -562,7 +583,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$j extends Api {
+    class Api$k extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Kucoin';
@@ -583,7 +604,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$k extends Api {
+    class Api$l extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Paymium';
@@ -608,7 +629,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$l extends Api {
+    class Api$m extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'Satang.pro';
@@ -647,7 +668,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
         return tokenInfo[code];
     }
-    class Api$m extends Api {
+    class Api$n extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'TomoX(TomoChain)';
@@ -673,7 +694,7 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
         }
     }
 
-    class Api$n extends Api {
+    class Api$o extends Api {
         constructor() {
             super(...arguments);
             this.apiName = 'VccExchange(Vietnam)';
@@ -697,28 +718,29 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
     const Providers = {
         binance: new Api$1(),
         binanceFutures: new Api$2(),
-        bitfinex: new Api$3(),
-        bitmex: new Api$4(),
-        bitpay: new Api$5(),
-        bitso: new Api$6(),
-        bitstamp: new Api$7(),
-        bittrex: new Api$8(),
-        btcmarkets: new Api$a(),
-        buda: new Api$9(),
-        cexio: new Api$b(),
-        coinbase: new Api$c(),
-        coingecko: new Api$d(),
-        cryptocompare: new Api$e(),
-        ftx: new Api$f(),
-        hitbtc: new Api$g(),
-        huobi: new Api$h(),
-        kraken: new Api$i(),
-        kucoin: new Api$j(),
-        paymium: new Api$k(),
-        poloniex: new Api$5(),
-        satangpro: new Api$l(),
-        tomox: new Api$m(),
-        vccexchange: new Api$n(),
+        bit2c: new Api$3(),
+        bitfinex: new Api$4(),
+        bitmex: new Api$5(),
+        bitpay: new Api$6(),
+        bitso: new Api$7(),
+        bitstamp: new Api$8(),
+        bittrex: new Api$9(),
+        btcmarkets: new Api$b(),
+        buda: new Api$a(),
+        cexio: new Api$c(),
+        coinbase: new Api$d(),
+        coingecko: new Api$e(),
+        cryptocompare: new Api$f(),
+        ftx: new Api$g(),
+        hitbtc: new Api$h(),
+        huobi: new Api$i(),
+        kraken: new Api$j(),
+        kucoin: new Api$k(),
+        paymium: new Api$l(),
+        poloniex: new Api$6(),
+        satangpro: new Api$m(),
+        tomox: new Api$n(),
+        vccexchange: new Api$o(),
     };
     function getProvider(name) {
         if (name in Providers) {
@@ -1376,6 +1398,13 @@ var init = (function (St, Clutter, GObject, GLib, Soup, Gio, Gtk) {
             decimal_digits: 2,
             rounding: 0,
             code: 'ILS',
+        },
+        NIS: {
+            symbol: '₪',
+            symbol_native: '₪',
+            decimal_digits: 2,
+            rounding: 0,
+            code: 'NIS',
         },
         INR: {
             symbol: '₹',
