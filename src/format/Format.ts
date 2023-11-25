@@ -1,6 +1,5 @@
 import StringFormat from 'string-format';
 import { CurrencyData } from './CurrencyData';
-import { _ } from '../gselib/extensionUtils';
 import { getMoscowTime, toSegmentStr } from './moscowTime';
 
 const defaultDigits = 2;
@@ -49,7 +48,9 @@ export function format(value: number | undefined, { base, quote, format }): stri
   })(format, formatData);
 }
 
-export function tooltipText() {
+type GettextFunc = (v: string) => string;
+
+export function tooltipText(_: GettextFunc) {
   const pad = (s, w) =>
     s +
     Array(w - s.length)

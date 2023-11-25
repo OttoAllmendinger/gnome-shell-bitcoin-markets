@@ -18,6 +18,5 @@ let instance = new MyProxy(
     '/org/gnome/Shell'
 );
 
-instance.EvalSync("global.reexec_self()");
 
-imports.mainloop.run("main");
+throw new Error("Not implemented");

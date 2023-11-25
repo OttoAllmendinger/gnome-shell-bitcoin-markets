@@ -1,14 +1,11 @@
-const Signals = imports.signals;
-const Mainloop = imports.mainloop;
-
-import * as Gtk from '@gi-types/gtk4';
-import * as GObject from '@gi-types/gobject2';
-
-import { SignalEmitter } from '../gselib/SignalEmitter';
-import { _ } from '../gselib/extensionUtils';
+import Gtk from '@girs/gtk-4.0';
+import GObject from '@girs/gobject-2.0';
+import GLib from '@girs/glib-2.0';
 
 import * as BaseProvider from '../providers/BaseProvider';
 import { getProvider } from '../providers';
+import { registerGObjectClass } from '../gjs';
+
 import { ComboBoxOptions } from './prefs';
 
 export function makeConfigRow(description: string, widget: Gtk.Widget): Gtk.Widget {
@@ -33,21 +30,31 @@ export function makeConfigRow(description: string, widget: Gtk.Widget): Gtk.Widg
 }
 
 function debounce(milliseconds, func) {
-  let tag = null;
+  let tag: number | null = null;
   return () => {
     if (tag !== null) {
-      Mainloop.source_remove(tag);
+      GLib.source_remove(tag);
     }
-    tag = Mainloop.timeout_add(milliseconds, () => {
+    tag = GLib.timeout_add(GLib.PRIORITY_DEFAULT, milliseconds, () => {
       func();
       tag = null;
+      return GLib.SOURCE_REMOVE;
     });
   };
 }
 
-export declare interface ComboBoxView extends SignalEmitter {}
+@registerGObjectClass
+export class ComboBoxView extends GObject.Object {
+  static metaInfo: GObject.MetaInfo<Record<string, never>, Record<string, never>, any> = {
+    GTypeName: 'ComboBoxView',
+    Signals: {
+      changed: {
+        param_types: [GObject.TYPE_STRING],
+        accumulator: 0,
+      },
+    },
+  };
 
-export class ComboBoxView {
   Columns = { LABEL: 0, VALUE: 1 };
 
   public widget: Gtk.ComboBox;
@@ -55,6 +62,7 @@ export class ComboBoxView {
   private _options?: ComboBoxOptions[];
 
   constructor(options) {
+    super();
     const model = new Gtk.ListStore();
     model.set_column_types([GObject.TYPE_STRING]);
 
@@ -95,16 +103,18 @@ export class ComboBoxView {
   }
 }
 
-Signals.addSignalMethods(ComboBoxView.prototype);
+type GettextFunc = (s: string) => string;
 
 export class BaseProviderConfigView {
+  private gettext: GettextFunc;
   private _api: string;
   private _provider: BaseProvider.Api;
   private _configWidget: Gtk.Box;
   private _indicatorConfig;
   private _widgets: Gtk.Widget[];
 
-  constructor(api: string, configWidget: Gtk.Box, indicatorConfig: ComboBoxOptions) {
+  constructor(gettext: GettextFunc, api: string, configWidget: Gtk.Box, indicatorConfig: ComboBoxOptions) {
+    this.gettext = gettext;
     this._api = api;
     this._provider = getProvider(api);
     this._configWidget = configWidget;
@@ -143,11 +153,11 @@ export class BaseProviderConfigView {
   }
 
   _addBaseEntry() {
-    return this._addSymbolEntry(_('Base'), 'base', 'BTC');
+    return this._addSymbolEntry(this.gettext('Base'), 'base', 'BTC');
   }
 
   _addQuoteEntry() {
-    return this._addSymbolEntry(_('Quote'), 'quote', 'USD');
+    return this._addSymbolEntry(this.gettext('Quote'), 'quote', 'USD');
   }
 
   _addSymbolEntry(label, key, defaultValue) {
@@ -157,6 +167,9 @@ export class BaseProviderConfigView {
     entry.connect(
       'changed',
       debounce(500, () => {
+        if (!entry.text) {
+          throw new Error();
+        }
         if (entry.text.length < 2) {
           return;
         }
@@ -172,13 +185,13 @@ export class BaseProviderConfigView {
   _addHelp() {
     const { apiDocs } = this._provider;
     if (!apiDocs) {
-      return logError(new Error(`no apiDocs for ${this._api}`));
+      return console.log(new Error(`no apiDocs for ${this._api}`));
     }
 
     const helpText = apiDocs.map(([label, url]) => `<a href="${url}">${label}</a>`).join(', ');
 
     this._addRow(
-      _('Help'),
+      this.gettext('Help'),
       new Gtk.Label({
         label: helpText,
         use_markup: true,

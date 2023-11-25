@@ -1,11 +1,10 @@
 import { timeoutAdd } from './timeouts';
-
-const Config = imports.misc.config;
-const Mainloop = imports.mainloop;
+import * as Config from '@gnome-shell/misc/config';
+import Glib from '@girs/glib-2.0';
 
 import * as HTTP from './HTTP';
 import { getProvider, BaseProvider, Providers } from './providers';
-import extensionUtils from 'gselib/extensionUtils';
+import { Extension } from '@gnome-shell/extensions/extension';
 
 interface PriceData {
   date: Date;
@@ -62,9 +61,9 @@ const applySubscribers = (subscribers, func: (s: Subscriber) => void) =>
         const { api, base, quote } = s.options;
         s.onUpdateError(e);
         e.message = `Error with subscriber ${api} ${base}${quote}: ${e.message}`;
-        logError(e);
+        console.log(e);
       } catch (e) {
-        logError(e);
+        console.log(e);
       }
     }
   });
@@ -119,14 +118,17 @@ class PollLoop {
 
   start() {
     if (this.signal === null) {
-      this.signal = Mainloop.idle_add(this.run.bind(this));
+      this.signal = Glib.idle_add(Glib.PRIORITY_DEFAULT, () => {
+        this.run();
+        return Glib.SOURCE_REMOVE;
+      });
       return true;
     }
   }
 
   stop() {
     if (this.signal !== null) {
-      Mainloop.source_remove(this.signal);
+      Glib.source_remove(this.signal);
       this.signal = null;
     }
   }
@@ -135,7 +137,7 @@ class PollLoop {
     try {
       this.update();
     } catch (e) {
-      logError(e);
+      console.error(e);
     }
 
     this.signal = timeoutAdd(this.interval * 1000, this.run.bind(this));
@@ -172,7 +174,7 @@ class PollLoop {
         } catch (e: any) {
           e.message = `Error updating ${url}: ${e.message}`;
           applySubscribers(tickerSubscribers, (s) => s.onUpdateError(e, { ticker }));
-          logError(e);
+          console.log(e);
         }
       });
     };
@@ -189,9 +191,14 @@ class PollLoop {
       return;
     }
 
+    const ext = Extension.lookupByURL(import.meta.url);
+    if (!ext) {
+      throw new Error('Unable to find extension');
+    }
+
     try {
       const response = await HTTP.getJSON(url, {
-        userAgent: HTTP.getDefaultUserAgent(extensionUtils.getCurrentExtension().metadata, Config.PACKAGE_VERSION),
+        userAgent: HTTP.getDefaultUserAgent(ext.metadata, Config.PACKAGE_VERSION),
       });
       const date = new Date();
       this.cache.set(url, { date, response });
@@ -200,7 +207,7 @@ class PollLoop {
       if (HTTP.isErrTooManyRequests(err)) {
         permanentErrors.set(this.provider, err);
       }
-      logError(err);
+      console.error(err);
       this.cache.delete(url);
       applySubscribers(getUrlSubscribers(), (s) => s.onUpdateError(err));
     }
@@ -230,7 +237,7 @@ export function setSubscribers(subscribers: Subscriber[]) {
     if (options.api in Providers) {
       return true;
     }
-    logError(new Error(`invalid provider ${options.api}`));
+    console.log(new Error(`invalid provider ${options.api}`));
     return false;
   });
 

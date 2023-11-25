@@ -1,4 +1,4 @@
-import * as GLib from '@gi-types/glib2';
+import GLib from '@girs/glib-2.0';
 
 const timeoutIds: number[] = [];
 
@@ -10,7 +10,7 @@ const timeoutIds: number[] = [];
 export function timeoutAdd(intervalMS: number, callback: () => void): number {
   const sourceId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, intervalMS, () => {
     callback();
-    return false /* do not run callback again */;
+    return GLib.SOURCE_REMOVE;
   });
   timeoutIds.push(sourceId);
   return sourceId;

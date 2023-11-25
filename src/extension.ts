@@ -1,23 +1,22 @@
+import Gio from '@girs/gio-2.0';
+import St from '@girs/st-13';
+import Clutter from '@girs/clutter-13';
+import { Extension, ExtensionMetadata } from '@gnome-shell/extensions/extension';
 import { Subscriber } from './ApiService';
 
-const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
-const PopupMenu = imports.ui.popupMenu;
-
-import * as St from '@gi-types/st1';
-import * as Clutter from '@gi-types/clutter10';
-
-import ExtensionUtils, { _ } from './gselib/extensionUtils';
-import { extendGObject } from './gselib/gobjectUtil';
+import * as Main from '@gnome-shell/ui/main';
+import * as PanelMenu from '@gnome-shell/ui/panelMenu';
+import * as PopupMenu from '@gnome-shell/ui/popupMenu';
 
 import * as ApiService from './ApiService';
 import * as Format from './format/Format';
 import * as HTTP from './HTTP';
-import { Defaults } from './IndicatorCollectionModel';
+import { Defaults } from './prefs/IndicatorCollectionModel';
 
 import { Options } from './providers/BaseProvider';
 import { getProvider } from './providers';
 import { removeAllTimeouts } from './timeouts';
+import { registerGObjectClass } from 'gjs';
 
 const INDICATORS_KEY = 'indicators';
 const FIRST_RUN_KEY = 'first-run';
@@ -30,154 +29,172 @@ const _Symbols = {
   unchanged: ' ',
 };
 
-const settings = ExtensionUtils.getSettings();
-
 interface IndicatorOptions extends Options {
   show_change: boolean;
 }
 
-const MarketIndicatorView = extendGObject(
-  class MarketIndicatorView extends PanelMenu.Button {
-    options?: IndicatorOptions;
+type PopupMenuItemWithLabel = PopupMenu.PopupMenuItem & {
+  label: St.Label;
+};
 
-    _init(options) {
-      super._init(0);
-      this.providerLabel = '';
-      this._initLayout();
-      this.setOptions(options);
+@registerGObjectClass
+class MarketIndicatorView extends PanelMenu.Button {
+  options?: IndicatorOptions;
+  providerLabel!: string;
+  _indicatorView!: St.Label;
+  _statusView!: St.Label;
+  _popupItemStatus!: PopupMenuItemWithLabel;
+  _popupItemSettings!: PopupMenu.PopupMenuItem;
+
+  // actor!: Clutter.Actor;
+
+  constructor(options) {
+    super(1.0, 'Bitcoin Markets Indicator', false);
+    this.providerLabel = '[providerlabel]';
+    this._initLayout();
+    this.setOptions(options);
+  }
+
+  setOptions(options: IndicatorOptions) {
+    try {
+      this.providerLabel = getProvider(options.api).getLabel(options);
+    } catch (e) {
+      console.error(e);
+      this.providerLabel = `[${options.api}]`;
+      this.onUpdateError(e);
+      return;
     }
 
-    setOptions(options: IndicatorOptions) {
-      try {
-        this.providerLabel = getProvider(options.api).getLabel(options);
-      } catch (e) {
-        logError(e);
-        this.providerLabel = `[${options.api}]`;
-        this.onUpdateError(e);
-        return;
-      }
+    this.options = options;
+  }
 
-      this.options = options;
-    }
+  _initLayout() {
+    const layout = new St.BoxLayout();
 
-    _initLayout() {
-      const layout = new St.BoxLayout();
+    this._indicatorView = new St.Label({
+      y_align: Clutter.ActorAlign.CENTER,
+      style_class: 'indicator',
+    });
 
-      this._indicatorView = new St.Label({
-        y_align: Clutter.ActorAlign.CENTER,
-        style_class: 'indicator',
-      });
+    this._statusView = new St.Label({
+      y_align: Clutter.ActorAlign.CENTER,
+      style_class: 'status',
+    });
 
-      this._statusView = new St.Label({
-        y_align: Clutter.ActorAlign.CENTER,
-        style_class: 'status',
-      });
+    layout.add_actor(this._statusView);
+    layout.add_actor(this._indicatorView);
 
-      layout.add_actor(this._statusView);
-      layout.add_actor(this._indicatorView);
+    this.add_actor(layout);
 
-      this.actor.add_actor(layout);
+    this._popupItemStatus = new PopupMenu.PopupMenuItem('', {
+      activate: false,
+      hover: false,
+      can_focus: false,
+    }) as PopupMenuItemWithLabel;
+    this._popupItemStatus.label.set_style('max-width: 12em;');
+    this._popupItemStatus.label.clutter_text.set_line_wrap(true);
+    this.menu.addMenuItem(this._popupItemStatus);
 
-      this._popupItemStatus = new PopupMenu.PopupMenuItem('', { activate: false, hover: false, can_focus: false });
-      this._popupItemStatus.label.set_style('max-width: 12em;');
-      this._popupItemStatus.label.clutter_text.set_line_wrap(true);
-      this.menu.addMenuItem(this._popupItemStatus);
+    this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-      this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+    this._popupItemSettings = new PopupMenu.PopupMenuItem('Settings');
+    this.menu.addMenuItem(this._popupItemSettings);
+    this._popupItemSettings.connect('activate', () => {
+      BitcoinMarketsExtension.getInstance().openPreferences();
+    });
+  }
 
-      this._popupItemSettings = new PopupMenu.PopupMenuItem(_('Settings'));
-      this.menu.addMenuItem(this._popupItemSettings);
-      this._popupItemSettings.connect('activate', () => {
-        ExtensionUtils.openPrefs();
-      });
-    }
-
-    getChange(lastValue, newValue) {
-      if (lastValue === undefined) {
-        return 'unchanged';
-      }
-      if (lastValue > newValue) {
-        return 'down';
-      } else if (lastValue < newValue) {
-        return 'up';
-      }
+  getChange(lastValue, newValue) {
+    if (lastValue === undefined) {
       return 'unchanged';
     }
+    if (lastValue > newValue) {
+      return 'down';
+    } else if (lastValue < newValue) {
+      return 'up';
+    }
+    return 'unchanged';
+  }
 
-    onUpdateStart() {
-      this._displayStatus(_Symbols.refresh);
+  onUpdateStart() {
+    this._displayStatus(_Symbols.refresh);
+  }
+
+  onUpdateError(error) {
+    this._displayText('error');
+    this._displayStatus(_Symbols.error);
+    this._updatePopupItemLabel(error);
+  }
+
+  onClearValue() {
+    this._displayStatus(_Symbols.refresh);
+    this._displayText(Format.format(undefined, this.options!));
+    this._updatePopupItemLabel();
+  }
+
+  onUpdatePriceData(priceData) {
+    const [p, p1] = priceData;
+
+    const change = p1 ? this.getChange(p.value, p1.value) : 'unchanged';
+
+    const _StatusToSymbol = {
+      up: _Symbols.up,
+      down: _Symbols.down,
+      unchanged: ' ',
+    };
+
+    let symbol = ' ';
+    if (this.options!.show_change) {
+      symbol = _StatusToSymbol[change];
+      this._displayStatus(symbol);
+    } else {
+      this._statusView.width = 0;
     }
 
-    onUpdateError(error) {
-      this._displayText('error');
-      this._displayStatus(_Symbols.error);
-      this._updatePopupItemLabel(error);
+    this._displayText(Format.format(p.value, this.options!));
+    this._updatePopupItemLabel();
+  }
+
+  _displayStatus(text) {
+    this._statusView.text = text;
+  }
+
+  _displayText(text) {
+    this._indicatorView.text = text;
+  }
+
+  _updatePopupItemLabel(err?) {
+    let text = this.providerLabel;
+    if (err) {
+      text += '\n\n' + (err instanceof HTTP.HTTPError ? err.format('\n\n') : String(err));
     }
+    this._popupItemStatus.label.clutter_text.set_markup(text);
+  }
 
-    onClearValue() {
-      this._displayStatus(_Symbols.refresh);
-      this._displayText(Format.format(undefined, this.options!));
-      this._updatePopupItemLabel();
-    }
-
-    onUpdatePriceData(priceData) {
-      const [p, p1] = priceData;
-
-      const change = p1 ? this.getChange(p.value, p1.value) : 'unchanged';
-
-      const _StatusToSymbol = {
-        up: _Symbols.up,
-        down: _Symbols.down,
-        unchanged: ' ',
-      };
-
-      let symbol = ' ';
-      if (this.options!.show_change) {
-        symbol = _StatusToSymbol[change];
-        this._displayStatus(symbol);
-      } else {
-        this._statusView.width = 0;
-      }
-
-      this._displayText(Format.format(p.value, this.options!));
-      this._updatePopupItemLabel();
-    }
-
-    _displayStatus(text) {
-      this._statusView.text = text;
-    }
-
-    _displayText(text) {
-      this._indicatorView.text = text;
-    }
-
-    _updatePopupItemLabel(err?) {
-      let text = this.providerLabel;
-      if (err) {
-        text += '\n\n' + (err instanceof HTTP.HTTPError ? err.format('\n\n') : String(err));
-      }
-      this._popupItemStatus.label.clutter_text.set_markup(text);
-    }
-
-    destroy() {
-      this._indicatorView.destroy();
-      this._statusView.destroy();
-      super.destroy();
-    }
-  },
-  PanelMenu.Button,
-);
+  destroy() {
+    this._indicatorView.destroy();
+    this._statusView.destroy();
+    super.destroy();
+  }
+}
 
 class IndicatorCollection {
+  private settings: Gio.Settings;
   private _indicators: InstanceType<typeof MarketIndicatorView>[];
   private _settingsChangedId: number;
 
   constructor() {
     this._indicators = [];
 
-    if (settings.get_boolean(FIRST_RUN_KEY)) {
+    this.settings = BitcoinMarketsExtension.getInstance().getSettings();
+
+    if (!this.settings) {
+      throw new Error('No settings');
+    }
+
+    if (this.settings.get_boolean(FIRST_RUN_KEY)) {
       this._initDefaults();
-      settings.set_boolean(FIRST_RUN_KEY, false);
+      this.settings.set_boolean(FIRST_RUN_KEY, false);
     } else {
       this._upgradeSettings();
     }
@@ -186,17 +203,17 @@ class IndicatorCollection {
       try {
         this._updateIndicators();
       } catch (e) {
-        logError(e);
+        console.error(e);
       }
     };
 
-    this._settingsChangedId = settings.connect('changed::' + INDICATORS_KEY, tryUpdateIndicators);
+    this._settingsChangedId = this.settings.connect('changed::' + INDICATORS_KEY, tryUpdateIndicators);
 
     tryUpdateIndicators();
   }
 
   _initDefaults() {
-    settings.set_strv(
+    this.settings.set_strv(
       INDICATORS_KEY,
       [Defaults].map((v) => JSON.stringify(v)),
     );
@@ -225,25 +242,25 @@ class IndicatorCollection {
       return options;
     }
 
-    const updated = settings
+    const updated = this.settings
       .get_strv(INDICATORS_KEY)
       .map((v) => JSON.parse(v))
       .map(applyDefaults);
-    settings.set_strv(
+    this.settings.set_strv(
       INDICATORS_KEY,
       updated.map((v) => JSON.stringify(v)),
     );
   }
 
   _updateIndicators() {
-    const arrOptions = settings
+    const arrOptions = this.settings
       .get_strv(INDICATORS_KEY)
       .map((str) => {
         try {
           return JSON.parse(str);
         } catch (e: any) {
           e.message = `Error parsing string ${str}: ${e.message}`;
-          logError(e);
+          console.error(e);
         }
       })
       .filter(Boolean);
@@ -253,7 +270,7 @@ class IndicatorCollection {
         try {
           this._indicators[i].setOptions(options);
         } catch (e) {
-          logError(e);
+          console.error(e);
         }
       });
     } else {
@@ -278,30 +295,37 @@ class IndicatorCollection {
   destroy() {
     this._removeAll();
     ApiService.setSubscribers([]);
-    (settings as any).disconnect(this._settingsChangedId);
+    this.settings.disconnect(this._settingsChangedId);
   }
 }
 
-let _indicatorCollection;
+export default class BitcoinMarketsExtension extends Extension {
+  static instance?: BitcoinMarketsExtension;
+  _indicatorCollection?: IndicatorCollection;
 
-function init(_metadata?) {
-  ExtensionUtils.initTranslations();
-}
+  static getInstance(): BitcoinMarketsExtension {
+    if (!this.instance) {
+      throw new Error();
+    }
 
-function enable() {
-  try {
-    _indicatorCollection = new IndicatorCollection();
-  } catch (e) {
-    logError(e);
+    return this.instance;
   }
-}
 
-function disable() {
-  _indicatorCollection.destroy();
-  removeAllTimeouts();
-}
+  constructor(props: ExtensionMetadata) {
+    super(props);
+    BitcoinMarketsExtension.instance = this;
+  }
 
-export default function () {
-  init();
-  return { enable, disable };
+  enable(): void {
+    try {
+      this._indicatorCollection = new IndicatorCollection();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  disable(): void {
+    this._indicatorCollection?.destroy();
+    removeAllTimeouts();
+  }
 }

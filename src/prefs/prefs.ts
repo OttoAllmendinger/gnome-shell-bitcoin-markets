@@ -1,26 +1,23 @@
-const Signals = imports.signals;
+import Adw from '@girs/adw-1';
+import Gtk from '@girs/gtk-4.0';
+import { ExtensionBase } from '@gnome-shell/extensions/extension';
+import { ExtensionPreferences } from '@gnome-shell/extensions/prefs';
 
-import * as Gtk from '@gi-types/gtk4';
-
-import { extendGObject } from '../gselib/gobjectUtil';
-import ExtensionUtils, { _ } from 'gselib/extensionUtils';
-
+import { registerGObjectClass } from '../gjs';
 import * as Format from '../format/Format';
 import { getProvider, Providers } from '../providers';
+
 import * as BaseProviderConfigView from './BaseProviderConfigView';
 
 const { ComboBoxView, makeConfigRow } = BaseProviderConfigView;
-
-import { IndicatorCollectionModel } from '../IndicatorCollectionModel';
-import { SignalEmitter } from 'gselib/SignalEmitter';
+import { IndicatorCollectionModel } from './IndicatorCollectionModel';
+import { GettextFunc } from './gettext';
 
 export interface ComboBoxOptions {
   value: string;
   label: string;
   active: boolean;
 }
-
-declare interface IndicatorConfigView extends SignalEmitter {}
 
 function getMarginAll(v: number) {
   return {
@@ -38,7 +35,7 @@ class IndicatorConfigView {
   private _layoutProviderSettings: Gtk.Box;
   private _apiConfigView?: BaseProviderConfigView.BaseProviderConfigView;
 
-  constructor(indicatorConfig) {
+  constructor(private gettext: GettextFunc, indicatorConfig) {
     const margin = 8;
 
     this._indicatorConfig = indicatorConfig;
@@ -49,7 +46,7 @@ class IndicatorConfigView {
 
     {
       const frame = new Gtk.Frame({
-        label: _('Indicator Settings'),
+        label: this.gettext('Indicator Settings'),
         ...getMarginAll(margin),
       });
       this._layoutIndicatorSettings = new Gtk.Box({
@@ -61,7 +58,7 @@ class IndicatorConfigView {
     }
     {
       const frame = new Gtk.Frame({
-        label: _('Provider Settings'),
+        label: this.gettext('Provider Settings'),
         ...getMarginAll(margin),
       });
       this._layoutProviderSettings = new Gtk.Box({
@@ -94,10 +91,10 @@ class IndicatorConfigView {
     }
 
     try {
-      this._apiConfigView = new BaseProviderConfigView.BaseProviderConfigView(api, widget, config);
+      this._apiConfigView = new BaseProviderConfigView.BaseProviderConfigView(this.gettext, api, widget, config);
     } catch (e: any) {
       e.message = `Error creating configView for api ${api}: ${e.message}`;
-      logError(e);
+      console.error(e);
     }
   }
 
@@ -106,17 +103,17 @@ class IndicatorConfigView {
 
     const entry = new Gtk.Entry({
       text: format,
-      tooltip_markup: Format.tooltipText(),
+      tooltip_markup: Format.tooltipText(this.gettext),
     });
 
     entry.connect('changed', () => {
       this._indicatorConfig.set('format', entry.text);
     });
 
-    return makeConfigRow(_('Format'), entry);
+    return makeConfigRow(this.gettext('Format'), entry);
   }
 
-  _confProvider() {
+  _confProvider(): Gtk.Widget {
     const preset = this._indicatorConfig.get('api');
 
     const options: ComboBoxOptions[] = Object.keys(Providers).map((name) => ({
@@ -135,10 +132,10 @@ class IndicatorConfigView {
 
     view.connect('changed', (view, api) => this._selectApi(api));
 
-    return makeConfigRow(_('Provider'), view.widget);
+    return makeConfigRow(this.gettext('Provider'), view.widget);
   }
 
-  _confShowChange() {
+  _confShowChange(): Gtk.Widget {
     const preset = this._indicatorConfig.get('show_change') !== false;
 
     const switchView = new Gtk.Switch({ active: preset });
@@ -147,10 +144,10 @@ class IndicatorConfigView {
       this._indicatorConfig.set('show_change', obj.active);
     });
 
-    return makeConfigRow(_('Show Change'), (switchView as unknown) as Gtk.Widget);
+    return makeConfigRow(this.gettext('Show Change'), switchView);
   }
 
-  _confShowBaseCurrency() {
+  _confShowBaseCurrency(): Gtk.Widget {
     const preset = this._indicatorConfig.get('show_base_currency') === true;
 
     const switchView = new Gtk.Switch({ active: preset });
@@ -159,169 +156,164 @@ class IndicatorConfigView {
       this._indicatorConfig.set('show_base_currency', obj.active);
     });
 
-    return makeConfigRow(_('Show Base Currency'), (switchView as unknown) as Gtk.Widget);
-  }
-
-  destroy() {
-    this.disconnectAll();
+    return makeConfigRow(this.gettext('Show Base Currency'), switchView);
   }
 }
 
-Signals.addSignalMethods(IndicatorConfigView.prototype);
+@registerGObjectClass
+class BitcoinMarketsSettingsWidget extends Gtk.Box {
+  private gettext: GettextFunc;
+  private _store?: InstanceType<typeof IndicatorCollectionModel>;
+  private _configLayout?: Gtk.Box;
+  private _treeView?: Gtk.TreeView;
+  private _selection?: Gtk.TreeSelection;
+  private _toolbar?: Gtk.Box;
+  private _delButton?: Gtk.Button;
+  private _indicatorConfigView: any;
 
-const BitcoinMarketsSettingsWidget = extendGObject(
-  class BitcoinMarketsSettingsWidget extends Gtk.Box {
-    private _store?: InstanceType<typeof IndicatorCollectionModel>;
-    private _configLayout?: Gtk.Box;
-    private _treeView?: Gtk.TreeView;
-    private _selection?: Gtk.TreeSelection;
-    private _toolbar?: Gtk.Box;
-    private _delButton?: Gtk.Button;
-    private _indicatorConfigView: any;
+  constructor(ext: ExtensionBase) {
+    super({
+      orientation: Gtk.Orientation.HORIZONTAL,
+    });
 
-    _init() {
-      super._init({
-        orientation: Gtk.Orientation.HORIZONTAL,
-      });
+    this.gettext = ext.gettext.bind(ext);
+    this._store = new IndicatorCollectionModel(ext.getSettings());
 
-      this._store = new IndicatorCollectionModel();
+    /* sidebar (left) */
 
-      /* sidebar (left) */
+    const sidebar = new Gtk.Box({
+      margin_start: 10,
+      margin_end: 10,
+      margin_top: 10,
+      margin_bottom: 10,
+      orientation: Gtk.Orientation.VERTICAL,
+      width_request: 240,
+    });
 
-      const sidebar = new Gtk.Box({
-        margin_start: 10,
-        margin_end: 10,
-        margin_top: 10,
-        margin_bottom: 10,
-        orientation: Gtk.Orientation.VERTICAL,
-        width_request: 240,
-      });
+    sidebar.append((this._getTreeView() as unknown) as Gtk.Widget);
+    sidebar.append((this._getToolbar() as unknown) as Gtk.Widget);
 
-      sidebar.append((this._getTreeView() as unknown) as Gtk.Widget);
-      sidebar.append((this._getToolbar() as unknown) as Gtk.Widget);
+    this.append(sidebar);
 
-      this.append(sidebar);
+    /* config (right) */
 
-      /* config (right) */
+    this._configLayout = new Gtk.Box({
+      // margin: 10,
+      orientation: Gtk.Orientation.HORIZONTAL,
+      hexpand: true,
+      vexpand: true,
+    });
 
-      this._configLayout = new Gtk.Box({
-        // margin: 10,
-        orientation: Gtk.Orientation.HORIZONTAL,
-        hexpand: true,
-        vexpand: true,
-      });
+    this.append(this._configLayout);
 
-      this.append(this._configLayout);
+    /* behavior */
 
-      /* behavior */
+    this._selection = this._treeView!.get_selection();
+    this._selection.connect('changed', this._onSelectionChanged.bind(this));
+  }
 
-      this._selection = this._treeView!.get_selection();
-      this._selection.connect('changed', this._onSelectionChanged.bind(this));
+  _getTreeView() {
+    this._treeView = new Gtk.TreeView({
+      model: this._store,
+      headers_visible: false,
+      reorderable: true,
+      hexpand: false,
+      vexpand: true,
+    });
+
+    const label = new Gtk.TreeViewColumn({ title: 'Label' });
+    const renderer = new Gtk.CellRendererText();
+    label.pack_start(renderer, true);
+    label.add_attribute(renderer, 'text', 0);
+    this._treeView.insert_column(label, 0);
+
+    return this._treeView;
+  }
+
+  _getToolbar() {
+    const toolbar = (this._toolbar = new Gtk.Box({}));
+
+    /* new widget button with menu */
+    const newButton = new Gtk.Button({ icon_name: 'list-add-symbolic' });
+    newButton.connect('clicked', this._addClicked.bind(this));
+    toolbar.append(newButton);
+
+    /* delete button */
+    const delButton = (this._delButton = new Gtk.Button({ icon_name: 'list-remove-symbolic' }));
+    delButton.connect('clicked', this._delClicked.bind(this));
+
+    toolbar.append(delButton);
+
+    this._updateToolbar();
+
+    return toolbar;
+  }
+
+  _onSelectionChanged() {
+    const [isSelected, , iter] = this._selection!.get_selected();
+
+    if (isSelected) {
+      this._showIndicatorConfig(this._store!.getConfig(iter));
+    } else {
+      this._showIndicatorConfig(null);
     }
 
-    _getTreeView() {
-      this._treeView = new Gtk.TreeView({
-        model: this._store,
-        headers_visible: false,
-        reorderable: true,
-        hexpand: false,
-        vexpand: true,
-      });
+    this._updateToolbar();
+  }
 
-      const label = new Gtk.TreeViewColumn({ title: 'Label' });
-      const renderer = new Gtk.CellRendererText();
-      label.pack_start(renderer, true);
-      label.add_attribute(renderer, 'text', 0);
-      this._treeView.insert_column(label, 0);
-
-      return this._treeView;
+  _showIndicatorConfig(indicatorConfig) {
+    if (this._indicatorConfigView) {
+      this._configLayout!.remove(this._indicatorConfigView.widget);
+      this._indicatorConfigView.destroy();
+      this._indicatorConfigView = null;
     }
 
-    _getToolbar() {
-      const toolbar = (this._toolbar = new Gtk.Box({}));
-
-      /* new widget button with menu */
-      const newButton = new Gtk.Button({ icon_name: 'list-add-symbolic' });
-      newButton.connect('clicked', this._addClicked.bind(this));
-      toolbar.append(newButton);
-
-      /* delete button */
-      const delButton = (this._delButton = new Gtk.Button({ icon_name: 'list-remove-symbolic' }));
-      delButton.connect('clicked', this._delClicked.bind(this));
-
-      toolbar.append(delButton);
-
-      this._updateToolbar();
-
-      return toolbar;
+    if (indicatorConfig === null) {
+      return;
     }
 
-    _onSelectionChanged() {
-      const [isSelected, , iter] = this._selection!.get_selected();
+    this._indicatorConfigView = new IndicatorConfigView(this.gettext, indicatorConfig);
+    this._configLayout!.append(this._indicatorConfigView.widget);
+  }
 
-      if (isSelected) {
-        this._showIndicatorConfig(this._store!.getConfig(iter));
-      } else {
-        this._showIndicatorConfig(null);
-      }
+  _updateToolbar() {
+    let sensitive = false;
 
-      this._updateToolbar();
+    if (this._selection) {
+      const [isSelected] = this._selection.get_selected();
+      sensitive = isSelected;
     }
 
-    _showIndicatorConfig(indicatorConfig) {
-      if (this._indicatorConfigView) {
-        this._configLayout!.remove(this._indicatorConfigView.widget);
-        this._indicatorConfigView.destroy();
-        this._indicatorConfigView = null;
-      }
+    this._delButton!.set_sensitive(sensitive);
+  }
 
-      if (indicatorConfig === null) {
-        return;
-      }
+  _addClicked() {
+    this._store!.append();
+    this._updateToolbar();
+  }
 
-      this._indicatorConfigView = new IndicatorConfigView(indicatorConfig);
-      this._configLayout!.append(this._indicatorConfigView.widget);
+  _delClicked() {
+    const [isSelected, , iter] = this._selection!.get_selected();
+
+    if (!iter) {
+      throw new Error();
     }
 
-    _updateToolbar() {
-      let sensitive = false;
-
-      if (this._selection) {
-        const [isSelected] = this._selection.get_selected();
-        sensitive = isSelected;
-      }
-
-      this._delButton!.set_sensitive(sensitive);
+    if (isSelected) {
+      this._store!.remove(iter);
     }
 
-    _addClicked() {
-      this._store!.append();
-      this._updateToolbar();
-    }
+    this._updateToolbar();
+  }
+}
 
-    _delClicked() {
-      const [isSelected, , iter] = this._selection!.get_selected();
-
-      if (!iter) {
-        throw new Error();
-      }
-
-      if (isSelected) {
-        this._store!.remove(iter);
-      }
-
-      this._updateToolbar();
-    }
-  },
-  Gtk.Box,
-);
-
-export default {
-  init() {
-    ExtensionUtils.initTranslations();
-  },
-
-  buildPrefsWidget() {
-    return new BitcoinMarketsSettingsWidget();
-  },
-};
+export default class BitcoinMarketsSettings extends ExtensionPreferences {
+  fillPreferencesWindow(window: Adw.PreferencesWindow): void {
+    const page = new Adw.PreferencesPage();
+    const group = new Adw.PreferencesGroup();
+    const gtkWidget = new BitcoinMarketsSettingsWidget(this);
+    group.add(gtkWidget);
+    page.add(group);
+    window.add(page);
+  }
+}
