@@ -4,17 +4,9 @@ import Gio from '@girs/gio-2.0';
 
 import { getProvider } from '../providers';
 import { registerGObjectClass } from '../gjs';
+import { Defaults } from '../defaults';
 
 const INDICATORS_KEY = 'indicators';
-
-export const Defaults = {
-  api: 'bitstamp',
-  base: 'BTC',
-  quote: 'USD',
-  attribute: 'last',
-  show_change: true,
-  format: '{v} {qs}',
-};
 
 class ConfigModel {
   private attributes: Record<string, unknown>;

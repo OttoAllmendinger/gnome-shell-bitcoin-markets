@@ -1,6 +1,7 @@
 import St from 'gi://St?version=13';
 import Clutter from 'gi://Clutter?version=13';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+import GObject from 'gi://GObject?version=2.0';
 import { panel } from 'resource:///org/gnome/shell/ui/main.js';
 import { Button } from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import { PopupMenuItem, PopupSeparatorMenuItem } from 'resource:///org/gnome/shell/ui/popupMenu.js';
@@ -8,8 +9,6 @@ import GLib from 'gi://GLib?version=2.0';
 import { PACKAGE_VERSION } from 'resource:///org/gnome/shell/misc/config.js';
 import Soup from 'gi://Soup?version=3.0';
 import Gio from 'gi://Gio?version=2.0';
-import Gtk from 'gi://Gtk?version=4.0';
-import GObject from 'gi://GObject?version=2.0';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -37,6 +36,29 @@ var _SuppressedError = typeof SuppressedError === "function" ? SuppressedError :
     var e = new Error(message);
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
 };
+
+// Taken from https://github.com/material-shell/material-shell/blob/main/src/utils/gjs.ts
+/// Decorator function to call `GObject.registerClass` with the given class.
+/// Use like
+/// ```
+/// @registerGObjectClass
+/// export class MyThing extends GObject.Object { ... }
+/// ```
+function registerGObjectClass(target) {
+    // Note that we use 'hasOwnProperty' because otherwise we would get inherited meta infos.
+    // This would be bad because we would inherit the GObjectName too, which is supposed to be unique.
+    if (Object.prototype.hasOwnProperty.call(target, 'metaInfo')) {
+        // eslint-disable-next-line
+        // @ts-ignore
+        // eslint-disable-next-line
+        return GObject.registerClass(target.metaInfo, target);
+    }
+    else {
+        // eslint-disable-next-line
+        // @ts-ignore
+        return GObject.registerClass(target);
+    }
+}
 
 const timeoutIds = [];
 /**
@@ -1972,30 +1994,6 @@ function format(value, { base, quote, format }) {
     })(format, formatData);
 }
 
-// Taken from https://github.com/material-shell/material-shell/blob/main/src/utils/gjs.ts
-/// Decorator function to call `GObject.registerClass` with the given class.
-/// Use like
-/// ```
-/// @registerGObjectClass
-/// export class MyThing extends GObject.Object { ... }
-/// ```
-function registerGObjectClass(target) {
-    // Note that we use 'hasOwnProperty' because otherwise we would get inherited meta infos.
-    // This would be bad because we would inherit the GObjectName too, which is supposed to be unique.
-    if (Object.prototype.hasOwnProperty.call(target, 'metaInfo')) {
-        // eslint-disable-next-line
-        // @ts-ignore
-        // eslint-disable-next-line
-        return GObject.registerClass(target.metaInfo, target);
-    }
-    else {
-        // eslint-disable-next-line
-        // @ts-ignore
-        return GObject.registerClass(target);
-    }
-}
-
-const INDICATORS_KEY = 'indicators';
 const Defaults = {
     api: 'bitstamp',
     base: 'BTC',
@@ -2004,113 +2002,8 @@ const Defaults = {
     show_change: true,
     format: '{v} {qs}',
 };
-class ConfigModel {
-    listStore;
-    iter;
-    column;
-    attributes;
-    constructor(listStore, iter, column = 1) {
-        this.listStore = listStore;
-        this.iter = iter;
-        this.column = column;
-        this.attributes = JSON.parse(this.listStore.get_value(iter, this.column));
-    }
-    set(key, value) {
-        this.attributes[key] = value;
-        this.listStore.set(this.iter, [this.column], [JSON.stringify(this.attributes)]);
-    }
-    get(key) {
-        if (key in this.attributes) {
-            return this.attributes[key];
-        }
-        return Defaults[key];
-    }
-}
-let IndicatorCollectionModel = class IndicatorCollectionModel extends Gtk.ListStore {
-    _settings;
-    Columns = {};
-    constructor(settings) {
-        super();
-        this.Columns = {
-            LABEL: 0,
-            CONFIG: 1,
-        };
-        this.set_column_types([GObject.TYPE_STRING, GObject.TYPE_STRING]);
-        this._settings = settings;
-        this._reloadFromSettings();
-        let flag;
-        const mutex = (func) => function (...args) {
-            if (!flag) {
-                flag = true;
-                func(...args);
-                flag = false;
-            }
-        };
-        this.connect('row-changed', mutex(this._onRowChanged.bind(this)));
-        this.connect('row-inserted', mutex(this._onRowInserted.bind(this)));
-        this.connect('row-deleted', mutex(this._onRowDeleted.bind(this)));
-    }
-    getConfig(iter) {
-        return new ConfigModel(this, iter, this.Columns.CONFIG);
-    }
-    _getLabel(config) {
-        try {
-            return getProvider(config.api).getLabel(config);
-        }
-        catch (e) {
-            console.log(e);
-            return `[unsupported: ${config.api}]`;
-        }
-    }
-    _reloadFromSettings() {
-        this.clear();
-        const configs = this._settings.get_strv(INDICATORS_KEY);
-        Object.keys(configs).forEach((key) => {
-            const json = configs[key];
-            try {
-                const label = this._getLabel(JSON.parse(json));
-                this.set(this.append(), [this.Columns.LABEL, this.Columns.CONFIG], [label, json]);
-            }
-            catch (e) {
-                console.log('error loading indicator config');
-                console.error(e);
-            }
-        });
-    }
-    _writeSettings() {
-        // eslint-disable-next-line
-        let [res, iter] = this.get_iter_first();
-        const configs = [];
-        while (res) {
-            configs.push(this.get_value(iter, this.Columns.CONFIG));
-            res = this.iter_next(iter);
-        }
-        this._settings.set_strv(INDICATORS_KEY, configs);
-    }
-    _onRowChanged(self, path, iter) {
-        const config = this.get_value(iter, this.Columns.CONFIG);
-        this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [
-            this._getLabel(JSON.parse(config)),
-            config,
-        ]);
-        this._writeSettings();
-    }
-    _onRowInserted(self, path, iter) {
-        this.set(iter, [this.Columns.LABEL, this.Columns.CONFIG], [
-            this._getLabel(Defaults),
-            JSON.stringify(Defaults),
-        ]);
-        this._writeSettings();
-    }
-    _onRowDeleted(_self, _path, _iter) {
-        this._writeSettings();
-    }
-};
-IndicatorCollectionModel = __decorate([
-    registerGObjectClass
-], IndicatorCollectionModel);
 
-const INDICATORS_KEY$1 = 'indicators';
+const INDICATORS_KEY = 'indicators';
 const FIRST_RUN_KEY = 'first-run';
 const _Symbols = {
     error: '\u26A0',
@@ -2264,11 +2157,11 @@ class IndicatorCollection {
                 console.error(e);
             }
         };
-        this._settingsChangedId = this.settings.connect('changed::' + INDICATORS_KEY$1, tryUpdateIndicators);
+        this._settingsChangedId = this.settings.connect('changed::' + INDICATORS_KEY, tryUpdateIndicators);
         tryUpdateIndicators();
     }
     _initDefaults() {
-        this.settings.set_strv(INDICATORS_KEY$1, [Defaults].map((v) => JSON.stringify(v)));
+        this.settings.set_strv(INDICATORS_KEY, [Defaults].map((v) => JSON.stringify(v)));
     }
     _upgradeSettings() {
         function applyDefaults(options) {
@@ -2292,14 +2185,14 @@ class IndicatorCollection {
             return options;
         }
         const updated = this.settings
-            .get_strv(INDICATORS_KEY$1)
+            .get_strv(INDICATORS_KEY)
             .map((v) => JSON.parse(v))
             .map(applyDefaults);
-        this.settings.set_strv(INDICATORS_KEY$1, updated.map((v) => JSON.stringify(v)));
+        this.settings.set_strv(INDICATORS_KEY, updated.map((v) => JSON.stringify(v)));
     }
     _updateIndicators() {
         const arrOptions = this.settings
-            .get_strv(INDICATORS_KEY$1)
+            .get_strv(INDICATORS_KEY)
             .map((str) => {
             try {
                 return JSON.parse(str);
@@ -2343,8 +2236,8 @@ class IndicatorCollection {
     }
 }
 class BitcoinMarketsExtension extends Extension {
-    static instance;
-    _indicatorCollection;
+    static instance = null;
+    _indicatorCollection = null;
     static getInstance() {
         if (!this.instance) {
             throw new Error();
@@ -2365,6 +2258,8 @@ class BitcoinMarketsExtension extends Extension {
     }
     disable() {
         this._indicatorCollection?.destroy();
+        this._indicatorCollection = null;
+        BitcoinMarketsExtension.instance = null;
         removeAllTimeouts();
     }
 }

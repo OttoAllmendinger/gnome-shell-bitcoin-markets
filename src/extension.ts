@@ -2,7 +2,7 @@ import Gio from '@girs/gio-2.0';
 import St from '@girs/st-13';
 import Clutter from '@girs/clutter-13';
 import { Extension, ExtensionMetadata } from '@gnome-shell/extensions/extension';
-import { Subscriber } from './ApiService';
+import { registerGObjectClass } from 'gjs';
 
 import * as Main from '@gnome-shell/ui/main';
 import * as PanelMenu from '@gnome-shell/ui/panelMenu';
@@ -11,12 +11,11 @@ import * as PopupMenu from '@gnome-shell/ui/popupMenu';
 import * as ApiService from './ApiService';
 import * as Format from './format/Format';
 import * as HTTP from './HTTP';
-import { Defaults } from './prefs/IndicatorCollectionModel';
 
 import { Options } from './providers/BaseProvider';
 import { getProvider } from './providers';
 import { removeAllTimeouts } from './timeouts';
-import { registerGObjectClass } from 'gjs';
+import { Defaults } from './defaults';
 
 const INDICATORS_KEY = 'indicators';
 const FIRST_RUN_KEY = 'first-run';
@@ -284,7 +283,7 @@ class IndicatorCollection {
       this._indicators = indicators;
     }
 
-    ApiService.setSubscribers(this._indicators.filter((i) => i.options) as Subscriber[]);
+    ApiService.setSubscribers(this._indicators.filter((i) => i.options) as ApiService.Subscriber[]);
   }
 
   _removeAll() {
@@ -300,8 +299,8 @@ class IndicatorCollection {
 }
 
 export default class BitcoinMarketsExtension extends Extension {
-  static instance?: BitcoinMarketsExtension;
-  _indicatorCollection?: IndicatorCollection;
+  static instance: BitcoinMarketsExtension | null = null;
+  _indicatorCollection: IndicatorCollection | null = null;
 
   static getInstance(): BitcoinMarketsExtension {
     if (!this.instance) {
@@ -326,6 +325,8 @@ export default class BitcoinMarketsExtension extends Extension {
 
   disable(): void {
     this._indicatorCollection?.destroy();
+    this._indicatorCollection = null;
+    BitcoinMarketsExtension.instance = null;
     removeAllTimeouts();
   }
 }

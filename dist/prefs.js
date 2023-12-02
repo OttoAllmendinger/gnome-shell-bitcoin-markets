@@ -927,7 +927,6 @@ var BaseProviderConfigView$1 = /*#__PURE__*/Object.freeze({
     BaseProviderConfigView: BaseProviderConfigView
 });
 
-const INDICATORS_KEY = 'indicators';
 const Defaults = {
     api: 'bitstamp',
     base: 'BTC',
@@ -936,6 +935,8 @@ const Defaults = {
     show_change: true,
     format: '{v} {qs}',
 };
+
+const INDICATORS_KEY = 'indicators';
 class ConfigModel {
     listStore;
     iter;

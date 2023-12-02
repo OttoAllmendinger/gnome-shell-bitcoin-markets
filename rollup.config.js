@@ -21,7 +21,7 @@ const targetPrefs = targetShellExt({
 const targetGjsHttp = targetShellExt({
   input: 'src/bin/gjs_http.ts',
   output: {
-    file: `${buildPath}/gjs_http.js`,
+    file: `${buildPath}/dev/gjs_http.js`,
     name: 'gjs_http',
   },
 });
