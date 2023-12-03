@@ -1,7 +1,7 @@
 import Gio from '@girs/gio-2.0';
 import St from '@girs/st-13';
 import Clutter from '@girs/clutter-13';
-import { Extension, ExtensionMetadata } from '@gnome-shell/extensions/extension';
+import { Extension, ExtensionBase, ExtensionMetadata } from '@gnome-shell/extensions/extension';
 import { registerGObjectClass } from 'gjs';
 
 import * as Main from '@gnome-shell/ui/main';
@@ -47,7 +47,7 @@ class MarketIndicatorView extends PanelMenu.Button {
 
   // actor!: Clutter.Actor;
 
-  constructor(options) {
+  constructor(private ext: ExtensionBase, options) {
     super(1.0, 'Bitcoin Markets Indicator', false);
     this.providerLabel = '[providerlabel]';
     this._initLayout();
@@ -99,7 +99,7 @@ class MarketIndicatorView extends PanelMenu.Button {
     this._popupItemSettings = new PopupMenu.PopupMenuItem('Settings');
     this.menu.addMenuItem(this._popupItemSettings);
     this._popupItemSettings.connect('activate', () => {
-      BitcoinMarketsExtension.getInstance().openPreferences();
+      this.ext.openPreferences();
     });
   }
 
@@ -182,14 +182,9 @@ class IndicatorCollection {
   private _indicators: InstanceType<typeof MarketIndicatorView>[];
   private _settingsChangedId: number;
 
-  constructor() {
+  constructor(private ext: ExtensionBase) {
+    this.settings = ext.getSettings();
     this._indicators = [];
-
-    this.settings = BitcoinMarketsExtension.getInstance().getSettings();
-
-    if (!this.settings) {
-      throw new Error('No settings');
-    }
 
     if (this.settings.get_boolean(FIRST_RUN_KEY)) {
       this._initDefaults();
@@ -275,7 +270,7 @@ class IndicatorCollection {
     } else {
       this._removeAll();
       const indicators = arrOptions.map((options) => {
-        return new MarketIndicatorView(options);
+        return new MarketIndicatorView(this.ext, options);
       });
       indicators.forEach((view, i) => {
         Main.panel.addToStatusArea(`bitcoin-market-indicator-${i}`, view);
@@ -299,25 +294,15 @@ class IndicatorCollection {
 }
 
 export default class BitcoinMarketsExtension extends Extension {
-  static instance: BitcoinMarketsExtension | null = null;
   _indicatorCollection: IndicatorCollection | null = null;
-
-  static getInstance(): BitcoinMarketsExtension {
-    if (!this.instance) {
-      throw new Error();
-    }
-
-    return this.instance;
-  }
 
   constructor(props: ExtensionMetadata) {
     super(props);
-    BitcoinMarketsExtension.instance = this;
   }
 
   enable(): void {
     try {
-      this._indicatorCollection = new IndicatorCollection();
+      this._indicatorCollection = new IndicatorCollection(this);
     } catch (e) {
       console.log(e);
     }
@@ -326,7 +311,6 @@ export default class BitcoinMarketsExtension extends Extension {
   disable(): void {
     this._indicatorCollection?.destroy();
     this._indicatorCollection = null;
-    BitcoinMarketsExtension.instance = null;
     removeAllTimeouts();
   }
 }

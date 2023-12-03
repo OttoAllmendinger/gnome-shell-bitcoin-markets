@@ -2013,6 +2013,7 @@ const _Symbols = {
     unchanged: ' ',
 };
 let MarketIndicatorView = class MarketIndicatorView extends Button {
+    ext;
     options;
     providerLabel;
     _indicatorView;
@@ -2020,8 +2021,9 @@ let MarketIndicatorView = class MarketIndicatorView extends Button {
     _popupItemStatus;
     _popupItemSettings;
     // actor!: Clutter.Actor;
-    constructor(options) {
+    constructor(ext, options) {
         super(1.0, 'Bitcoin Markets Indicator', false);
+        this.ext = ext;
         this.providerLabel = '[providerlabel]';
         this._initLayout();
         this.setOptions(options);
@@ -2063,7 +2065,7 @@ let MarketIndicatorView = class MarketIndicatorView extends Button {
         this._popupItemSettings = new PopupMenuItem('Settings');
         this.menu.addMenuItem(this._popupItemSettings);
         this._popupItemSettings.connect('activate', () => {
-            BitcoinMarketsExtension.getInstance().openPreferences();
+            this.ext.openPreferences();
         });
     }
     getChange(lastValue, newValue) {
@@ -2133,15 +2135,14 @@ MarketIndicatorView = __decorate([
     registerGObjectClass
 ], MarketIndicatorView);
 class IndicatorCollection {
+    ext;
     settings;
     _indicators;
     _settingsChangedId;
-    constructor() {
+    constructor(ext) {
+        this.ext = ext;
+        this.settings = ext.getSettings();
         this._indicators = [];
-        this.settings = BitcoinMarketsExtension.getInstance().getSettings();
-        if (!this.settings) {
-            throw new Error('No settings');
-        }
         if (this.settings.get_boolean(FIRST_RUN_KEY)) {
             this._initDefaults();
             this.settings.set_boolean(FIRST_RUN_KEY, false);
@@ -2216,7 +2217,7 @@ class IndicatorCollection {
         else {
             this._removeAll();
             const indicators = arrOptions.map((options) => {
-                return new MarketIndicatorView(options);
+                return new MarketIndicatorView(this.ext, options);
             });
             indicators.forEach((view, i) => {
                 panel.addToStatusArea(`bitcoin-market-indicator-${i}`, view);
@@ -2236,21 +2237,13 @@ class IndicatorCollection {
     }
 }
 class BitcoinMarketsExtension extends Extension {
-    static instance = null;
     _indicatorCollection = null;
-    static getInstance() {
-        if (!this.instance) {
-            throw new Error();
-        }
-        return this.instance;
-    }
     constructor(props) {
         super(props);
-        BitcoinMarketsExtension.instance = this;
     }
     enable() {
         try {
-            this._indicatorCollection = new IndicatorCollection();
+            this._indicatorCollection = new IndicatorCollection(this);
         }
         catch (e) {
             console.log(e);
@@ -2259,7 +2252,6 @@ class BitcoinMarketsExtension extends Extension {
     disable() {
         this._indicatorCollection?.destroy();
         this._indicatorCollection = null;
-        BitcoinMarketsExtension.instance = null;
         removeAllTimeouts();
     }
 }
