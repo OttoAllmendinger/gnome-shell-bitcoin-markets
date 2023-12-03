@@ -1,14 +1,14 @@
-import St from 'gi://St?version=13';
-import Clutter from 'gi://Clutter?version=13';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import GObject from 'gi://GObject?version=2.0';
+import GObject from 'gi://GObject';
 import { panel } from 'resource:///org/gnome/shell/ui/main.js';
 import { Button } from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import { PopupMenuItem, PopupSeparatorMenuItem } from 'resource:///org/gnome/shell/ui/popupMenu.js';
-import GLib from 'gi://GLib?version=2.0';
+import GLib from 'gi://GLib';
 import { PACKAGE_VERSION } from 'resource:///org/gnome/shell/misc/config.js';
-import Soup from 'gi://Soup?version=3.0';
-import Gio from 'gi://Gio?version=2.0';
+import Soup from 'gi://Soup';
+import Gio from 'gi://Gio';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.

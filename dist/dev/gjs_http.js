@@ -1,6 +1,6 @@
-import Soup from 'gi://Soup?version=3.0';
-import Gio from 'gi://Gio?version=2.0';
-import GLib from 'gi://GLib?version=2.0';
+import Soup from 'gi://Soup';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 
 function _promisify(cls, function_name) {
     Gio._promisify(cls, function_name, undefined);
