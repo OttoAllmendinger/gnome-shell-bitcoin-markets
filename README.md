@@ -21,10 +21,12 @@ Available APIs:
 - Coinbase
 - CryptoCompare
 - FTX exchange
+- Gate.io
 - HitBTC
 - Huobi
 - Kraken
 - Kucoin
+- MEXC
 - Paymium
 - Satang.pro
 - TomoX(TomoChain)
@@ -43,6 +45,7 @@ The latest development version can be installed manually with these commands
 
         git clone https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets.git
         cd gnome-shell-bitcoin-markets
+        make
         make install
 
 Then go to https://extensions.gnome.org/local/ to turn on the extension or use
@@ -109,6 +112,7 @@ On most systems you can use `journalctl /usr/bin/gnome-shell -f` to get log outp
 - https://github.com/luissantos - Bittrex support
 - https://github.com/omerta - Buda support
 - https://github.com/sha-265 - Bit2C support
+- https://github.com/proro485 - Gate.io, MEXC support
 
 ## Tips
 
