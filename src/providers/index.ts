@@ -18,10 +18,12 @@ import * as ProviderCoinbase from './ProviderCoinbase';
 import * as ProviderCoinGecko from './ProviderCoinGecko';
 import * as ProviderCryptoCompare from './ProviderCryptoCompare';
 import * as ProviderFtx from './ProviderFtx';
+import * as ProviderGate from './ProviderGate';
 import * as ProviderHitBTC from './ProviderHitBTC';
 import * as ProviderHuobi from './ProviderHuobi';
 import * as ProviderKraken from './ProviderKraken';
 import * as ProviderKucoin from './ProviderKucoin';
+import * as ProviderMEXC from './ProviderMEXC';
 import * as ProviderPaymium from './ProviderPaymium';
 import * as ProviderPoloniex from './ProviderBitPay';
 import * as ProviderSatangPro from './ProviderSatangPro';
@@ -49,10 +51,12 @@ export const Providers: Record<string, BaseProvider.Api> = {
   coingecko: new ProviderCoinGecko.Api(),
   cryptocompare: new ProviderCryptoCompare.Api(),
   ftx: new ProviderFtx.Api(),
+  gate: new ProviderGate.Api(),
   hitbtc: new ProviderHitBTC.Api(),
   huobi: new ProviderHuobi.Api(),
   kraken: new ProviderKraken.Api(),
   kucoin: new ProviderKucoin.Api(),
+  mexc: new ProviderMEXC.Api(),
   paymium: new ProviderPaymium.Api(),
   poloniex: new ProviderPoloniex.Api(),
   satangpro: new ProviderSatangPro.Api(),
