@@ -27,6 +27,8 @@ import * as ProviderPoloniex from './ProviderBitPay';
 import * as ProviderSatangPro from './ProviderSatangPro';
 import * as ProviderTomoX from './ProviderTomoX';
 import * as ProviderVccExchange from './ProviderVccExchange';
+import * as ProviderBybit from './ProviderBybit';
+import * as ProviderBybitPerpetual from './ProviderBybitPerpetual';
 
 export const Providers: Record<string, BaseProvider.Api> = {
   binance: new ProviderBinance.Api(),
@@ -40,6 +42,8 @@ export const Providers: Record<string, BaseProvider.Api> = {
   bittrex: new ProviderBittrex.Api(),
   btcmarkets: new ProviderBTCMarkets.Api(),
   buda: new ProviderBuda.Api(),
+  bybit: new ProviderBybit.Api(),
+  bybitPerpetual: new ProviderBybitPerpetual.Api(),
   cexio: new ProviderCexio.Api(),
   coinbase: new ProviderCoinbase.Api(),
   coingecko: new ProviderCoinGecko.Api(),

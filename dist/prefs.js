@@ -714,6 +714,58 @@ class Api$o extends Api {
     }
 }
 
+class Api$p extends Api {
+    apiName = 'Bybit';
+    apiDocs = [
+        ['API Docs', 'https://bybit-exchange.github.io/docs/v5/market/tickers'],
+        ['Symbols', 'https://bybit-exchange.github.io/docs/v5/enum#symbol'],
+    ];
+    /* quote https://bybit-exchange.github.io/docs/v5/rate-limit
+     *
+     * `No more than 120 requests are allowed in any 5-second window.`
+     */
+    interval = 10;
+    getUrl({ base, quote }) {
+        const symbol = `${base}${quote}`.toUpperCase();
+        return `https://api.bybit.com/v5/market/tickers?category=spot&symbol=${symbol}`;
+    }
+    getLast(data) {
+        if (data.retMsg !== 'OK') {
+            throw new Error(data.retMsg);
+        }
+        return data.result.list[0].lastPrice;
+    }
+    getDefaultTicker() {
+        return { base: 'BTC', quote: 'USDT' };
+    }
+}
+
+class Api$q extends Api {
+    apiName = 'Bybit Perpetual';
+    apiDocs = [
+        ['API Docs', 'https://bybit-exchange.github.io/docs/v5/market/tickers'],
+        ['Symbols', 'https://bybit-exchange.github.io/docs/v5/enum#symbol'],
+    ];
+    /* quote https://bybit-exchange.github.io/docs/v5/rate-limit
+     *
+     * `No more than 120 requests are allowed in any 5-second window.`
+     */
+    interval = 10;
+    getUrl({ base, quote }) {
+        const symbol = `${base}${quote}`.toUpperCase();
+        return `https://api.bybit.com/v5/market/tickers?category=linear&symbol=${symbol}`;
+    }
+    getLast(data) {
+        if (data.retMsg !== 'OK') {
+            throw new Error(data.retMsg);
+        }
+        return data.result.list[0].lastPrice;
+    }
+    getDefaultTicker() {
+        return { base: 'BTC', quote: 'USDT' };
+    }
+}
+
 const Providers = {
     binance: new Api$1(),
     binanceFutures: new Api$2(),
@@ -726,6 +778,8 @@ const Providers = {
     bittrex: new Api$9(),
     btcmarkets: new Api$b(),
     buda: new Api$a(),
+    bybit: new Api$p(),
+    bybitPerpetual: new Api$q(),
     cexio: new Api$c(),
     coinbase: new Api$d(),
     coingecko: new Api$e(),

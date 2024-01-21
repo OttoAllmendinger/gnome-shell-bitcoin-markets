@@ -16,6 +16,8 @@ Available APIs:
 - Bitstamp
 - Bittrex
 - Buda
+- Bybit
+- Bybit Perpetual
 - CEX.IO
 - CoinGecko
 - Coinbase
