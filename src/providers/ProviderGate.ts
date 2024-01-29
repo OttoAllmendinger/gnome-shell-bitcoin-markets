@@ -5,18 +5,17 @@ export class Api extends BaseProvider.Api {
 
   apiDocs = [['API Docs', 'https://www.gate.io/docs/developers/apiv4']];
 
-  interval = 10; // unknown, guessing
+  interval = 60; // unknown, guessing
 
   getUrl({ base, quote }) {
-    return `https://api.gateio.ws/api/v4/spot/currency_pairs/${base}_${quote}`;
+    return `https://api.gateio.ws/api/v4/spot/tickers?currency_pair=${base}_${quote}`;
   }
 
   getLast(data) {
-    if (data.error) {
-      throw new Error(data.error);
+    if (!Array.isArray(data) || data.length !== 1) {
+      throw new Error('invalid response');
     }
-
-    return data.ll;
+    return data[0].last;
   }
 
   getDefaultTicker(): BaseProvider.Ticker {

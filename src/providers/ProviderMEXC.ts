@@ -8,15 +8,12 @@ export class Api extends BaseProvider.Api {
   interval = 10; // unknown, guessing
 
   getUrl({ base, quote }) {
+    // https://mexcdevelop.github.io/apidocs/spot_v3_en/#symbol-price-ticker
     return `https://api.mexc.com/api/v3/ticker/price?symbol=${base}${quote}`;
   }
 
   getLast(data) {
-    if (data.error) {
-      throw new Error(data.error);
-    }
-
-    return data.ll;
+    return data.price;
   }
 
   getDefaultTicker(): BaseProvider.Ticker {

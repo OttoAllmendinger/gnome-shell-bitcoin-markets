@@ -541,6 +541,24 @@ class Api$g extends Api {
 }
 
 class Api$h extends Api {
+    apiName = 'Gate.io';
+    apiDocs = [['API Docs', 'https://www.gate.io/docs/developers/apiv4']];
+    interval = 60; // unknown, guessing
+    getUrl({ base, quote }) {
+        return `https://api.gateio.ws/api/v4/spot/tickers?currency_pair=${base}_${quote}`;
+    }
+    getLast(data) {
+        if (!Array.isArray(data) || data.length !== 1) {
+            throw new Error('invalid response');
+        }
+        return data[0].last;
+    }
+    getDefaultTicker() {
+        return { base: 'BTC', quote: 'USDT' };
+    }
+}
+
+class Api$i extends Api {
     apiName = 'HitBTC';
     apiDocs = [['API Docs', 'https://api.hitbtc.com/']];
     interval = 15;
@@ -552,7 +570,7 @@ class Api$h extends Api {
     }
 }
 
-class Api$i extends Api {
+class Api$j extends Api {
     apiName = 'Huobi';
     apiDocs = [['API Docs', 'https://huobiapi.github.io/docs/spot/v1/en/#introduction']];
     // Each API Key can send maximum of 100 https requests within 10 seconds
@@ -572,7 +590,7 @@ class Api$i extends Api {
     }
 }
 
-class Api$j extends Api {
+class Api$k extends Api {
     apiName = 'Kraken';
     apiDocs = [
         ['API Docs', 'https://www.kraken.com/help/api#public-market-data'],
@@ -597,7 +615,7 @@ class Api$j extends Api {
     }
 }
 
-class Api$k extends Api {
+class Api$l extends Api {
     apiName = 'Kucoin';
     apiDocs = [['API Docs', 'https://docs.kucoin.com/']];
     interval = 15;
@@ -615,7 +633,23 @@ class Api$k extends Api {
     }
 }
 
-class Api$l extends Api {
+class Api$m extends Api {
+    apiName = 'MEXC';
+    apiDocs = [['API Docs', 'https://mexcdevelop.github.io/apidocs/spot_v3_en']];
+    interval = 10; // unknown, guessing
+    getUrl({ base, quote }) {
+        // https://mexcdevelop.github.io/apidocs/spot_v3_en/#symbol-price-ticker
+        return `https://api.mexc.com/api/v3/ticker/price?symbol=${base}${quote}`;
+    }
+    getLast(data) {
+        return data.price;
+    }
+    getDefaultTicker() {
+        return { base: 'BTC', quote: 'USDT' };
+    }
+}
+
+class Api$n extends Api {
     apiName = 'Paymium';
     apiDocs = [['API Docs', 'https://github.com/Paymium/api-documentation#ticker']];
     interval = 60; // unclear, should be safe
@@ -637,7 +671,7 @@ class Api$l extends Api {
     }
 }
 
-class Api$m extends Api {
+class Api$o extends Api {
     apiName = 'Satang.pro';
     apiDocs = [['API Docs', 'https://docs.satang.pro/apis/public/orders']];
     interval = 60; // unclear, should be safe
@@ -673,7 +707,7 @@ function getTokenInfo(code) {
     }
     return tokenInfo[code];
 }
-class Api$n extends Api {
+class Api$p extends Api {
     apiName = 'TomoX(TomoChain)';
     apiDocs = [['API Docs', 'https://apidocs.tomochain.com/#tomodex-apis-trades']];
     interval = 15;
@@ -696,7 +730,7 @@ class Api$n extends Api {
     }
 }
 
-class Api$o extends Api {
+class Api$q extends Api {
     apiName = 'VccExchange(Vietnam)';
     apiDocs = [['API Docs', 'https://vcc.exchange/api']];
     interval = 15;
@@ -714,7 +748,7 @@ class Api$o extends Api {
     }
 }
 
-class Api$p extends Api {
+class Api$r extends Api {
     apiName = 'Bybit';
     apiDocs = [
         ['API Docs', 'https://bybit-exchange.github.io/docs/v5/market/tickers'],
@@ -740,7 +774,7 @@ class Api$p extends Api {
     }
 }
 
-class Api$q extends Api {
+class Api$s extends Api {
     apiName = 'Bybit Perpetual';
     apiDocs = [
         ['API Docs', 'https://bybit-exchange.github.io/docs/v5/market/tickers'],
@@ -778,22 +812,24 @@ const Providers = {
     bittrex: new Api$9(),
     btcmarkets: new Api$b(),
     buda: new Api$a(),
-    bybit: new Api$p(),
-    bybitPerpetual: new Api$q(),
+    bybit: new Api$r(),
+    bybitPerpetual: new Api$s(),
     cexio: new Api$c(),
     coinbase: new Api$d(),
     coingecko: new Api$e(),
     cryptocompare: new Api$f(),
     ftx: new Api$g(),
-    hitbtc: new Api$h(),
-    huobi: new Api$i(),
-    kraken: new Api$j(),
-    kucoin: new Api$k(),
-    paymium: new Api$l(),
+    gate: new Api$h(),
+    hitbtc: new Api$i(),
+    huobi: new Api$j(),
+    kraken: new Api$k(),
+    kucoin: new Api$l(),
+    mexc: new Api$m(),
+    paymium: new Api$n(),
     poloniex: new Api$6(),
-    satangpro: new Api$m(),
-    tomox: new Api$n(),
-    vccexchange: new Api$o(),
+    satangpro: new Api$o(),
+    tomox: new Api$p(),
+    vccexchange: new Api$q(),
 };
 function getProvider(name) {
     if (name in Providers) {
