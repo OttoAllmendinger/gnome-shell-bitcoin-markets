@@ -80,10 +80,10 @@ class MarketIndicatorView extends PanelMenu.Button {
       style_class: 'status',
     });
 
-    layout.add_actor(this._statusView);
-    layout.add_actor(this._indicatorView);
+    layout.add_child(this._statusView);
+    layout.add_child(this._indicatorView);
 
-    this.add_actor(layout);
+    this.add_child(layout);
 
     this._popupItemStatus = new PopupMenu.PopupMenuItem('', {
       activate: false,

@@ -2140,9 +2140,9 @@ let MarketIndicatorView = class MarketIndicatorView extends Button {
             y_align: Clutter.ActorAlign.CENTER,
             style_class: 'status',
         });
-        layout.add_actor(this._statusView);
-        layout.add_actor(this._indicatorView);
-        this.add_actor(layout);
+        layout.add_child(this._statusView);
+        layout.add_child(this._indicatorView);
+        this.add_child(layout);
         this._popupItemStatus = new PopupMenuItem('', {
             activate: false,
             hover: false,
