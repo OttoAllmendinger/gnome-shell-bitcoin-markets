@@ -1,6 +1,6 @@
 # Maintainers needed
 
-Please contact me at otto.allmendinger@gmal.com if you want to maintain this extension
+Please contact me at otto.allmendinger@gmail.com if you want to maintain this extension
 
 # gnome-shell-bitcoin-markets
 
