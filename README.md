@@ -1,3 +1,10 @@
+# Maintainers needed
+
+Please contact me at otto.allmendinger@gmal.com if you want to maintain this extension
+
+# gnome-shell-bitcoin-markets
+
+
 ![Screenshot](https://github.com/OttoAllmendinger/gnome-shell-bitcoin-markets/blob/master/data/screenshot.png?raw=true)
 
 Displays Bitcoin and Altcoin market information in the Gnome Shell.
