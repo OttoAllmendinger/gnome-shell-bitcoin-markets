@@ -36,6 +36,7 @@ Available APIs:
 - Kraken
 - Kucoin
 - MEXC
+- Nobitex
 - Paymium
 - Satang.pro
 - TomoX(TomoChain)
@@ -122,6 +123,7 @@ On most systems you can use `journalctl /usr/bin/gnome-shell -f` to get log outp
 - https://github.com/omerta - Buda support
 - https://github.com/sha-265 - Bit2C support
 - https://github.com/proro485 - Gate.io, MEXC support
+- https://github.com/itismoej - Nobitex support
 
 ## Tips
 
