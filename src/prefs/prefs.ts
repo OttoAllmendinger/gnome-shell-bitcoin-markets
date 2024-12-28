@@ -10,7 +10,7 @@ import { getProvider, Providers } from '../providers';
 import * as BaseProviderConfigView from './BaseProviderConfigView';
 
 const { ComboBoxView, makeConfigRow } = BaseProviderConfigView;
-import { IndicatorCollectionModel } from './IndicatorCollectionModel';
+import { ConfigModel, IndicatorCollectionModel } from './IndicatorCollectionModel';
 import { GettextFunc } from './gettext';
 
 export interface ComboBoxOptions {
@@ -29,13 +29,13 @@ function getMarginAll(v: number) {
 }
 
 class IndicatorConfigView {
-  private _indicatorConfig: any;
+  public widget: Gtk.Box;
+  private _indicatorConfig: ConfigModel;
   private _layoutIndicatorSettings: Gtk.Box;
-  private widget: Gtk.Box;
   private _layoutProviderSettings: Gtk.Box;
   private _apiConfigView?: BaseProviderConfigView.BaseProviderConfigView;
 
-  constructor(private gettext: GettextFunc, indicatorConfig) {
+  constructor(private gettext: GettextFunc, indicatorConfig: ConfigModel) {
     const margin = 8;
 
     this._indicatorConfig = indicatorConfig;
@@ -169,7 +169,7 @@ class BitcoinMarketsSettingsWidget extends Gtk.Box {
   private _selection?: Gtk.TreeSelection;
   private _toolbar?: Gtk.Box;
   private _delButton?: Gtk.Button;
-  private _indicatorConfigView: any;
+  private _indicatorConfigView: IndicatorConfigView | null = null;
 
   constructor(ext: ExtensionBase) {
     super({
@@ -261,10 +261,9 @@ class BitcoinMarketsSettingsWidget extends Gtk.Box {
     this._updateToolbar();
   }
 
-  _showIndicatorConfig(indicatorConfig) {
+  _showIndicatorConfig(indicatorConfig: ConfigModel | null) {
     if (this._indicatorConfigView) {
       this._configLayout!.remove(this._indicatorConfigView.widget);
-      this._indicatorConfigView.destroy();
       this._indicatorConfigView = null;
     }
 

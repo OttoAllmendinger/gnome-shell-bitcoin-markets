@@ -1160,9 +1160,9 @@ function getMarginAll(v) {
 }
 class IndicatorConfigView {
     gettext;
+    widget;
     _indicatorConfig;
     _layoutIndicatorSettings;
-    widget;
     _layoutProviderSettings;
     _apiConfigView;
     constructor(gettext, indicatorConfig) {
@@ -1272,7 +1272,7 @@ let BitcoinMarketsSettingsWidget = class BitcoinMarketsSettingsWidget extends Gt
     _selection;
     _toolbar;
     _delButton;
-    _indicatorConfigView;
+    _indicatorConfigView = null;
     constructor(ext) {
         super({
             orientation: Gtk.Orientation.HORIZONTAL,
@@ -1344,7 +1344,6 @@ let BitcoinMarketsSettingsWidget = class BitcoinMarketsSettingsWidget extends Gt
     _showIndicatorConfig(indicatorConfig) {
         if (this._indicatorConfigView) {
             this._configLayout.remove(this._indicatorConfigView.widget);
-            this._indicatorConfigView.destroy();
             this._indicatorConfigView = null;
         }
         if (indicatorConfig === null) {

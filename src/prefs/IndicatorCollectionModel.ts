@@ -8,7 +8,7 @@ import { Defaults } from '../defaults';
 
 const INDICATORS_KEY = 'indicators';
 
-class ConfigModel {
+export class ConfigModel {
   private attributes: Record<string, unknown>;
 
   constructor(private listStore: Gtk.ListStore, private iter: Gtk.TreeIter, private column = 1) {

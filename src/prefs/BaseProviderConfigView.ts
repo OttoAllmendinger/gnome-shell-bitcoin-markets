@@ -7,6 +7,7 @@ import { getProvider } from '../providers';
 import { registerGObjectClass } from '../gjs';
 
 import { ComboBoxOptions } from './prefs';
+import { ConfigModel } from './IndicatorCollectionModel'
 
 export function makeConfigRow(description: string, widget: Gtk.Widget): Gtk.Widget {
   const box = new Gtk.Box({
@@ -110,10 +111,10 @@ export class BaseProviderConfigView {
   private _api: string;
   private _provider: BaseProvider.Api;
   private _configWidget: Gtk.Box;
-  private _indicatorConfig;
+  private _indicatorConfig: ConfigModel;
   private _widgets: Gtk.Widget[];
 
-  constructor(gettext: GettextFunc, api: string, configWidget: Gtk.Box, indicatorConfig: ComboBoxOptions) {
+  constructor(gettext: GettextFunc, api: string, configWidget: Gtk.Box, indicatorConfig: ConfigModel) {
     this.gettext = gettext;
     this._api = api;
     this._provider = getProvider(api);
