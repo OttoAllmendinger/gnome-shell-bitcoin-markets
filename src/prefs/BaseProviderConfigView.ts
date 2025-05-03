@@ -171,7 +171,7 @@ export class BaseProviderConfigView {
         if (!entry.text) {
           throw new Error();
         }
-        if (entry.text.length < 2) {
+        if (entry.text.length < 1) {
           return;
         }
         this._indicatorConfig.set(key, entry.text.toUpperCase());
